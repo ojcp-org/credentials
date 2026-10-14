@@ -859,7 +859,7 @@ export function Assistant() {
               <IconInfoCircle size={12} color="gray" />
               <Text size="xs" c="dimmed">
                 Sandbox: made-up employers.{" "}
-                <Anchor href={`${boot.origins.home}/`} size="xs">
+                <Anchor href={`${boot.origins.home}/hood`} size="xs">
                   See what happens under the hood
                 </Anchor>
               </Text>

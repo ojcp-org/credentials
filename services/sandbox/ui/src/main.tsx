@@ -12,6 +12,7 @@ import { Hood } from "./personas/Hood.tsx";
 import { Hr } from "./personas/Hr.tsx";
 import { Registry } from "./personas/Registry.tsx";
 import { Wallet } from "./personas/Wallet.tsx";
+import { Welcome } from "./personas/Welcome.tsx";
 import { themeFor } from "./theme.ts";
 
 function Persona() {
@@ -23,7 +24,7 @@ function Persona() {
     case "agent":
       return <Assistant />;
     case "home":
-      return <Hood />;
+      return location.pathname === "/hood" ? <Hood /> : <Welcome />;
     case "attestA":
     case "attestB":
     case "lists":

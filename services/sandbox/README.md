@@ -8,6 +8,8 @@ It covers hiring credentials and their issuer profile ([RFC 0014](https://github
 
 ## The five tabs
 
+`sandbox.` opens on a plain welcome: the story in two sentences, who's who, three things to watch for, and **Start the story**. No protocol terms until you ask for them.
+
 Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, where the story is ("Step 6 of 10", with a **Next** button that takes you to the right site), all ten steps, and Jordan's inbox for codes. Clicking a tab goes to that party's own origin, so cookies, signatures and wallet requests work exactly as between separate companies. Below the bar, each site has its own look, so it's always clear whose screen you're on.
 
 | Tab | Persona | Origin | What happens |
@@ -16,9 +18,9 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 | 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
 | 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
 | 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
-| 5 · Under the hood | Anyone evaluating OJCP | `sandbox.` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any of the sandbox's providers. The attesters' and trust list's own pages show what each vouched for and what it's doing. |
+| 5 · Under the hood | Anyone evaluating OJCP | `sandbox.…/hood` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any of the sandbox's providers. The attesters' and trust list's own pages show what each vouched for and what it's doing. |
 
-On every page, short plain-English lines slide in at the corner as things happen anywhere in the sandbox: JobGPT asking for permission, an employer checking it, the wallet checking who's asking, an attester suspending a site. Only moments an event marks with `say` appear; the speaker button turns them off. Under the hood keeps the full technical record.
+On every page, short plain-English lines slide in at the corner as things happen anywhere in the sandbox: JobGPT asking for permission, an employer checking it, the wallet checking who's asking, an attester suspending a site. Only moments an event marks with `say` appear; the speaker button turns them off. A line still being read follows you to the next page, across redirects and origins, with its countdown carried on. Under the hood keeps the full technical record.
 
 With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which calls the same functions as the buttons. It never sees a credential, a key or a wallet record. Without it, the assistant runs scripted, with suggested replies.
 
@@ -34,7 +36,7 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 
 | Host (under `sandbox.ojcp.dev`, or `sandbox.lvh.me:8443` locally) | Role |
 |---|---|
-| `sandbox.` | Under the hood |
+| `sandbox.` | The welcome (`/`) and Under the hood (`/hood`) |
 | `hr.` | ExamplePeople, the HR platform: an RFC 0014 issuer (`services/issuer`) |
 | `wallet.` | Jordan's wallet |
 | `agent.` | JobGPT, Jordan's assistant: an agent platform built on `@ojcp/agent-wallet` |

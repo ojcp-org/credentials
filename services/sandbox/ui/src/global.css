@@ -129,7 +129,7 @@ a {
   background: #e8a830;
   opacity: 0.5;
   transform-origin: left;
-  animation: narration-life var(--life) linear forwards;
+  animation: narration-life var(--life) linear var(--life-spent, 0ms) forwards;
 }
 
 .narrator:hover .narration-life {

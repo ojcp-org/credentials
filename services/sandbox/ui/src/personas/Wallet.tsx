@@ -755,7 +755,7 @@ export function Wallet() {
   return (
     <Phone title="Your wallet">
       <Home />
-      <Anchor href={`${boot.origins.home}/`} size="xs" c="dimmed" ta="center">
+      <Anchor href={`${boot.origins.home}/hood`} size="xs" c="dimmed" ta="center">
         How the wallet decides what to trust
       </Anchor>
     </Phone>

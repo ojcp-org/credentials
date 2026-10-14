@@ -34,6 +34,8 @@ interface Toast extends Narrated {
   say: string;
   /** When it appeared here, in page time, for its countdown. */
   shown: number;
+  /** How far its countdown had run when it arrived on this page. */
+  spent: number;
 }
 
 const WHO: Record<string, { label: string; icon: typeof IconWallet; color: string }> = {
@@ -65,12 +67,14 @@ export function Narrator() {
   useEffect(() => {
     if (muted) return;
     let live = true;
-    // Undefined until the first load, which only finds where "now" is: no replaying history.
+    // Undefined until the first load. Each page is a fresh load on its own origin
+    // (a redirect, a link to the wallet), so the first load picks up the lines
+    // still within their reading time, with their countdown carried on.
     let since: number | undefined;
     let world: string | undefined;
     const load = async () => {
       const page = await fetch(`/_sandbox/events?since=${since ?? 0}`)
-        .then((r) => r.json() as Promise<{ world: string; events: Narrated[] }>)
+        .then((r) => r.json() as Promise<{ world: string; now: number; events: Narrated[] }>)
         .catch(() => undefined);
       if (!live || !page) return;
       // A reset built a new world, whose ids start again: narrate it from its start.
@@ -82,10 +86,18 @@ export function Narrator() {
       world = page.world;
       const first = since === undefined;
       since = Math.max(since ?? 0, ...page.events.map((e) => e.id));
-      if (first) return;
-      const fresh = page.events
-        .filter((e): e is Narrated & { say: string } => typeof e.say === "string")
-        .map((e) => ({ ...e, shown: Date.now() }));
+      const said = page.events.filter(
+        (e): e is Narrated & { say: string } => typeof e.say === "string",
+      );
+      // Sandbox time is in seconds, the same clock as events' `at`.
+      const fresh = first
+        ? said
+            .map((e) => {
+              const spent = Math.max(0, (page.now - e.at) * 1000);
+              return { ...e, shown: Date.now() - spent, spent };
+            })
+            .filter((e) => e.spent < lifetime(e.say))
+        : said.map((e) => ({ ...e, shown: Date.now(), spent: 0 }));
       if (fresh.length) setToasts((t) => [...t, ...fresh].slice(-MAX_SHOWN));
     };
     void load();
@@ -141,6 +153,8 @@ export function Narrator() {
               style={{
                 borderLeft: `3px solid ${OUTCOME[t.outcome]}`,
                 ["--life" as string]: `${lifetime(t.say)}ms`,
+                // A line carried over from the previous page resumes its countdown.
+                ["--life-spent" as string]: `-${t.spent}ms`,
               }}
             >
               <Group gap={8} wrap="nowrap" align="flex-start">

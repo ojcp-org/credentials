@@ -68,7 +68,14 @@ interface Story {
   inbox: InboxMessage[];
 }
 
-const TABS: Array<{ tab: Tab; label: string; who: string; role: Role; icon: typeof IconWallet }> = [
+const TABS: Array<{
+  tab: Tab;
+  label: string;
+  who: string;
+  role: Role;
+  path?: string;
+  icon: typeof IconWallet;
+}> = [
   {
     tab: "hr",
     label: "HR",
@@ -97,7 +104,14 @@ const TABS: Array<{ tab: Tab; label: string; who: string; role: Role; icon: type
     role: "acme",
     icon: IconBriefcase,
   },
-  { tab: "hood", label: "Under the hood", who: "How it works", role: "home", icon: IconStack2 },
+  {
+    tab: "hood",
+    label: "Under the hood",
+    who: "How it works",
+    role: "home",
+    path: "hood",
+    icon: IconStack2,
+  },
 ];
 
 const TAB_OF: Partial<Record<Role, Tab>> = {
@@ -115,7 +129,9 @@ const TAB_OF: Partial<Record<Role, Tab>> = {
   lists: "hood",
 };
 
-export const activeTab: Tab | undefined = TAB_OF[boot.role];
+// The welcome page (home's `/`) is before the story, so no tab is lit there.
+export const activeTab: Tab | undefined =
+  boot.role === "home" && location.pathname !== "/hood" ? undefined : TAB_OF[boot.role];
 
 /** The tab a link lands on, from its origin. */
 function tabOfHref(href: string): Tab | undefined {
@@ -292,7 +308,7 @@ export function SandboxBar() {
               <a
                 className="ojcp-tab"
                 data-active={activeTab === t.tab}
-                href={`${boot.origins[t.role]}/`}
+                href={`${boot.origins[t.role]}/${t.path ?? ""}`}
                 aria-label={t.label}
               >
                 <span className="num">{i + 1}</span>

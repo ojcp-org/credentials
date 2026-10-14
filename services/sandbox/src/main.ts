@@ -63,7 +63,8 @@ async function build(): Promise<Sandbox> {
 
 /** The React app's pages on each origin; everything else is the party's own. */
 const PAGES: Partial<Record<Host, RegExp>> = {
-  home: /^\/$/,
+  // The welcome, and the technical view.
+  home: /^\/(hood)?$/,
   agent: /^\/$/,
   hr: /^\/(practice)?$/,
   // The permission service's consent screen is a screen in the wallet app.
@@ -135,7 +136,7 @@ serve(
     console.info(`OJCP sandbox on :${info.port}`);
     for (const h of [...PROVIDER_HOSTS, "issuer", "hr", "wallet"] as const)
       console.info(`  ${running.world.origins.origin(h)}`);
-    console.info(`  start at ${running.world.origins.origin("hr")}/`);
+    console.info(`  start at ${running.world.origins.origin("home")}/`);
     console.info(`  (${Object.keys(HOSTS).length} origins)`);
   },
 );

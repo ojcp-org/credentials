@@ -270,7 +270,7 @@ function TrustList() {
       </SimpleGrid>
       <Text size="xs" c="dimmed" mt="xl">
         Try it: under the hood, the lab's "Distrust an attester" incident lands here.{" "}
-        <Anchor href={`${boot.origins.home}/`} size="xs">
+        <Anchor href={`${boot.origins.home}/hood`} size="xs">
           Open the lab
         </Anchor>
       </Text>

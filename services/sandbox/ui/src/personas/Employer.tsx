@@ -676,7 +676,7 @@ export function Employer() {
         {tab === "jobs" && !isAcme && (
           <Text size="xs" c="dimmed" mt="xl">
             A job site in the OJCP sandbox.{" "}
-            <Anchor href={`${boot.origins.home}/`}>
+            <Anchor href={`${boot.origins.home}/hood`}>
               Who runs it, and does the assistant trust it?
             </Anchor>
           </Text>

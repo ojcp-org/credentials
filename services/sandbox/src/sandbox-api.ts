@@ -144,8 +144,8 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       title: "Under the hood",
       detail:
         "Every message between the parties, the trust network, and what happens when things go wrong.",
-      href: `${o.origin("home")}/`,
-      at: [{ url: `${o.origin("home")}/` }],
+      href: `${o.origin("home")}/hood`,
+      at: [{ url: `${o.origin("home")}/hood` }],
       done: visited.has("hood"),
     },
   ];
@@ -202,8 +202,13 @@ export function sandboxApi(current: () => Sandbox, reset: () => Promise<void>): 
     return c.json({ ok: true });
   });
   app.get("/events", (c) => {
-    const { events } = current().world;
-    return c.json({ world: events.world, events: events.since(Number(c.req.query("since") ?? 0)) });
+    const { events, clock } = current().world;
+    return c.json({
+      world: events.world,
+      // Sandbox time, which events' `at` uses: a page that just loaded picks up lines still being read.
+      now: clock.now(),
+      events: events.since(Number(c.req.query("since") ?? 0)),
+    });
   });
   app.get("/parties", async (c) => {
     const { world, agent } = current();
