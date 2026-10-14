@@ -147,10 +147,10 @@ describe("standing mandate, end to end", () => {
       result: { status: "submitted", retried: true },
     });
     // per_employer is 2: the retry didn't count, so one more is allowed, then none.
+    // The agent refuses at begin, so the candidate is never asked to do work for an
+    // application that can't be sent.
     expect(await apply(world, b)).toMatchObject({ ok: true });
-    await expect(begin(world, c).then(() => apply(world, c))).rejects.toMatchObject({
-      reason: "per_employer_reached",
-    });
+    await expect(begin(world, c)).rejects.toMatchObject({ reason: "per_employer_reached" });
   });
 
   it("keeps credentials for applications however much the agent searches", async () => {

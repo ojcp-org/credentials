@@ -331,8 +331,8 @@ function Lab({ parties, reload }: { parties: Parties; reload: () => void }) {
           Conformance run
         </Text>
         <Text size="sm" c={OJCP.muted} mb="xs">
-          Every case against the provider chosen above. Point the open-source runner,
-          @ojcp/conformance, at your own provider.
+          Every case against the provider chosen above. To test your own provider, run the same
+          cases from this repository's tests against it.
         </Text>
         <Button
           size="xs"

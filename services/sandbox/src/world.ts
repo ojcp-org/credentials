@@ -1,6 +1,6 @@
 /**
  * Builds the sandbox: every party with its own keys and origin, wired the way
- * real ones would be. `reset()` in main replaces the whole world.
+ * real ones would be. Resetting the sandbox builds a new world.
  */
 import { AgentKeyring } from "@ojcp/agent-wallet";
 import {
@@ -10,7 +10,6 @@ import {
   generateSigner,
   type JWK,
   randomBytes,
-  thumbprint,
 } from "@ojcp/credentials-core";
 import { createApp, DirectoryMandateKeySource, InMemoryIssuerStore, Issuer } from "@ojcp/issuer";
 import type { Hono } from "hono";
@@ -19,9 +18,9 @@ import { type Host, NOTICE, Origins, type SandboxConfig } from "./config.ts";
 import { EventBus, Inbox, SandboxClock } from "./events.ts";
 import { HrPlatform } from "./hr.ts";
 import { VerifierCa } from "./pki.ts";
-import { SandboxProvider } from "./provider/provider.ts";
+import { OJCP_VERSION, SandboxProvider } from "./provider/provider.ts";
 import { WalletStepVerifier } from "./provider/wallet-step.ts";
-import { walletApp } from "./wallet/app.ts";
+import { cancelPermission, type WalletPermissions, walletApp } from "./wallet/app.ts";
 import { SandboxWallet } from "./wallet/wallet.ts";
 
 const DAY = 86_400;
@@ -60,6 +59,7 @@ export class SandboxWorld {
   /** Acme's wallet steps (RFC 0013). */
   acmeWalletSteps!: WalletStepVerifier;
   readonly apps = new Map<Host, Hono>();
+  #walletPermissions!: WalletPermissions;
 
   private constructor(config: SandboxConfig) {
     this.config = config;
@@ -94,6 +94,11 @@ export class SandboxWorld {
     return applied;
   }
 
+  /** Jordan cancels a permission in his wallet (the lab's "Jordan cancels" too). */
+  cancelPermission(id: string): Promise<boolean> {
+    return cancelPermission(this.wallet, this.#walletPermissions, id);
+  }
+
   async #build(): Promise<void> {
     const o = this.origins;
     const now = this.clock.now();
@@ -126,7 +131,7 @@ export class SandboxWorld {
         },
       ],
       statusLists: [1, 2, 3].map((n) => `${o.origin("issuer")}/status/${n}`),
-      ojcpVersion: "0.3",
+      ojcpVersion: OJCP_VERSION,
       policyUri: `${o.origin("issuer")}/`,
       consumerReportingAgency: false,
       adminToken: base64url(randomBytes(32)),
@@ -188,15 +193,13 @@ export class SandboxWorld {
       clock: this.clock,
       events: this.events,
     });
-    this.apps.set(
-      "wallet",
-      walletApp(this.wallet, {
-        issuer: this.issuer,
-        owner: { email: CANDIDATE.email },
-        events: this.events,
-        host: o.host("wallet"),
-      }),
-    );
+    this.#walletPermissions = {
+      issuer: this.issuer,
+      owner: { email: CANDIDATE.email },
+      events: this.events,
+      host: o.host("wallet"),
+    };
+    this.apps.set("wallet", walletApp(this.wallet, this.#walletPermissions));
     // The candidate's own device key, bound to their accounts at providers.
     const device = await generateSigner("ES256");
     this.candidate = { signer: device, iss: `did:jwk:${base64urlJson(device.publicJwk)}` };
@@ -348,14 +351,6 @@ export class SandboxWorld {
         "Sandbox started: an HR platform, a wallet, a permission service, two attesters, a trust list, four job sites and an assistant, each on its own origin",
       outcome: "info",
     });
-  }
-
-  async listPin(): Promise<string> {
-    return this.lists.pin();
-  }
-
-  thumbprintOf(jwk: JWK): Promise<string> {
-    return thumbprint(jwk);
   }
 }
 

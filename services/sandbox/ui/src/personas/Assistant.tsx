@@ -319,10 +319,12 @@ function JobsCard({
               <Text size="sm">{unverified.length} on a site I couldn't verify</Text>
             </Accordion.Control>
             <Accordion.Panel>
-              <Text size="xs">
-                {unverified[0]?.site} uses Acme's name but no independent party vouches for who runs
-                it, so I won't send your details there.
-              </Text>
+              {[...new Map(unverified.map((f) => [f.site, f])).values()].map((f) => (
+                <Text size="xs" key={f.site} mb={6}>
+                  <b>{f.site}</b> ({f.job.employer}): {f.recipient.note} I won't send your details
+                  there.
+                </Text>
+              ))}
             </Accordion.Panel>
           </Accordion.Item>
         )}

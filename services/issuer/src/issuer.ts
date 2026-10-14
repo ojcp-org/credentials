@@ -60,6 +60,8 @@ const PRE_AUTHORIZED_GRANT = "urn:ietf:params:oauth:grant-type:pre-authorized_co
 const PROOF_TYP = "openid4vci-proof+jwt";
 const MANDATE_KEY_QUARANTINE = 7 * 86_400;
 const OTP_TTL = 600;
+const OTP_ATTEMPTS = 5;
+const OTP_SENDS = 3;
 const CODE_TTL = 60;
 const ACCESS_TTL = 300;
 const OFFER_TTL = 7 * 86_400;
@@ -377,12 +379,22 @@ export class Issuer {
 
   async #sendOtp(id: string, element: CandidateElement): Promise<void> {
     if ("jkt" in element) return;
+    // Guesses carry over to a new code, and only a few codes are sent: resending
+    // can't buy more guesses, or flood the person with messages.
+    const previous = await this.config.store.get("otp", id);
+    if (previous && previous.sends >= OTP_SENDS)
+      throw new ProtocolError(
+        "access_denied",
+        "too many codes sent; start again from your agent",
+        429,
+      );
     const code = numericCode();
     await this.config.store.put("otp", {
       id,
       identifier: identifierKey(element),
       codeHash: await hashToken(code),
-      attempts: 0,
+      attempts: previous?.attempts ?? 0,
+      sends: (previous?.sends ?? 0) + 1,
       expiresAt: this.now() + OTP_TTL,
     });
     await this.config.messenger.send(element, {
@@ -393,7 +405,7 @@ export class Issuer {
 
   async #checkOtp(id: string, code: string): Promise<boolean> {
     const otp = await this.config.store.get("otp", id);
-    if (!otp || otp.expiresAt < this.now() || otp.attempts >= 5) return false;
+    if (!otp || otp.expiresAt < this.now() || otp.attempts >= OTP_ATTEMPTS) return false;
     if ((await hashToken(code.trim())) !== otp.codeHash) {
       await this.config.store.put("otp", { ...otp, attempts: otp.attempts + 1 });
       return false;
@@ -413,6 +425,8 @@ export class Issuer {
   ): Promise<string> {
     const pending = await this.pending(pendingId);
     if (!pending) throw new ProtocolError("invalid_request", "authorization expired", 404);
+    // A narrowing the issuer would refuse mustn't use up the person's codes.
+    narrow(pending.dataset, narrowing);
     for (const element of pending.dataset.candidate) {
       const key = identifierKey(element);
       const code = codes[key];

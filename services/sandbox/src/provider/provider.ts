@@ -20,9 +20,11 @@ import {
   candidateDataDigest,
   type GeneratedSigner,
   generateSigner,
+  HIRING_VCT,
   isRecord,
   type JWK,
   KeyDirectory,
+  ONET_SOC_2019,
   onet,
   parseSdJwt,
   publicPart,
@@ -74,7 +76,7 @@ export const MANIFEST_POLICY: UserMandatesPolicy = {
     max_lifetime_months: 3,
     max_per_employer: 2,
     max_breadth: "broad",
-    taxonomies: ["https://www.onetcenter.org/taxonomy/2019/list.html"],
+    taxonomies: [ONET_SOC_2019],
   },
   action: { max_lifetime_seconds: 600 },
 };
@@ -286,7 +288,7 @@ export class SandboxProvider {
                   {
                     verification_type: "employment",
                     format: "dc+sd-jwt",
-                    types: ["https://spec.ojcp.dev/vct/employment/v1"],
+                    types: [HIRING_VCT.employment],
                     profiles: ["baseline"],
                   },
                 ],
@@ -735,9 +737,11 @@ export class SandboxProvider {
       const status =
         session.status === "submitted"
           ? "submitted"
-          : step?.status === "pending"
-            ? "pending_verification"
-            : "pending_submission";
+          : step?.status === "expired"
+            ? "expired"
+            : step?.status === "pending"
+              ? "pending_verification"
+              : "pending_submission";
       return {
         ojcp_version: OJCP_VERSION,
         application_id: session.application_id,

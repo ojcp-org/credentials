@@ -152,7 +152,8 @@ export class SandboxAgent {
   readonly verifications = new Map<string, PendingVerification>();
   readonly #clients = new Map<string, Client>();
   readonly #jobs = new Map<string, JobPostingFacts[]>();
-  #pending: { state: string; codeVerifier: string } | undefined;
+  /** Open authorization requests, by OAuth state: a second proposal doesn't lose the first. */
+  readonly #pending = new Map<string, string>();
   #refreshToken: string | undefined;
   /** The consent screen the candidate was sent to, while a proposal is open. */
   consentUrl: string | undefined;
@@ -261,7 +262,7 @@ export class SandboxAgent {
       redirectUri: `${this.origin}/callback`,
       proposal: this.proposal,
     });
-    this.#pending = { state: start.state, codeVerifier: start.codeVerifier };
+    this.#pending.set(start.state, start.codeVerifier);
     this.consentUrl = start.url;
     this.#emit(
       "info",
@@ -272,18 +273,19 @@ export class SandboxAgent {
   }
 
   async completeMandate(code: string, state: string): Promise<void> {
-    if (!this.#pending || this.#pending.state !== state) throw new Error("unexpected state");
+    const codeVerifier = this.#pending.get(state);
+    if (!codeVerifier) throw new Error("unexpected state");
     const obtained = await completeStandingMandate({
       issuer: this.world.origins.origin("issuer"),
       clientId: CLIENT_ID,
       redirectUri: `${this.origin}/callback`,
       code,
-      codeVerifier: this.#pending.codeVerifier,
+      codeVerifier,
       keyring: this.world.keyring,
       holder: this.holder,
       now: () => this.world.clock.now(),
     });
-    this.#pending = undefined;
+    this.#pending.clear();
     this.consentUrl = undefined;
     this.#refreshToken = obtained.refreshToken;
     this.#emit(
@@ -294,6 +296,14 @@ export class SandboxAgent {
         applications_total: obtained.batch.terms.applications_total,
       },
     );
+  }
+
+  /** The candidate declined in their wallet: the request is closed. Returns whether it was ours. */
+  declineMandate(state: string): boolean {
+    if (!this.#pending.delete(state)) return false;
+    if (this.#pending.size === 0) this.consentUrl = undefined;
+    this.#emit("refused", "The candidate declined in their wallet; JobGPT has no permission");
+    return true;
   }
 
   /**
@@ -336,46 +346,6 @@ export class SandboxAgent {
       back.searchParams.get("code") ?? "",
       back.searchParams.get("state") ?? "",
     );
-  }
-
-  /** Plays the candidate cancelling on the issuer's account page. */
-  async revokeAsCandidate(): Promise<void> {
-    const issuer = this.world.origins.origin("issuer");
-    const start = await fetch(`${issuer}/account/code`, {
-      method: "POST",
-      body: new URLSearchParams({ identifier: this.email }),
-    });
-    const challenge = (await start.text()).match(/name="challenge" value="([^"]+)"/)?.[1] ?? "";
-    const pending = start.headers.get("set-cookie")?.split(";")[0] ?? "";
-    const verify = await fetch(`${issuer}/account/verify`, {
-      method: "POST",
-      headers: { cookie: pending },
-      body: new URLSearchParams({ challenge, code: this.world.inbox.latestCode(this.email) ?? "" }),
-      redirect: "manual",
-    });
-    const session =
-      verify.headers
-        .getSetCookie()
-        .find((c) => c.startsWith("ojcp_account="))
-        ?.split(";")[0] ?? "";
-    const page = await (
-      await fetch(`${issuer}/account/mandates`, { headers: { cookie: session } })
-    ).text();
-    for (const [, id] of page.matchAll(/\/account\/revoke\/([A-Za-z0-9_-]+)/g))
-      await fetch(`${issuer}/account/revoke/${id}`, {
-        method: "POST",
-        headers: { cookie: session },
-      });
-    // The candidate's own agent stops at once; employers' systems follow once the change reaches their status copies.
-    for (const batch of await this.store.batches()) await this.holder.revokeBatch(batch.id);
-    this.#refreshToken = undefined;
-    this.world.events.emit({
-      actor: "candidate",
-      where: this.world.origins.host("issuer"),
-      title:
-        "Candidate cancelled on the issuer's account page. The agent stops at once; employers' systems stop accepting the credentials once the change reaches their status copies (about 2 hours)",
-      outcome: "ok",
-    });
   }
 
   /**
@@ -482,7 +452,9 @@ export class SandboxAgent {
           ojcpVersion: OJCP_VERSION,
         })
       ).userMandate;
-    } catch {
+    } catch (error) {
+      // No mandate covers searching here: search without one. Anything else is a bug.
+      if (!(error instanceof StandingMandateRefusal)) throw error;
       mandate = undefined;
     }
     const out = await this.callTool(host, "search_jobs", {
@@ -771,10 +743,7 @@ export class SandboxAgent {
     if (new URL(step.verification_url).origin !== origin)
       return refuse("wallet_step_origin", "its verification page isn't on the site's own origin");
     // §2.1: the step's verifier is one the apply path names, and the proof goes to the provider.
-    if (
-      !acceptedVerifiers.includes(step.verifier_id) ||
-      step.verifier_id !== new URL(origin).host
-    )
+    if (!acceptedVerifiers.includes(step.verifier_id) || step.verifier_id !== new URL(origin).host)
       return refuse("wallet_step_verifier", "its verifier isn't the site the application is with");
     if (step.proof_delivery !== "provider_managed")
       return refuse(
@@ -825,7 +794,7 @@ export class SandboxAgent {
     id: string,
   ): Promise<
     | { status: "still_pending"; text: string }
-    | { status: "done"; step: "completed" | "deferred"; outcome: ApplyOutcome }
+    | { status: "done"; step: "completed" | "deferred" | "expired"; outcome: ApplyOutcome }
   > {
     const v = this.verifications.get(id);
     if (!v) throw new Error("no such verification");
@@ -834,17 +803,27 @@ export class SandboxAgent {
       application_id: v.session.application_id,
       agent_declaration: this.declaration(),
     });
-    if (!status.ok)
-      return {
-        status: "done",
-        step: "completed",
-        outcome: this.#providerRefused(label, status.result),
-      };
+    // A failed check says nothing about the step: keep the link so the candidate can try again.
+    if (!status.ok) {
+      const text = `${label}: couldn't check the application's status (${String(status.result.error_code)})`;
+      this.#emit("refused", text, { wire_error: status.result });
+      return { status: "still_pending", text };
+    }
     const vs = status.result.verification_status;
     if (status.result.status === "pending_verification") {
       const text = `${label}: the work-history step is still pending`;
       this.#emit("info", text, { verification_status: vs });
       return { status: "still_pending", text };
+    }
+    if (status.result.status === "expired") {
+      this.verifications.delete(id);
+      const text = `${label}: the work-history step passed its deadline, so the application expired`;
+      this.#emit("info", text);
+      return {
+        status: "done",
+        step: "expired",
+        outcome: { status: "refused_by_provider", error: { error_code: "expired" }, text },
+      };
     }
     const step =
       isRecord(vs) && Array.isArray(vs.deferred_steps) && vs.deferred_steps.length > 0

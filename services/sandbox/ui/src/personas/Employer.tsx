@@ -62,12 +62,13 @@ interface VerifyView {
   masked_contact: string;
   purpose: string;
   asks: string[];
-  status: "pending" | "completed" | "deferred";
+  status: "pending" | "completed" | "deferred" | "expired";
   declined: boolean;
   bound: boolean;
   code_sent: boolean;
   awaiting_confirmation: boolean;
   mismatch?: boolean;
+  exhausted?: boolean;
   result?: {
     basis: string;
     issuer: string;
@@ -193,6 +194,7 @@ function Verify({ appRef: code }: { appRef: string }) {
   const [pin, setPin] = useState("");
   const [contact, setContact] = useState("");
   const [busy, setBusy] = useState(false);
+  const [otherDevice, setOtherDevice] = useState<string>();
   const params = new URLSearchParams(location.search);
   const responseCode = params.get("response_code");
 
@@ -245,8 +247,9 @@ function Verify({ appRef: code }: { appRef: string }) {
           </Text>
           {v.mismatch && (
             <Alert color="red" mb="sm">
-              That email belongs to a different application. If you didn't start this, ignore it and
-              tell us at the link in our emails.
+              {v.exhausted
+                ? "That didn't match three times, so we've set this answer aside. Confirm your email on this page, then share from your wallet again."
+                : "That isn't the email on this application. Check it and try again."}
             </Alert>
           )}
           <Group>
@@ -296,6 +299,11 @@ function Verify({ appRef: code }: { appRef: string }) {
                     onClick={async () => {
                       const r = await call("session", { code: pin });
                       if (r) setV(r);
+                      else {
+                        // An expired or used-up code is cleared: show "Send me a code" again.
+                        setPin("");
+                        api<VerifyView>(`/api/verify/${code}`).then(setV, () => undefined);
+                      }
                     }}
                   >
                     Confirm
@@ -350,6 +358,31 @@ function Verify({ appRef: code }: { appRef: string }) {
                 On a phone, this opens your wallet app. Continuing without one is fine: we check
                 another way after you apply, and it doesn't count against you.
               </Text>
+              <Anchor
+                size="xs"
+                component="button"
+                onClick={async () => {
+                  const r = await call("wallet");
+                  if (r?.client_id && r.request_uri)
+                    setOtherDevice(
+                      `${boot.origins.wallet}/authorize?${new URLSearchParams({ client_id: r.client_id, request_uri: r.request_uri })}`,
+                    );
+                }}
+              >
+                Use a wallet on another device
+              </Anchor>
+              {otherDevice && (
+                <Paper withBorder radius="md" p="sm">
+                  <Text size="xs" mb={4}>
+                    Open this on the device with your wallet (a QR code, on a real site). When it
+                    comes back there, you'll type your email to finish, because that browser hasn't
+                    confirmed it's you.
+                  </Text>
+                  <Code block style={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }}>
+                    {otherDevice}
+                  </Code>
+                </Paper>
+              )}
             </Stack>
           </Stepper.Step>
           <Stepper.Completed>
@@ -379,6 +412,11 @@ function Verify({ appRef: code }: { appRef: string }) {
                   Your assistant learns only that this step is done.
                 </Text>
               </Paper>
+            ) : v.status === "expired" ? (
+              <Alert color="gray">
+                The three days to confirm your work history ran out, so this application expired.
+                Your assistant can start a new one.
+              </Alert>
             ) : (
               <Alert color="gray">
                 You're continuing without a wallet. We'll check your work history another way after
@@ -397,7 +435,7 @@ function Verify({ appRef: code }: { appRef: string }) {
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 const ARRANGEMENT: Record<string, string> = {
-  onsite: "on-site",
+  on_site: "on-site",
   hybrid: "hybrid",
   remote: "remote",
 };

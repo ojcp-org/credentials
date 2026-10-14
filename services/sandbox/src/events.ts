@@ -14,9 +14,6 @@ export class SandboxClock {
   advance(seconds: number): void {
     this.#offset += seconds;
   }
-  reset(): void {
-    this.#offset = 0;
-  }
   get offset(): number {
     return this.#offset;
   }
@@ -68,15 +65,6 @@ export class EventBus {
 
   since(id: number): SandboxEvent[] {
     return this.#events.filter((e) => e.id > id);
-  }
-
-  subscribe(listener: (e: SandboxEvent) => void): () => void {
-    this.#listeners.add(listener);
-    return () => this.#listeners.delete(listener);
-  }
-
-  clear(): void {
-    this.#events.length = 0;
   }
 }
 

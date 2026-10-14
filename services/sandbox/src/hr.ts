@@ -18,6 +18,7 @@ import { createApp, DirectoryMandateKeySource, InMemoryIssuerStore, Issuer } fro
 import { Hono } from "hono";
 import { NOTICE, type Origins } from "./config.ts";
 import type { EventBus, Inbox, SandboxClock } from "./events.ts";
+import { OJCP_VERSION } from "./provider/provider.ts";
 
 const DAY = 86_400;
 export const PLATFORM_NAME = "ExamplePeople";
@@ -86,7 +87,7 @@ export class HrPlatform {
       mandateKeys: new DirectoryMandateKeySource(store),
       clients: [],
       statusLists: [1, 2].map((n) => `${origin}/status/${n}`),
-      ojcpVersion: "0.3",
+      ojcpVersion: OJCP_VERSION,
       policyUri: `${origin}/practice`,
       consumerReportingAgency: false,
       adminToken: base64url(randomBytes(32)),

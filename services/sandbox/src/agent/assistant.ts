@@ -25,6 +25,7 @@ export interface ChatMessage {
 
 export const FIRST_ASK =
   "Find data science jobs in New York, hybrid or remote, paying at least $125k, and apply for me.";
+const ASK_AGAIN = "Ask for my permission again";
 
 const MAX_MESSAGES = 200;
 
@@ -72,7 +73,8 @@ export class Assistant {
   /** Short replies the candidate can tap, for where the conversation is. */
   async suggestions(): Promise<string[]> {
     if (!this.asked) return [FIRST_ASK];
-    if (!(await this.#hasPermission())) return [];
+    // After a cancel or a decline, offer to ask again.
+    if (!(await this.#hasPermission())) return [ASK_AGAIN];
     const feed = await this.#view.feed();
     const open = feed.filter((f) => f.verdict === "can_apply").length;
     const out: string[] = [];
@@ -177,7 +179,7 @@ export class Assistant {
           : `${record.employer} confirmed your work history straight from your wallet, so I sent your application for ${record.title}.`
         : record.verification
           ? `${record.employer} hasn't received your confirmation yet. Finish on their page, then tell me.`
-          : record.headline === "Held back"
+          : record.headline === "Held back" || record.headline === "Expired"
             ? `I didn't send your application for ${record.title}: ${record.detail}`
             : `${record.employer} didn't accept the application: ${record.detail}`,
       { kind: "applications", ids: [record.id] },
@@ -188,6 +190,13 @@ export class Assistant {
   onCancelled(): void {
     this.#say(
       "Your permission was cancelled in your wallet, so I've stopped applying for you. Applications I already sent stay with those employers. Ask me again whenever you want to give a new permission.",
+    );
+  }
+
+  /** The candidate declined the permission in their wallet. */
+  onDeclined(): void {
+    this.#say(
+      "You declined in your wallet, so I don't have permission and won't apply for you. Nothing was sent anywhere. Ask me again if you change your mind.",
     );
   }
 

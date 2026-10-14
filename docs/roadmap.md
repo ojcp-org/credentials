@@ -12,9 +12,9 @@ Everything tracks draft RFCs. When they change during the comment period (closin
 - **Action mandates.** Statement for approval, presentation, verification.
 - **Provider trust (RFC 0010).** `@ojcp/trust`: identity keys and key certificates, attestations (JWK or X.509 pinned), trust lists, status, tier derivation and display; its resolver drives the wallet's trust floor.
 - **Vectors.** Language-neutral vectors and a TypeScript test that holds the SDK to them.
-- **Sandbox.** `services/sandbox`: one story in five persona tabs (HR platform, wallet, assistant, employer, under the hood), every party on its own origin. It covers the RFC 0014 record into a browser wallet and RFC 0013 presentation to an employer that pins the issuer, plus standing mandates, trust incidents, hostile-agent probes and a conformance run against any provider. Image and manifests for `*.sandbox.ojcp.dev`; not deployed yet. Next: the same flow with a real wallet app on a phone.
+- **Sandbox.** `services/sandbox`: one story in five persona tabs (HR platform, wallet, assistant, employer, under the hood), every party on its own origin. It covers the RFC 0014 record into a browser wallet and RFC 0013 presentation to an employer that pins the issuer, plus standing mandates, trust incidents, hostile-agent probes and a conformance run against the sandbox's providers. Live at `https://sandbox.ojcp.dev`. Next: the same flow with a real wallet app on a phone.
 
-Proved by 61 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers, and the RFC 0010 §11 fixture groups.
+Proved by 66 tests, including end-to-end runs through the issuer's HTTP handlers (the built-in consent page and the JSON consent API), the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable`, and the RFC 0010 §11 fixture groups.
 
 ## Next
 

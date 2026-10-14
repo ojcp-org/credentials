@@ -12,7 +12,7 @@ import type { Assistant } from "./agent/assistant.ts";
 import type { CandidateView } from "./agent/candidate.ts";
 import { Probe } from "./agent/probe.ts";
 import type { Host } from "./config.ts";
-import type { SandboxWorld } from "./world.ts";
+import { CANDIDATE, type SandboxWorld } from "./world.ts";
 
 export interface Sandbox {
   world: SandboxWorld;
@@ -267,8 +267,11 @@ export function sandboxApi(current: () => Sandbox, reset: () => Promise<void>): 
         title: "Incidents cleared (a domain takeover is undone only by resetting the sandbox)",
         outcome: "info",
       });
-    } else if (kind === "cancel") await agent.revokeAsCandidate();
-    else return c.json({ error: `unknown incident ${kind}` }, 404);
+    } else if (kind === "cancel") {
+      // As Jordan would: in his wallet, which runs the permission service.
+      for (const a of await world.issuer.authorizationsFor({ email: CANDIDATE.email }))
+        await world.cancelPermission(a.id);
+    } else return c.json({ error: `unknown incident ${kind}` }, 404);
     agent.trust.invalidate();
     return c.json({ ok: true });
   });
@@ -312,11 +315,6 @@ export function sandboxApi(current: () => Sandbox, reset: () => Promise<void>): 
     return c.json({ results });
   });
 
-  app.post("/lab/retry", async (c) => c.json(await current().agent.retryLast()));
-  app.post("/lab/refresh", async (c) => {
-    await current().agent.refresh();
-    return c.json({ ok: true });
-  });
   app.post("/lab/reset", async (c) => {
     await reset();
     return c.json({ ok: true });

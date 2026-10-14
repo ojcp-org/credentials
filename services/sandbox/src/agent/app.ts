@@ -25,12 +25,8 @@ export function agentApp(
 
   app.get("/callback", async (c) => {
     if (c.req.query("error")) {
-      world.events.emit({
-        actor: "agent",
-        where: origins.host("agent"),
-        title: "The candidate declined in their wallet; JobGPT has no permission",
-        outcome: "refused",
-      });
+      // Only a decline for a request JobGPT actually made gets a reply.
+      if (agent.declineMandate(c.req.query("state") ?? "")) assistant.onDeclined();
       return c.redirect("/", 303);
     }
     await assistant.serially(async () => {

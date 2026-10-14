@@ -39,7 +39,7 @@ function recipientOf(
     return {
       name: site,
       verified: false,
-      note: "Identity couldn't be verified",
+      note: whyUnverified(derived),
       summary: `${site} (unverified)`,
     };
   const name = derived.entity.legal_name;
@@ -57,6 +57,22 @@ function recipientOf(
     ? `${who}, on behalf of ${hosted.name}${hosted.confirmed ? "" : " (not confirmed)"}`
     : who;
   return { name, verified: true, note, summary, ...(hosted ? { onBehalfOf: hosted } : {}) };
+}
+
+/** Why a site's identity couldn't be confirmed, in words, from what derivation found (RFC 0010 §5.2). */
+function whyUnverified(derived: DerivedTier): string {
+  const reasons = new Set(derived.rejected.map((r) => r.reason));
+  if (reasons.has("wrong_subject"))
+    return "It shows attestations made for a different site or key: copied, or the site changed hands.";
+  if (reasons.has("distrusted"))
+    return "The trust list stopped trusting the attester that vouched for it.";
+  if (derived.notes.some((n) => /status (suspended|revoked)/.test(n)))
+    return "An attester suspended what it said about this site while it investigates.";
+  if (reasons.has("expired") || reasons.has("lifetime"))
+    return "What attesters said about it has expired.";
+  if (reasons.has("untrusted_issuer"))
+    return "The only parties vouching for it aren't on the trust list.";
+  return "No independent party vouches for who runs it.";
 }
 
 const ORDER: Record<FeedItem["verdict"], number> = {
@@ -332,7 +348,9 @@ export class CandidateView {
           items.push({
             ...base,
             verdict: "unverified",
-            reasons: ["I couldn't confirm who runs this site, so I won't send your details there."],
+            reasons: [
+              `I couldn't confirm who runs this site, so I won't send your details there. ${base.recipient.note}`,
+            ],
           });
         else {
           const coverage = evaluateScope(m.scope, jobFacts(j, m.scope.taxonomy));
@@ -475,7 +493,11 @@ export class CandidateView {
     const result = await this.#agent.continueAfterVerification(record.verification.id);
     if (result.status === "still_pending") return record;
     const { outcome, step } = result;
-    if (outcome.status === "submitted") {
+    if (step === "expired") {
+      record.state = "not_sent";
+      record.headline = "Expired";
+      record.detail = `${record.employer} gave three days to confirm your work history, and the time ran out. Ask me to apply again if you're still interested.`;
+    } else if (outcome.status === "submitted") {
       record.state = "sent";
       record.headline = "Sent";
       record.detail =

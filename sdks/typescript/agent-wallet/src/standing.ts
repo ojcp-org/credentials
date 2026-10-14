@@ -332,6 +332,10 @@ export class StandingMandateHolder {
         throw new StandingMandateRefusal("binding_actions", "binding actions need the user");
       if (input.request?.application_data?.eeo !== undefined)
         throw new StandingMandateRefusal("eeo", "EEO data needs per-submission consent");
+    }
+    // Limits at begin too: an application the submit can't finish would only
+    // waste the candidate's time (and, with a wallet step, their attention).
+    if (isSubmit || input.tool === "begin_application") {
       const submissions = await this.#store.submissions(batch.id);
       if (submissions.length >= batch.terms.applications_total)
         throw new StandingMandateRefusal("total_reached", "the user's total is used up");

@@ -45,6 +45,10 @@ const REQUEST_TTL = 600;
 const REQUEST_FETCHES = 5;
 const CODE_TTL = 600;
 const CODE_TRIES = 5;
+/** Codes a step may send in all: each is a message to the candidate. */
+const CODE_SENDS = 5;
+/** Guesses at the contact on another device before that presentation is dropped (§3 item 4). */
+const CONTACT_TRIES = 3;
 const COOKIE = "ojcp_verify";
 
 /** What the job needs, from §5's closed list, coarse claims first. */
@@ -84,13 +88,19 @@ interface Step {
   ref: string;
   job: { title: string; rule: string };
   contact: string;
-  status: "pending" | "completed" | "deferred";
+  /** `expired`: still pending at the deadline (RFC 0013 §7); deferred and completed steps don't expire. */
+  status: "pending" | "completed" | "deferred" | "expired";
   deadline: number;
   code?: { hash: Uint8Array; expires: number; tries: number };
+  codesSent: number;
   /** Hashes of bound-session tokens. */
   sessions: Uint8Array[];
   /** A validated presentation waiting for the binding of §3. */
-  awaiting?: { responseCode: string; kept: Omit<KeptPresentation, "via"> };
+  awaiting?: {
+    responseCode: string;
+    kept: Omit<KeptPresentation, "via">;
+    contactTries: number;
+  };
   result?: KeptPresentation;
   declined?: boolean;
 }
@@ -177,6 +187,7 @@ export class WalletStepVerifier {
       status: "pending",
       deadline: this.#o.clock.now() + STEP_DEADLINE,
       sessions: [],
+      codesSent: 0,
     };
     this.#steps.set(step.ref, step);
     this.#emit(
@@ -223,7 +234,21 @@ export class WalletStepVerifier {
   }
 
   #byApplication(applicationId: string): Step | undefined {
-    return [...this.#steps.values()].find((s) => s.applicationId === applicationId);
+    const step = [...this.#steps.values()].find((s) => s.applicationId === applicationId);
+    return step && this.#expire(step);
+  }
+
+  /** A step still pending at its deadline has expired, and the application with it. */
+  #expire(step: Step): Step {
+    if (step.status === "pending" && this.#o.clock.now() > step.deadline) {
+      step.status = "expired";
+      step.awaiting = undefined;
+      this.#emit(
+        "info",
+        `The wallet step for ${step.ref} passed its deadline with nothing shared, so it expired`,
+      );
+    }
+    return step;
   }
 
   /** §2.2: the state the agent may learn, and nothing more. */
@@ -322,7 +347,10 @@ export class WalletStepVerifier {
   }
 
   routes(app: Hono): void {
-    const step = (c: Context) => this.#steps.get(c.req.param("ref") ?? "");
+    const step = (c: Context) => {
+      const s = this.#steps.get(c.req.param("ref") ?? "");
+      return s && this.#expire(s);
+    };
     const missing = { error: "This verification link is no longer valid." };
 
     app.get("/ojcp/accepted-issuers.json", (c) =>
@@ -349,7 +377,10 @@ export class WalletStepVerifier {
     app.post("/api/verify/:ref/code", async (c) => {
       const s = step(c);
       if (!s) return c.json(missing, 404);
+      if (s.codesSent >= CODE_SENDS)
+        return c.json({ error: "Too many codes sent. Ask your assistant to start again." }, 429);
       const code = String(100_000 + (new DataView(randomBytes(4).buffer).getUint32(0) % 900_000));
+      s.codesSent++;
       s.code = {
         hash: await sha256(utf8(code)),
         expires: this.#o.clock.now() + CODE_TTL,
@@ -370,8 +401,11 @@ export class WalletStepVerifier {
       if (!s) return c.json(missing, 404);
       const { code } = z.object({ code: z.string() }).parse(await c.req.json());
       const now = this.#o.clock.now();
-      if (!s.code || s.code.expires < now || s.code.tries >= CODE_TRIES)
+      if (!s.code || s.code.expires < now || s.code.tries >= CODE_TRIES) {
+        // Clear it, so the page offers a new code.
+        s.code = undefined;
         return c.json({ error: "That code has expired. Send a new one." }, 400);
+      }
       s.code.tries++;
       if (!timingSafeEqual(await sha256(utf8(code.trim())), s.code.hash))
         return c.json({ error: "That code isn't right." }, 400);
@@ -436,11 +470,19 @@ export class WalletStepVerifier {
       if (!s.awaiting || s.awaiting.responseCode !== body.response_code)
         return c.json(await this.#view(c, s));
       if (!(await contactMatches(body.contact, s.contact))) {
+        s.awaiting.contactTries++;
+        // A few tries, then the presentation is dropped: guessing contacts can't bind it.
+        const exhausted = s.awaiting.contactTries >= CONTACT_TRIES;
+        if (exhausted) s.awaiting = undefined;
         this.#emit(
           "refused",
-          `A presentation for ${s.ref} was not confirmed: the typed contact didn't match`,
+          `A presentation for ${s.ref} was not confirmed: the typed contact didn't match${exhausted ? "; after three tries it was discarded" : ""}`,
         );
-        return c.json({ ...(await this.#view(c, s, body.response_code)), mismatch: true });
+        return c.json({
+          ...(await this.#view(c, s, exhausted ? undefined : body.response_code)),
+          mismatch: true,
+          exhausted,
+        });
       }
       this.#complete(s, "contact_confirmed");
       return c.json(await this.#view(c, s));
@@ -588,6 +630,7 @@ export class WalletStepVerifier {
         basis: checked.credential.basis,
         presentationSha256: checked.presentationSha256,
       },
+      contactTries: 0,
     };
     this.#emit(
       "ok",

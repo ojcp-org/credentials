@@ -409,7 +409,9 @@ export interface World {
   issuerSigner: GeneratedSigner;
 }
 
-export async function createWorld(options: { manifest?: UserMandatesPolicy } = {}): Promise<World> {
+export async function createWorld(
+  options: { manifest?: UserMandatesPolicy; consentUi?: string } = {},
+): Promise<World> {
   const clock = new Clock();
   const messenger = new CapturingMessenger();
   const store = new InMemoryIssuerStore();
@@ -446,6 +448,7 @@ export async function createWorld(options: { manifest?: UserMandatesPolicy } = {
     adminToken: "a".repeat(40),
     cookieSecret: "c".repeat(40),
     now: () => clock.now,
+    ...(options.consentUi ? { consentUi: options.consentUi } : {}),
   });
   // The issuer observed the directory when the keys were published.
   clock.now = START - 8 * 86_400;

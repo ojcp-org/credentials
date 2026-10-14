@@ -23,7 +23,10 @@ export interface Otp {
   /** Normalized identifier JSON. */
   identifier: string;
   codeHash: string;
+  /** Wrong guesses so far, across every code sent for this request. */
   attempts: number;
+  /** Codes sent for this request: each resend is another message to the person. */
+  sends: number;
   expiresAt: number;
 }
 

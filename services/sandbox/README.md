@@ -16,7 +16,7 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 | 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
 | 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
 | 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
-| 5 · Under the hood | Anyone evaluating OJCP | `sandbox.` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any provider. |
+| 5 · Under the hood | Anyone evaluating OJCP | `sandbox.` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any of the sandbox's providers. The attesters' and trust list's own pages show what each vouched for and what it's doing. |
 
 With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which calls the same functions as the buttons. It never sees a credential, a key or a wallet record. Without it, the assistant runs scripted, with suggested replies.
 
@@ -81,7 +81,9 @@ docker build -f services/sandbox/Dockerfile -t ojcp-sandbox .
 
 - `charts/apps-vcluster/ojcp-sandbox.yaml`: the Argo CD application;
 - `charts/apps-vcluster/charts/ojcp-sandbox/`: Deployment, Service and ALB Ingress;
-- `vclusters/apps/ojcp-sandbox-cert.yaml`: the ACM certificate, to append to `vclusters/apps/vcluster.yaml`. The `ojcp.dev` certificate's `*.ojcp.dev` covers one label only.
+- `vclusters/apps/ojcp-sandbox-cert.yaml`: the ACM certificate, already in `vclusters/apps/vcluster.yaml`. The `ojcp.dev` certificate's `*.ojcp.dev` covers one label only.
+
+The Deployment's image tag is the commit to deploy; bump it in `rx-workloads-dev` when CI publishes a new one. The GHCR package `ojcp-org/sandbox` is public, so no pull secret is needed. The Service is headless: the apps vCluster allocates IPv4 cluster IPs while the host cluster is IPv6, and the ALB targets pod IPs.
 
 DNS records come from external-dns, which reads the Ingress hosts, as for `ojcp.dev`. The ALB controller finds the certificate from the Ingress `tls` hosts. For chat mode, create the secret in the `ojcp-sandbox` namespace:
 

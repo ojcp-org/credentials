@@ -41,10 +41,15 @@ function view(r: PendingRequest) {
 /** The owner's session with their wallet app. */
 const SESSION = "wallet_session";
 
-export function walletApp(
-  wallet: SandboxWallet,
-  permissions: { issuer: Issuer; owner: CandidateElement; events: EventBus; host: string },
-): Hono {
+/** The permission service the wallet provider runs for its owner (RFC 0008). */
+export interface WalletPermissions {
+  issuer: Issuer;
+  owner: CandidateElement;
+  events: EventBus;
+  host: string;
+}
+
+export function walletApp(wallet: SandboxWallet, permissions: WalletPermissions): Hono {
   const app = new Hono();
   app.onError((error, c) => {
     if (error instanceof ProtocolError)
@@ -154,25 +159,41 @@ export function walletApp(
     );
   });
   app.post("/api/wallet/permissions/:id/cancel", async (c) => {
-    const { issuer, owner, events, host } = permissions;
-    const id = c.req.param("id");
-    const mine = (await issuer.authorizationsFor(owner)).find((a) => a.id === id);
-    if (!mine) return c.json({ error: "No such permission." }, 404);
-    await issuer.revokeAuthorization(id);
-    const agent = issuer.client(mine.clientId)?.name ?? mine.clientId;
-    wallet.activity.unshift({
-      at: issuer.now(),
-      kind: "declined",
-      text: `Cancelled ${agent}'s permission to apply for you`,
-    });
-    events.emit({
-      actor: "candidate",
-      where: host,
-      title: `Candidate cancelled ${agent}'s permission in their wallet. The permission service marks its credentials revoked at the next hourly epoch; employers and ${agent} stop accepting them then`,
-      outcome: "ok",
-    });
+    if (!(await cancelPermission(wallet, permissions, c.req.param("id"))))
+      return c.json({ error: "No such permission." }, 404);
     return c.json({ ok: true });
   });
 
   return app;
+}
+
+/**
+ * The owner cancels a permission they gave an agent. Returns false if it isn't theirs.
+ * Used by the wallet's Permissions screen and by the lab's "Jordan cancels".
+ */
+export async function cancelPermission(
+  wallet: SandboxWallet,
+  permissions: WalletPermissions,
+  id: string,
+): Promise<boolean> {
+  const { issuer, owner, events, host } = permissions;
+  const mine = (await issuer.authorizationsFor(owner)).find((a) => a.id === id);
+  if (!mine) return false;
+  await issuer.revokeAuthorization(id);
+  // A real service publishes at its next hourly epoch (RFC 0008 §7.1). The
+  // sandbox publishes a cancellation at once, so its effect can be watched.
+  await issuer.status.applyEpoch();
+  const agent = issuer.client(mine.clientId)?.name ?? mine.clientId;
+  wallet.activity.unshift({
+    at: issuer.now(),
+    kind: "declined",
+    text: `Cancelled ${agent}'s permission to apply for you`,
+  });
+  events.emit({
+    actor: "candidate",
+    where: host,
+    title: `Candidate cancelled ${agent}'s permission in their wallet. The permission service published the change to its status list (a real one does so at its next hourly epoch); ${agent} and employers stop accepting the credentials when they next check`,
+    outcome: "ok",
+  });
+  return true;
 }
