@@ -255,6 +255,14 @@ export function createApp(issuer: Issuer): Hono {
   });
 
   // ── Account: revocation (RFC 0008 §7.2) ──────────────────────────────────
+  // An operator with its own permissions screen (a wallet provider, say) sends
+  // people there; registered first, these routes take the built-in pages' place.
+  if (config.accountUi) {
+    const to = config.accountUi;
+    app.get("/", (c) => c.redirect(to, 303));
+    app.get("/account", (c) => c.redirect(to, 303));
+    app.all("/account/*", (c) => c.redirect(to, 303));
+  }
   // A person who opens the issuer directly is here to see or cancel permissions.
   app.get("/", (c) => c.redirect("/account"));
   app.get("/account", (c) => c.html(<AccountStartPage />));

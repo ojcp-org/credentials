@@ -18,6 +18,8 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 | 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
 | 5 · Under the hood | Anyone evaluating OJCP | `sandbox.` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any of the sandbox's providers. The attesters' and trust list's own pages show what each vouched for and what it's doing. |
 
+On every page, short plain-English lines slide in at the corner as things happen anywhere in the sandbox: JobGPT asking for permission, an employer checking it, the wallet checking who's asking, an attester suspending a site. Only moments an event marks with `say` appear; the speaker button turns them off. Under the hood keeps the full technical record.
+
 With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which calls the same functions as the buttons. It never sees a credential, a key or a wallet record. Without it, the assistant runs scripted, with suggested replies.
 
 ## What each party proves
@@ -36,7 +38,7 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 | `hr.` | ExamplePeople, the HR platform: an RFC 0014 issuer (`services/issuer`) |
 | `wallet.` | Jordan's wallet |
 | `agent.` | JobGPT, Jordan's assistant: an agent platform built on `@ojcp/agent-wallet` |
-| `issuer.` | The permission service's protocol endpoints, run by Jordan's wallet provider: issues standing mandates (`services/issuer`; its consent screen is the wallet's) |
+| `issuer.` | Protocol endpoints of the permission service Jordan's wallet provider runs (`services/issuer`): it issues standing mandates and publishes their status. It has no pages of its own: consent and the permissions list are wallet screens, and its account pages redirect there (`accountUi`) |
 | `acme.` | Acme Corporation's careers site: an employer running its own provider, with wallet steps |
 | `acme-careers.` | A lookalike of Acme's site, using Acme's name with no attestations of its own |
 | `ats.` | ExampleATS, hosting Globex and Initech jobs on one origin |

@@ -154,13 +154,19 @@ export class WalletStepVerifier {
     return new URL(this.#o.origin).host;
   }
 
-  #emit(outcome: "ok" | "refused" | "info", title: string, detail?: Record<string, unknown>) {
+  #emit(
+    outcome: "ok" | "refused" | "info",
+    title: string,
+    detail?: Record<string, unknown>,
+    say?: string,
+  ) {
     this.#o.events.emit({
       actor: "provider",
       where: this.host,
       title,
       outcome,
       ...(detail ? { detail } : {}),
+      ...(say ? { say } : {}),
     });
   }
 
@@ -343,6 +349,7 @@ export class WalletStepVerifier {
         kept: EMPLOYMENT_PATHS.map(claimLabel),
         presentation_sha256: step.result.presentationSha256,
       },
+      `${this.#o.employerName} confirmed your work history and tied it to this one application. JobGPT only learns that it's done.`,
     );
   }
 
@@ -422,6 +429,8 @@ export class WalletStepVerifier {
       this.#emit(
         "ok",
         `Contact confirmed for ${s.ref}: this browser is now the application's bound session`,
+        undefined,
+        `${this.#o.employerName} confirmed it's you, so nobody else can attach a record to your application.`,
       );
       return c.json({ ...(await this.#view(c, s)), bound: true });
     });
@@ -446,6 +455,8 @@ export class WalletStepVerifier {
       this.#emit(
         "info",
         `Candidate chose to continue without a wallet for ${s.ref}: the step is deferred, and the employer checks later by its own means`,
+        undefined,
+        `You went ahead without a wallet. ${this.#o.employerName} will check your history its own way, and that doesn't count against you.`,
       );
       return c.json(await this.#view(c, s));
     });
@@ -636,6 +647,7 @@ export class WalletStepVerifier {
       "ok",
       `Validated the presentation for ${s.ref}: pinned issuer key and signing window, accepted type, basis and profile, key binding to this request's nonce, status VALID; everything not asked for was dropped unread`,
       { issuer: checked.issuer.iss, basis: checked.credential.basis },
+      `${this.#o.employerName} checked the record's signature against your employer's HR system and kept only what it asked for.`,
     );
     return c.json({
       redirect_uri: `${this.#o.origin}/verify/${s.ref}?response_code=${responseCode}`,

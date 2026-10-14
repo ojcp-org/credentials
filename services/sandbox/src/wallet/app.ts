@@ -132,6 +132,7 @@ export function walletApp(wallet: SandboxWallet, permissions: WalletPermissions)
       title:
         "Candidate approved the permission in their wallet with Face ID. The wallet account had already verified their email, so no code was needed",
       outcome: "ok",
+      say: "You approved JobGPT's permission with Face ID. Your wallet keeps it, and you can cancel it there any time.",
     });
     return c.json({ redirect });
   });
@@ -194,6 +195,7 @@ export async function cancelPermission(
     where: host,
     title: `Candidate cancelled ${agent}'s permission in their wallet. The permission service published the change to its status list (a real one does so at its next hourly epoch); ${agent} and employers stop accepting the credentials when they next check`,
     outcome: "ok",
+    say: `You cancelled ${agent}'s permission. Its passes stop working at once, for ${agent} and for every employer.`,
   });
   return true;
 }

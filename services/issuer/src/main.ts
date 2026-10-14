@@ -32,6 +32,7 @@ const Env = z.object({
     .string()
     .regex(/^(\/|https:\/\/).*\{id\}/)
     .optional(),
+  OJCP_ACCOUNT_UI: z.url({ protocol: /^https$/ }).optional(),
   NODE_ENV: z.string().optional(),
 });
 
@@ -101,6 +102,7 @@ const issuer = await Issuer.create({
   cookieSecret: env.OJCP_COOKIE_SECRET,
   ...(env.OJCP_DISPLAY_NAME ? { displayName: env.OJCP_DISPLAY_NAME } : {}),
   ...(env.OJCP_CONSENT_UI ? { consentUi: env.OJCP_CONSENT_UI } : {}),
+  ...(env.OJCP_ACCOUNT_UI ? { accountUi: env.OJCP_ACCOUNT_UI } : {}),
 });
 
 // Status changes apply at fixed hourly epochs (RFC 0008 §7.1).

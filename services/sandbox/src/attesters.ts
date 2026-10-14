@@ -182,6 +182,7 @@ export class SandboxAttester {
       where: new URL(this.origin).host,
       title: `${this.label} suspends its attestations for ${subject}`,
       outcome: "info",
+      say: `${this.label} suspended what it said about ${siteOf(subject)}. Until it's sorted out, assistants won't send applications there.`,
     });
   }
 
@@ -340,6 +341,7 @@ export class SandboxListPublisher {
       where: new URL(this.origin).host,
       title: `Trust list distrusts ${attester.label}: ${reason}`,
       outcome: "info",
+      say: `The trust list stopped trusting ${attester.label}. Every site that relied on it now shows as unverified.`,
     });
   }
 

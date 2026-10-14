@@ -161,14 +161,13 @@ const ROLES: Partial<Record<Host, { name: string; role: string }>> = {
     name: "ExamplePeople (HR for Vandelay Industries)",
     role: "Issues employment records (RFC 0014)",
   },
-  wallet: { name: "Jordan's wallet", role: "Holds records; presents them to employers (RFC 0013)" },
+  wallet: {
+    name: "Jordan's wallet",
+    role: "Holds records and presents them to employers (RFC 0013). Its permission service signs JobGPT's passes and publishes whether they still stand (RFC 0008)",
+  },
   agent: {
     name: "JobGPT, Jordan's AI assistant",
     role: "Agent platform with a Job search app (RFC 0008)",
-  },
-  issuer: {
-    name: "Permission service (run by Jordan's wallet provider)",
-    role: "Issues JobGPT's standing mandate; Jordan approves and cancels it in his wallet (RFC 0008)",
   },
   acme: { name: "Acme Corporation careers", role: "Employer running its own provider" },
   ats: { name: "ExampleATS", role: "ATS hosting Globex and Initech on one origin" },

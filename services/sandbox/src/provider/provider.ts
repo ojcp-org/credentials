@@ -238,16 +238,27 @@ export class SandboxProvider {
   async takeOver(): Promise<void> {
     this.identity = await generateSigner("ES256");
     await this.#certify();
-    this.#emit("info", "Domain taken over: a new identity key with no logged link to the old one");
+    this.#emit(
+      "info",
+      "Domain taken over: a new identity key with no logged link to the old one",
+      undefined,
+      `Someone took over ${this.host} with a new key. Its old attestations don't match it, so assistants stop trusting it.`,
+    );
   }
 
-  #emit(outcome: "ok" | "refused" | "info", title: string, detail?: Record<string, unknown>): void {
+  #emit(
+    outcome: "ok" | "refused" | "info",
+    title: string,
+    detail?: Record<string, unknown>,
+    say?: string,
+  ): void {
     this.#options.events.emit({
       actor: "provider",
       where: this.host,
       title,
       outcome,
       ...(detail ? { detail } : {}),
+      ...(say ? { say } : {}),
     });
   }
 

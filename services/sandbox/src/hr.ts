@@ -137,6 +137,7 @@ export class HrPlatform {
           "Employee asked for their record in the portal: a single-use, 10-minute pre-authorized offer, returned only to their signed-in session",
         outcome: "info",
         detail: { basis: "customer_records", organization: EMPLOYER },
+        say: "ExamplePeople, your employer's HR system, offered a signed record of your job to your wallet.",
       });
       return c.json({ offerUri });
     });

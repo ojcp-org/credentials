@@ -4,6 +4,7 @@ import { MantineProvider } from "@mantine/core";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { boot } from "./boot.ts";
+import { Narrator } from "./chrome/Narrator.tsx";
 import { SandboxBar } from "./chrome/SandboxBar.tsx";
 import { Assistant } from "./personas/Assistant.tsx";
 import { Employer } from "./personas/Employer.tsx";
@@ -43,6 +44,7 @@ if (root)
         <MantineProvider theme={theme} forceColorScheme={scheme}>
           <SandboxBar />
           <Persona />
+          <Narrator />
         </MantineProvider>
       </StrictMode>,
     ),

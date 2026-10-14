@@ -88,6 +88,29 @@ export interface PendingApproval {
   bindingActions: BindingAction[];
 }
 
+/** A posting's employer as the agent reads it: the id from the wire type, plus the name schema.org adds. */
+const PostingEmployer = z
+  .looseObject({ ojcp_employer_id: z.string().optional(), name: z.string().optional() })
+  .catch({});
+
+/** The employer of a posting, as `confirmEmployer` and the candidate's screens want it. */
+export function postingEmployer(job: JobPostingFacts): {
+  ojcp_employer_id?: string;
+  name?: string;
+} {
+  const e = PostingEmployer.parse(job.employer ?? {});
+  return {
+    ...(e.ojcp_employer_id ? { ojcp_employer_id: e.ojcp_employer_id } : {}),
+    ...(e.name ? { name: e.name } : {}),
+  };
+}
+
+/** The employer's name for people, or its id when the posting has no name. */
+export const employerName = (job: JobPostingFacts): string => {
+  const e = postingEmployer(job);
+  return e.name ?? e.ojcp_employer_id ?? "the employer";
+};
+
 /** An RFC 0013 wallet step as the agent may relay it (§4.1). */
 const WalletStep = z.looseObject({
   step_id: z.string(),
@@ -196,13 +219,19 @@ export class SandboxAgent {
     return this.world.origins.origin("agent");
   }
 
-  #emit(outcome: "ok" | "refused" | "info", title: string, detail?: Record<string, unknown>): void {
+  #emit(
+    outcome: "ok" | "refused" | "info",
+    title: string,
+    detail?: Record<string, unknown>,
+    say?: string,
+  ): void {
     this.world.events.emit({
       actor: "agent",
       where: this.world.origins.host("agent"),
       title,
       outcome,
       ...(detail ? { detail } : {}),
+      ...(say ? { say } : {}),
     });
   }
 
@@ -268,6 +297,7 @@ export class SandboxAgent {
       "info",
       "Proposed a standing mandate to the permission service; the candidate approves it in their wallet",
       { proposal: this.proposal },
+      "JobGPT asked your wallet for permission to apply for you. It can't give itself permission: only you can, in your wallet.",
     );
     return start.url;
   }
@@ -295,6 +325,7 @@ export class SandboxAgent {
         expires: new Date(obtained.batch.mandate.exp * 1000).toISOString().slice(0, 10),
         applications_total: obtained.batch.terms.applications_total,
       },
+      "Your wallet's permission service gave JobGPT a set of one-use passes. Each shows an employer only what that application needs.",
     );
   }
 
@@ -302,7 +333,12 @@ export class SandboxAgent {
   declineMandate(state: string): boolean {
     if (!this.#pending.delete(state)) return false;
     if (this.#pending.size === 0) this.consentUrl = undefined;
-    this.#emit("refused", "The candidate declined in their wallet; JobGPT has no permission");
+    this.#emit(
+      "refused",
+      "The candidate declined in their wallet; JobGPT has no permission",
+      undefined,
+      "You declined, so JobGPT has nothing to apply with.",
+    );
     return true;
   }
 
@@ -384,6 +420,8 @@ export class SandboxAgent {
         this.#emit(
           "info",
           "The permission service's status list shows the agent's credentials revoked: the candidate cancelled. The agent stops.",
+          undefined,
+          "JobGPT checked its passes and found them cancelled. It has stopped applying.",
         );
       }
     }
@@ -549,14 +587,24 @@ export class SandboxAgent {
         };
         this.approvals.set(approval.id, approval);
         const text = `${label} needs the candidate's own approval: ${bindingActions.map((b) => b.title).join(", ")}. A standing mandate never covers legal agreements.`;
-        this.#emit("refused", text, { binding_actions: bindingActions });
+        this.#emit(
+          "info",
+          text,
+          { binding_actions: bindingActions },
+          `${employerName(job)} has terms for "${String(job.title)}". JobGPT can't agree to terms for you, so it stopped and asked you.`,
+        );
         return { status: "needs_approval", approval, text };
       }
       return await this.#submit(host, job, employerId, session, label);
     } catch (error) {
       if (error instanceof StandingMandateRefusal) {
         const text = `Agent will not apply to ${label}: ${error.message} (${error.reason})`;
-        this.#emit("refused", text);
+        this.#emit(
+          "refused",
+          text,
+          undefined,
+          `JobGPT held back on "${String(job.title)}" at ${employerName(job)}: your permission doesn't cover it.`,
+        );
         return { status: "refused_by_agent", reason: error.reason, text };
       }
       throw error;
@@ -589,7 +637,12 @@ export class SandboxAgent {
       // The mandate may have changed since begin_application (e.g. a limit was reached).
       if (!(error instanceof StandingMandateRefusal)) throw error;
       const text = `Agent will not submit ${label}: ${error.message} (${error.reason})`;
-      this.#emit("refused", text);
+      this.#emit(
+        "refused",
+        text,
+        undefined,
+        `JobGPT held back on "${String(job.title)}": a limit you set was reached.`,
+      );
       return { status: "refused_by_agent", reason: error.reason, text };
     }
     const submitted = await this.callTool(host, "submit_application", {
@@ -608,7 +661,14 @@ export class SandboxAgent {
       await this.holder.recordSubmission(ex.batchId, this.world.origins.origin(host), employerId);
     this.#lastSubmit = { provider: host, job, employerId, session };
     const text = `Submitted ${label}${submitted.result.retried ? " (retry: the provider returned the original outcome)" : ""}`;
-    this.#emit("ok", text, { application_id: session.application_id });
+    this.#emit(
+      "ok",
+      text,
+      { application_id: session.application_id },
+      submitted.result.retried
+        ? undefined
+        : `JobGPT sent your application for "${String(job.title)}" to ${employerName(job)}. Their system checked your permission first.`,
+    );
     return { status: "submitted", application_id: session.application_id, text };
   }
 
@@ -709,7 +769,12 @@ export class SandboxAgent {
         details: submitted.result,
       });
     const text = `Submitted ${label} under the candidate's action mandate`;
-    this.#emit("ok", text);
+    this.#emit(
+      "ok",
+      text,
+      undefined,
+      `You agreed on your phone, so JobGPT sent "${String(a.job.title)}" to ${employerName(a.job)}.`,
+    );
     return { status: "submitted", application_id: a.session.application_id, text };
   }
 
@@ -774,14 +839,19 @@ export class SandboxAgent {
     };
     this.verifications.set(verification.id, verification);
     const text = `${label} asks the candidate to verify their work history at its own page (${verification.ref}). Wallet steps are for the person: the agent stops and links to the page`;
-    this.#emit("refused", text, {
-      checked: [
-        `site trust tier: ${tier.tier}`,
-        "verification page on the site's origin",
-        "claims within RFC 0013 §5",
-      ],
-      asks: verification.asks,
-    });
+    this.#emit(
+      "info",
+      text,
+      {
+        checked: [
+          `site trust tier: ${tier.tier}`,
+          "verification page on the site's origin",
+          "claims within RFC 0013 §5",
+        ],
+        asks: verification.asks,
+      },
+      `${employerName(job)} wants to confirm your work history. That's between you and them, so JobGPT stopped and linked you to their page.`,
+    );
     return { status: "needs_verification", verification, text };
   }
 
@@ -818,7 +888,12 @@ export class SandboxAgent {
     if (status.result.status === "expired") {
       this.verifications.delete(id);
       const text = `${label}: the work-history step passed its deadline, so the application expired`;
-      this.#emit("info", text);
+      this.#emit(
+        "info",
+        text,
+        undefined,
+        `The time to confirm your work history ran out, so "${String(v.job.title)}" expired.`,
+      );
       return {
         status: "done",
         step: "expired",

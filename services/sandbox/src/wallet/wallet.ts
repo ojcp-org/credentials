@@ -203,13 +203,19 @@ export class SandboxWallet {
     this.#events = options.events;
   }
 
-  #emit(outcome: "ok" | "refused" | "info", title: string, detail?: Record<string, unknown>) {
+  #emit(
+    outcome: "ok" | "refused" | "info",
+    title: string,
+    detail?: Record<string, unknown>,
+    say?: string,
+  ) {
     this.#events.emit({
       actor: "wallet",
       where: this.#host,
       title,
       outcome,
       ...(detail ? { detail } : {}),
+      ...(say ? { say } : {}),
     });
   }
 
@@ -350,6 +356,7 @@ export class SandboxWallet {
       "ok",
       `Wallet redeemed the offer (pre-authorized code + code from the text) and stored ${issued.credentials.length} copies, each bound to its own key`,
       { issuer: offer.credential_issuer, vct: HIRING_VCT[type], basis: held.basis },
+      "Your wallet checked the HR system's signature and saved your record. It never goes to JobGPT.",
     );
     return held;
   }
@@ -370,6 +377,8 @@ export class SandboxWallet {
       this.#emit(
         "refused",
         "Wallet refused a request: its signer isn't a verifier this wallet trusts",
+        undefined,
+        "Your wallet refused a request it couldn't trace to a verified employer.",
       );
       throw new WalletError(
         "This wallet couldn't confirm who is asking, so it won't show the request.",
@@ -420,6 +429,7 @@ export class SandboxWallet {
       "info",
       `Wallet checked a request from ${responseHost}: signed under a trusted verifier certificate for that host (${signer.organization ?? "no organization"})`,
       { client_id: clientId, asks_for: pending.share.map((s) => s.label) },
+      `Your wallet checked who's asking: ${signer.organization ?? responseHost}, verified for ${responseHost}. It shows you exactly what they'll see.`,
     );
     return pending;
   }
@@ -467,6 +477,8 @@ export class SandboxWallet {
       this.#emit(
         "refused",
         `${request.verifier.host} didn't accept the presentation (${response.status}); nothing was kept`,
+        undefined,
+        `${who} couldn't accept what your wallet sent, so nothing was kept.`,
       );
       throw new WalletError(`${who} couldn't accept this. Go back to its page and try again.`);
     }
@@ -485,6 +497,9 @@ export class SandboxWallet {
         ? `Wallet sent an encrypted presentation to ${request.verifier.host} with only the requested claims, bound to its nonce and client ID`
         : `Candidate declined ${request.verifier.host}'s request in the wallet`,
       decision === "share" ? { disclosed: request.share.map((s) => s.label) } : undefined,
+      decision === "share"
+        ? `Your wallet sent ${who} only what it asked for, encrypted so only ${who} can read it.`
+        : `You declined ${who}'s request. Nothing was shared.`,
     );
     return answer.success ? answer.data.redirect_uri : undefined;
   }

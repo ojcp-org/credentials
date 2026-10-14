@@ -41,6 +41,11 @@ export interface SandboxEvent {
   outcome: "ok" | "refused" | "info";
   /** Structured detail: what was sent, disclosed or decided. */
   detail?: Record<string, unknown>;
+  /**
+   * One plain-English sentence for the narration toasts, set only on the
+   * moments a viewer should notice. The title stays the technical record.
+   */
+  say?: string;
 }
 
 export class EventBus {

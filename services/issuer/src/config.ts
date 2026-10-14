@@ -69,6 +69,12 @@ export interface IssuerConfig {
    * with one-time codes. Unset: the built-in page.
    */
   consentUi?: string;
+  /**
+   * The operator's own screen for seeing and cancelling permissions, e.g.
+   * `https://wallet.example/#permissions`. The issuer's account pages then
+   * redirect there. Unset: the built-in account pages, signed in with a code.
+   */
+  accountUi?: string;
   /** A banner shown on every page, e.g. for a test-only deployment. */
   notice?: string;
   now?: () => number;

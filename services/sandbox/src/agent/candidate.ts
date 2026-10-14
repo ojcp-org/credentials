@@ -15,7 +15,13 @@ import {
 } from "@ojcp/credentials-core";
 import { confirmEmployer, type DerivedTier } from "@ojcp/trust";
 import type { Host } from "../config.ts";
-import { type ApplyOutcome, PROVIDER_HOSTS, type SandboxAgent } from "./agent.ts";
+import {
+  type ApplyOutcome,
+  employerName,
+  PROVIDER_HOSTS,
+  postingEmployer,
+  type SandboxAgent,
+} from "./agent.ts";
 
 /** Who receives an application, as RFC 0010 §5.5 says to show it. */
 export interface Recipient {
@@ -322,18 +328,13 @@ export class CandidateView {
           job: {
             id: j.ojcp_id,
             title: String(j.title ?? j.ojcp_id),
-            employer: isNamed(j.employer) ? j.employer.name : (j.employer?.ojcp_employer_id ?? ""),
+            employer: employerName(j),
             place: place(j),
             arrangement: ARRANGEMENT[j.remote_policy ?? ""] ?? "Not stated",
             pay,
             occupation: codeValue ? (onet.title(codeValue) ?? codeValue) : "Not classified",
           },
-          recipient: recipientOf(derived, site, {
-            ...(j.employer?.ojcp_employer_id
-              ? { ojcp_employer_id: j.employer.ojcp_employer_id }
-              : {}),
-            ...(isNamed(j.employer) ? { name: j.employer.name } : {}),
-          }),
+          recipient: recipientOf(derived, site, postingEmployer(j)),
         };
         // Any attempt counts: one held back by a limit shouldn't be offered again.
         const applied = this.applications.find((a) => a.jobId === j.ojcp_id);
@@ -383,7 +384,7 @@ export class CandidateView {
       provider: host,
       jobId: job.ojcp_id,
       title: String(job.title ?? job.ojcp_id),
-      employer: isNamed(job.employer) ? job.employer.name : (job.employer?.ojcp_employer_id ?? ""),
+      employer: employerName(job),
       recipient,
     };
     switch (outcome.status) {
@@ -456,12 +457,11 @@ export class CandidateView {
     const m = await this.#mandate();
     const job = await this.#agent.job(host, jobId);
     const { derived } = await this.#agent.describe(host);
-    const recipient = recipientOf(derived, this.#agent.world.origins.host(host), {
-      ...(job.employer?.ojcp_employer_id
-        ? { ojcp_employer_id: job.employer.ojcp_employer_id }
-        : {}),
-      ...(isNamed(job.employer) ? { name: job.employer.name } : {}),
-    }).summary;
+    const recipient = recipientOf(
+      derived,
+      this.#agent.world.origins.host(host),
+      postingEmployer(job),
+    ).summary;
     const record = this.#record(host, job, recipient, await this.#agent.apply(host, jobId), m);
     this.applications.unshift(record);
     return record;
@@ -548,12 +548,3 @@ const AGENT_REASON: Record<string, string> = {
     "The employer's verification page wasn't on its own site, so I didn't pass it on.",
   wallet_step_malformed: "The employer's verification request didn't make sense, so I stopped.",
 };
-
-function isNamed(employer: unknown): employer is { name: string } {
-  return (
-    typeof employer === "object" &&
-    employer !== null &&
-    "name" in employer &&
-    typeof employer.name === "string"
-  );
-}
