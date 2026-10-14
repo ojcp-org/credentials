@@ -152,6 +152,7 @@ export class SandboxWorld {
       o.origin("attestA"),
       "Sandbox KYB Co.",
       "sandbox:kyb-co",
+      "A know-your-business check, the kind a bank runs: who the company legally is, and which careers sites it has authorised to post its jobs.",
       this.clock,
       this.events,
     );
@@ -159,15 +160,16 @@ export class SandboxWorld {
       o.origin("attestB"),
       "Sandbox Business Registry",
       "sandbox:registry",
+      "A lookup in the company register, the kind a state's Secretary of State keeps: the company is registered and in good standing.",
       this.clock,
       this.events,
     );
     this.lists = await SandboxListPublisher.create(o.origin("lists"), this.clock, this.events);
     this.lists.list(this.attestA, ["legal_entity", "hosted_employer"]);
     this.lists.list(this.attestB, ["business_registration"]);
-    this.apps.set("attestA", this.attestA.app(NOTICE));
-    this.apps.set("attestB", this.attestB.app(NOTICE));
-    this.apps.set("lists", this.lists.app(NOTICE));
+    this.apps.set("attestA", this.attestA.app());
+    this.apps.set("attestB", this.attestB.app());
+    this.apps.set("lists", this.lists.app());
 
     // The HR platform the candidate's employer uses (RFC 0014), and the candidate's wallet.
     this.hr = await HrPlatform.create({

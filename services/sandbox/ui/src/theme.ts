@@ -88,6 +88,10 @@ export function themeFor(role: Role): { theme: MantineThemeOverride; scheme: "li
         theme: createTheme({ ...base, primaryColor: "dark", primaryShade: 7 }),
         scheme: "light",
       };
+    case "attestA":
+    case "attestB":
+    case "lists":
+      return { theme: createTheme({ ...base, primaryColor: "green" }), scheme: "light" };
     default:
       return { theme: createTheme({ ...base, primaryColor: "orange" }), scheme: "light" };
   }

@@ -72,6 +72,9 @@ const PAGES: Partial<Record<Host, RegExp>> = {
   lookalike: /^\/$/,
   ats: /^\/$/,
   globex: /^\/$/,
+  attestA: /^\/$/,
+  attestB: /^\/$/,
+  lists: /^\/$/,
 };
 
 running = await build();

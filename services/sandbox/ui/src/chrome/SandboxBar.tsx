@@ -109,6 +109,10 @@ const TAB_OF: Partial<Record<Role, Tab>> = {
   globex: "employer",
   lookalike: "employer",
   home: "hood",
+  // The trust network: its attesters and trust list are explored from under the hood.
+  attestA: "hood",
+  attestB: "hood",
+  lists: "hood",
 };
 
 export const activeTab: Tab | undefined = TAB_OF[boot.role];

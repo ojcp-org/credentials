@@ -41,8 +41,8 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 | `acme-careers.` | A lookalike of Acme's site, using Acme's name with no attestations of its own |
 | `ats.` | ExampleATS, hosting Globex and Initech jobs on one origin |
 | `globex.ats.` | Globex's careers site, a tenant sharing ExampleATS's identity key |
-| `attest-a.`, `attest-b.` | Two attesters run by different operators |
-| `lists.` | The trust-list publisher the assistant pins |
+| `attest-a.`, `attest-b.` | Two attesters run by different operators: Sandbox KYB Co. and Sandbox Business Registry. Each page says what it checks, what it vouched for and whether that still stands, and shows what it's doing live (issuing, suspending, answering status-list fetches without learning who asked) |
+| `lists.` | The trust-list publisher the assistant pins. Its page lists the attesters it trusts and for what, any distrust, its pinned key, and its live activity |
 
 All pages are one React app (`ui/`, React and Mantine with ojcp.dev's theme), served on each origin with a bootstrap naming the persona. Each party's own Hono app answers everything else, and every origin serves `/_sandbox/` for the bar, the timeline and the lab.
 

@@ -9,6 +9,7 @@ import { Assistant } from "./personas/Assistant.tsx";
 import { Employer } from "./personas/Employer.tsx";
 import { Hood } from "./personas/Hood.tsx";
 import { Hr } from "./personas/Hr.tsx";
+import { Registry } from "./personas/Registry.tsx";
 import { Wallet } from "./personas/Wallet.tsx";
 import { themeFor } from "./theme.ts";
 
@@ -22,6 +23,10 @@ function Persona() {
       return <Assistant />;
     case "home":
       return <Hood />;
+    case "attestA":
+    case "attestB":
+    case "lists":
+      return <Registry />;
     default:
       return <Employer />;
   }
