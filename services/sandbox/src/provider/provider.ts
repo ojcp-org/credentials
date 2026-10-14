@@ -861,6 +861,7 @@ export class SandboxProvider {
       const work = r?.workHistory;
       if (!r || work?.status !== "deferred")
         return c.json({ error: "Nothing to check for this application." }, 404);
+      if (work.check) return c.json({ error: "A check is already recorded." }, 409);
       const body = z
         .object({ outcome: z.enum(["confirmed", "not_confirmed"]), note: z.string().max(500) })
         .safeParse(await c.req.json().catch(() => undefined));

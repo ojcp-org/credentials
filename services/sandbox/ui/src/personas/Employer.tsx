@@ -505,8 +505,9 @@ function WorkHistory({ r, reload }: { r: Received; reload: () => void }) {
         </Badge>
       )}
       <Text size="sm">
-        The candidate chose to continue without a wallet, so nothing here is verified yet. Check the
-        work history your usual way, such as a reference call or a verification service.
+        {w.check
+          ? "The candidate chose to continue without a wallet, and a recruiter checked the work history by other means."
+          : "The candidate chose to continue without a wallet, so nothing here is verified yet. Check the work history your usual way, such as a reference call or a verification service."}
       </Text>
       {requirement}
       <Text size="xs" c="dimmed">
