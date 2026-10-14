@@ -38,6 +38,7 @@ import {
 } from "@ojcp/credentials-core";
 import { z } from "zod";
 import type { AgentClient, IssuerConfig } from "./config.ts";
+import { type ConsentView, consentView } from "./consent.ts";
 import { hashToken, numericCode, pkceMatches, token } from "./secrets.ts";
 import { StatusRegistry } from "./status.ts";
 import type {
@@ -418,6 +419,43 @@ export class Issuer {
       if (!code || !(await this.#checkOtp(`${pendingId}:${key}`, code)))
         throw new ProtocolError("access_denied", "a verification code is wrong or expired", 403);
     }
+    return this.#authorize(pending, narrowing);
+  }
+
+  /**
+   * The operator approved for a person it has already signed in, e.g. a wallet
+   * provider whose app unlocked with the owner's biometrics. `verified` are the
+   * identifiers the operator itself verified for that person (RFC 0008 §2.3);
+   * the mandate may bind only those, so a request naming anyone else is refused.
+   */
+  async approveSignedIn(
+    pendingId: string,
+    verified: CandidateElement[],
+    narrowing: Narrowing = {},
+  ): Promise<string> {
+    const pending = await this.pending(pendingId);
+    if (!pending) throw new ProtocolError("invalid_request", "authorization expired", 404);
+    const theirs = new Set(verified.map(identifierKey));
+    if (!pending.dataset.candidate.every((e) => theirs.has(identifierKey(e))))
+      throw new ProtocolError(
+        "access_denied",
+        "this request names someone other than the signed-in person",
+        403,
+      );
+    return this.#authorize(pending, narrowing);
+  }
+
+  /** What the consent screen shows for a pending request, or undefined once it expired. */
+  async consent(pendingId: string): Promise<ConsentView | undefined> {
+    const pending = await this.pending(pendingId);
+    const client = pending && this.client(pending.clientId);
+    if (!pending || !client) return undefined;
+    const { exp } = monthEpochs(new Date(this.now() * 1000), pending.dataset.months);
+    return consentView(pendingId, client, pending.dataset, new Date(exp * 1000));
+  }
+
+  async #authorize(pending: PendingAuthorization, narrowing: Narrowing): Promise<string> {
+    const pendingId = pending.id;
     const dataset = narrow(pending.dataset, narrowing);
     const { nbf, exp } = monthEpochs(new Date(this.now() * 1000), dataset.months);
     const client = this.client(pending.clientId);

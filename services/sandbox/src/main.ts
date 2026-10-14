@@ -66,9 +66,8 @@ const PAGES: Partial<Record<Host, RegExp>> = {
   home: /^\/$/,
   agent: /^\/$/,
   hr: /^\/(practice)?$/,
-  wallet: /^\/(offer|authorize)?$/,
-  // The permission service's consent screen is the wallet provider's own.
-  issuer: /^\/consent\/[A-Za-z0-9_-]+$/,
+  // The permission service's consent screen is a screen in the wallet app.
+  wallet: /^\/(offer|authorize|permissions\/[A-Za-z0-9_-]+)?$/,
   acme: /^\/(verify\/[A-Z0-9]{4,6}|ats)?$/,
   lookalike: /^\/$/,
   ats: /^\/$/,

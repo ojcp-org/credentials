@@ -132,8 +132,8 @@ export class SandboxWorld {
       adminToken: base64url(randomBytes(32)),
       cookieSecret: base64url(randomBytes(32)),
       notice: NOTICE,
-      // Run by Jordan's wallet provider: consent happens in the wallet's own screens.
-      consentUi: "/consent/{id}",
+      // Run by Jordan's wallet provider: consent is a screen in the wallet app.
+      consentUi: `${o.origin("wallet")}/permissions/{id}`,
       now: () => this.clock.now(),
     });
     // The issuer saw the agent's directory when its keys were published (RFC 0008 §3.4's 7-day rule).

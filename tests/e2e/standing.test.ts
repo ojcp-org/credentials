@@ -1,4 +1,4 @@
-import { refreshStandingMandate } from "@ojcp/agent-wallet";
+import { beginStandingMandate, refreshStandingMandate } from "@ojcp/agent-wallet";
 import {
   actionDigest,
   actionStatement,
@@ -29,6 +29,7 @@ import {
   obtainMandate,
   PROPOSAL,
   PROVIDER,
+  REDIRECT,
   rawPresentation,
   type ToolResult,
   type World,
@@ -163,6 +164,31 @@ describe("standing mandate, end to end", () => {
     for (const p of employers) expect(await apply(world, p)).toMatchObject({ ok: true });
     // The batch is now spent on applications, so the holder reports a refresh is due (§4.1).
     expect(await world.holder.needsRefresh()).toHaveLength(1);
+  });
+
+  it("lets an operator approve only for the person it signed in (RFC 0008 §2.3)", async () => {
+    const world = await createWorld();
+    const pending = async () => {
+      const { url } = await beginStandingMandate({
+        issuer: ISSUER,
+        clientId: CLIENT_ID,
+        redirectUri: REDIRECT,
+        proposal: PROPOSAL,
+        fetch: world.issuerFetch,
+      });
+      const html = await (await world.issuerFetch(url)).text();
+      return html.match(/\/authorize\/([A-Za-z0-9_-]+)\/approve/)?.[1] ?? "";
+    };
+    // Someone else's account can't approve a request naming this candidate.
+    await expect(
+      world.issuer.approveSignedIn(await pending(), [{ email: "someone@else.example" }]),
+    ).rejects.toMatchObject({ error: "access_denied" });
+    // The candidate's own account can, without a code.
+    const redirect = new URL(
+      await world.issuer.approveSignedIn(await pending(), PROPOSAL.candidate),
+    );
+    expect(redirect.origin + redirect.pathname).toBe(REDIRECT);
+    expect(redirect.searchParams.get("code")).toBeTruthy();
   });
 });
 

@@ -201,8 +201,8 @@ function ProposalCard({
         </Button>
       </Group>
       <Text size="xs" c="dimmed" mt="sm">
-        Your wallet asks for a code sent to your email; in the sandbox it arrives in Jordan's inbox.
-        You can narrow any of this there.
+        Your wallet opens with exactly this, and you approve with Face ID. You can narrow any of it
+        there; JobGPT can't widen it.
       </Text>
     </Paper>
   );

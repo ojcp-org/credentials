@@ -293,11 +293,15 @@ export class SandboxAgent {
     );
   }
 
-  /** Plays the candidate approving everything proposed (demo shortcut and conformance runs). */
+  /**
+   * Plays a candidate approving everything proposed (demo shortcut and
+   * conformance runs). Conformance candidates aren't the wallet's owner, so this
+   * proves their email with a one-time code through the JSON consent API.
+   */
   async approveAsCandidate(): Promise<void> {
     const consent = await fetch(await this.startMandate(), { redirect: "manual" });
     const location = consent.headers.get("location") ?? "";
-    const id = location.match(/\/consent\/([A-Za-z0-9_-]+)$/)?.[1];
+    const id = location.match(/\/permissions\/([A-Za-z0-9_-]+)$/)?.[1];
     if (!id) throw new Error(`the consent screen did not open (${consent.status})`);
     const api = `${this.world.origins.origin("issuer")}/api/consent/${id}`;
     const post = async (path: string, body: unknown): Promise<Record<string, unknown>> => {

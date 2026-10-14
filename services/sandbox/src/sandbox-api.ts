@@ -25,13 +25,22 @@ export interface Sandbox {
 
 export type Tab = "hr" | "wallet" | "assistant" | "employer" | "hood";
 
+/** A page, by origin and path; `prefix` matches every path under it. */
+export interface StoryPage {
+  url: string;
+  prefix?: true;
+}
+
 export interface StoryStep {
   n: number;
   tab: Tab;
   title: string;
   /** What happens, in a sentence. */
   detail: string;
+  /** Where to go next for this step. */
   href: string;
+  /** The pages where the step can be done: the bar says "You're here" only on these. */
+  at: StoryPage[];
   done: boolean;
 }
 
@@ -52,6 +61,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "Jordan works at Vandelay Industries. Its HR platform, ExamplePeople, can put a signed record of the job in his wallet at any time.",
       href: `${o.origin("hr")}/`,
+      at: [{ url: `${o.origin("hr")}/` }],
       done: world.hr.offered || world.wallet.records.length > 0,
     },
     {
@@ -59,7 +69,9 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       title: "Save it in your wallet",
       detail:
         "The wallet checks the HR platform's signature and keeps three copies, each bound to its own key.",
-      href: world.hr.offered ? `${o.origin("wallet")}/` : `${o.origin("hr")}/`,
+      // The wallet opens from the HR portal's offer link, so that's where to go.
+      href: `${o.origin("hr")}/`,
+      at: [{ url: `${o.origin("wallet")}/offer` }],
       done: world.wallet.records.length > 0,
     },
     {
@@ -68,6 +80,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "JobGPT is a ChatGPT-style assistant. Its Job search app finds roles on OJCP career sites and can apply for Jordan.",
       href: `${o.origin("agent")}/`,
+      at: [{ url: `${o.origin("agent")}/` }],
       done: assistant.asked,
     },
     {
@@ -76,6 +89,10 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "Jordan's wallet provider runs the permission service. He chooses which jobs, where, minimum pay and how many applications, and can cancel there at any time; JobGPT can't change it.",
       href: agent.consentUrl ?? `${o.origin("agent")}/`,
+      // Until JobGPT proposes, the step starts with its "Approve in my wallet" button.
+      at: agent.consentUrl
+        ? [{ url: `${o.origin("wallet")}/permissions/`, prefix: true }]
+        : [{ url: `${o.origin("agent")}/` }],
       done: hasPermission,
     },
     {
@@ -84,6 +101,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "It applies only where the permission covers the job and it can verify who runs the site.",
       href: `${o.origin("agent")}/`,
+      at: [{ url: `${o.origin("agent")}/` }],
       done: view.applications.length > 0,
     },
     {
@@ -92,6 +110,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "On its own page, Acme confirms Jordan's email first, so the check can't be attached to someone else's application.",
       href: verifyUrl ?? `${o.origin("acme")}/`,
+      at: [{ url: `${o.origin("acme")}/verify/`, prefix: true }],
       done: acme.bound || acme.settled,
     },
     {
@@ -99,7 +118,9 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       title: "Approve sharing in your wallet",
       detail:
         "The wallet checks who's asking and shows exactly what Acme will see. Nothing goes through the assistant.",
-      href: verifyUrl ?? `${o.origin("wallet")}/`,
+      // The wallet opens from Acme's verification page.
+      href: verifyUrl ?? `${o.origin("acme")}/`,
+      at: [{ url: `${o.origin("wallet")}/authorize` }],
       done: shared || acme.settled,
     },
     {
@@ -107,6 +128,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       title: "Your assistant sends the application",
       detail: "Acme tells the assistant only that the step is done, never what the record said.",
       href: `${o.origin("agent")}/`,
+      at: [{ url: `${o.origin("agent")}/` }],
       done: acmeSentWithHistory,
     },
     {
@@ -114,6 +136,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       title: "See it from Acme's side",
       detail: "What Acme's recruiters receive, what was verified, and what they never learn.",
       href: `${o.origin("acme")}/ats`,
+      at: [{ url: `${o.origin("acme")}/ats` }],
       done: visited.has("ats"),
     },
     {
@@ -122,6 +145,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       detail:
         "Every message between the parties, the trust network, and what happens when things go wrong.",
       href: `${o.origin("home")}/`,
+      at: [{ url: `${o.origin("home")}/` }],
       done: visited.has("hood"),
     },
   ];

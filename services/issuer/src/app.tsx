@@ -7,7 +7,6 @@ import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
 import { z } from "zod";
-import { consentView } from "./consent.ts";
 import { type Issuer, type Narrowing, ProtocolError } from "./issuer.ts";
 import {
   AccountCodePage,
@@ -117,16 +116,14 @@ export function createApp(issuer: Issuer): Hono {
 
   // The same consent as JSON, for an operator's own screen (`consentUi`).
   const consentFor = async (id: string) => {
-    const pending = await issuer.pending(id);
-    if (!pending)
+    const view = await issuer.consent(id);
+    if (!view)
       throw new ProtocolError(
         "invalid_request",
         "This request has expired. Start again from your agent.",
         404,
       );
-    const client = issuer.client(pending.clientId);
-    if (!client) throw new ProtocolError("unauthorized_client", "unknown client");
-    return consentView(id, client, pending.dataset, expiryFor(issuer, pending.dataset.months));
+    return view;
   };
   const ConsentDecision = z.object({
     codes: z.record(z.string(), z.string()),

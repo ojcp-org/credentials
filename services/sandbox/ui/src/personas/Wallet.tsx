@@ -15,6 +15,7 @@ import {
   Group,
   List,
   Loader,
+  Modal,
   NumberInput,
   Paper,
   PinInput,
@@ -29,6 +30,7 @@ import {
   IconAlertTriangle,
   IconCircleCheck,
   IconEyeOff,
+  IconFaceId,
   IconLock,
   IconShieldCheck,
   IconX,
@@ -310,8 +312,10 @@ interface Option {
 }
 
 /**
- * The permission service's consent screen (RFC 0008 §3.3), run by the wallet
- * provider and shown in the wallet. Jordan can only narrow what the assistant asked for.
+ * The permission service's consent screen (RFC 0008 §3.3). Jordan's wallet
+ * provider runs the service, so this is a wallet screen: the wallet already
+ * verified his email when he set it up, and he approves with Face ID. He can
+ * only narrow what the assistant asked for.
  */
 function Consent() {
   const id = location.pathname.split("/").at(-1) ?? "";
@@ -323,12 +327,11 @@ function Consent() {
   const [actions, setActions] = useState<string[]>([]);
   const [perEmployer, setPerEmployer] = useState(1);
   const [total, setTotal] = useState(1);
-  const [sent, setSent] = useState(false);
-  const [codes, setCodes] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string>();
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
-    api<ConsentView>(`/api/consent/${id}`).then(
+    api<ConsentView>(`/api/wallet/consent/${id}`).then(
       (c) => {
         setV(c);
         setJobs(c.jobs.map((o) => o.value));
@@ -364,7 +367,7 @@ function Consent() {
       </Stack>
     </Checkbox.Group>
   );
-  const complete = v.contacts.every((c) => (codes[c.value] ?? "").length === 6);
+  const nothingLeft = jobs.length === 0 || places.length === 0 || arrangements.length === 0;
 
   return (
     <>
@@ -380,12 +383,14 @@ function Consent() {
             </Text>
           </Box>
         </Group>
-        <Badge mt="sm" color={v.client.affiliated ? "orange" : "teal"} variant="light">
-          {v.client.affiliated ? "Shares control with your wallet" : "Independent of your wallet"}
-        </Badge>
         <Text size="sm" mt="sm">
           wants permission to apply for jobs for you until <b>{v.until}</b>. Untick anything you
           don't want, and lower any limit.
+        </Text>
+        <Text size="xs" c="dimmed" mt={6}>
+          {v.client.affiliated
+            ? `${v.client.name} is run by your wallet provider.`
+            : `${v.client.name} is a separate company. It can't approve this for you or change it later.`}
         </Text>
       </Paper>
       <Paper p="md" radius="lg" withBorder>
@@ -454,40 +459,21 @@ function Consent() {
         </Text>
       </Paper>
       {error && <Alert color="red">{error}</Alert>}
-      <Paper p="md" radius="lg" withBorder>
-        <Text size="sm" fw={500} mb={6}>
-          Confirm it's you
-        </Text>
-        {sent ? (
-          v.contacts.map((c) => (
-            <Box key={c.value} mb="xs">
-              <Text size="xs" c="dimmed" mb={4}>
-                Code sent to {c.label} (see Jordan's inbox)
-              </Text>
-              <PinInput
-                length={6}
-                type="number"
-                value={codes[c.value] ?? ""}
-                onChange={(x) => setCodes({ ...codes, [c.value]: x })}
-              />
-            </Box>
-          ))
-        ) : (
-          <Text size="xs" c="dimmed">
-            We'll send a 6-digit code to {v.contacts.map((c) => c.label).join(" and ")}.
-          </Text>
-        )}
-      </Paper>
       <Stack gap="xs">
-        {sent ? (
-          <Button
-            size="md"
-            disabled={!complete}
-            loading={busy === "approve"}
-            onClick={() =>
-              run("approve", async () => {
-                const { redirect } = await api<{ redirect: string }>(`/api/consent/${id}/approve`, {
-                  codes,
+        <Button
+          size="md"
+          leftSection={<IconFaceId size={20} />}
+          disabled={nothingLeft}
+          loading={busy === "approve"}
+          onClick={() =>
+            run("approve", async () => {
+              // The sandbox's stand-in for the phone's biometric prompt.
+              setScanning(true);
+              await new Promise((r) => setTimeout(r, 900));
+              setScanning(false);
+              const { redirect } = await api<{ redirect: string }>(
+                `/api/wallet/consent/${id}/approve`,
+                {
                   selection: {
                     job_families: jobs,
                     locations: places,
@@ -496,26 +482,18 @@ function Consent() {
                     per_employer: perEmployer,
                     applications_total: total,
                   },
-                });
-                location.href = redirect;
-              })
-            }
-          >
-            Give {v.client.name} permission
-          </Button>
-        ) : (
-          <Button
-            size="md"
-            loading={busy === "codes"}
-            onClick={() =>
-              run("codes", async () => {
-                await api(`/api/consent/${id}/codes`, {});
-                setSent(true);
-              })
-            }
-          >
-            Send me a code
-          </Button>
+                },
+              );
+              location.href = redirect;
+            })
+          }
+        >
+          Approve with Face ID
+        </Button>
+        {nothingLeft && (
+          <Text size="xs" c="dimmed" ta="center">
+            Keep at least one kind of job, place and way of working, or decline.
+          </Text>
         )}
         <Button
           size="md"
@@ -523,7 +501,10 @@ function Consent() {
           loading={busy === "deny"}
           onClick={() =>
             run("deny", async () => {
-              const { redirect } = await api<{ redirect: string }>(`/api/consent/${id}/deny`, {});
+              const { redirect } = await api<{ redirect: string }>(
+                `/api/wallet/consent/${id}/decline`,
+                {},
+              );
               location.href = redirect;
             })
           }
@@ -531,8 +512,23 @@ function Consent() {
           Decline
         </Button>
       </Stack>
+      <Modal
+        opened={scanning}
+        onClose={() => undefined}
+        withCloseButton={false}
+        centered
+        size="xs"
+        radius="lg"
+        title="Face ID"
+      >
+        <Stack align="center" gap="xs" py="md">
+          <IconFaceId size={56} stroke={1.2} />
+          <Text size="sm">Confirming it's you…</Text>
+        </Stack>
+      </Modal>
       <Text size="xs" c="dimmed" ta="center">
-        This screen comes from your wallet provider's permission service, not from {v.client.name}.
+        Your wallet provider keeps this permission, not {v.client.name}. Cancel it any time under
+        Permissions.
       </Text>
     </>
   );
@@ -757,7 +753,7 @@ function Authorize() {
 
 export function Wallet() {
   const path = location.pathname;
-  if (boot.role === "issuer")
+  if (path.startsWith("/permissions/"))
     return (
       <Phone title="Approve a permission">
         <Consent />

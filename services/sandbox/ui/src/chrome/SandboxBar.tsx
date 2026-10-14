@@ -38,12 +38,19 @@ import { OJCP } from "../theme.ts";
 
 export type Tab = "hr" | "wallet" | "assistant" | "employer" | "hood";
 
+/** A page, by origin and path; `prefix` matches every path under it. */
+interface StoryPage {
+  url: string;
+  prefix?: true;
+}
+
 export interface StoryStep {
   n: number;
   tab: Tab;
   title: string;
   detail: string;
   href: string;
+  at: StoryPage[];
   done: boolean;
 }
 
@@ -96,8 +103,6 @@ const TABS: Array<{ tab: Tab; label: string; who: string; role: Role; icon: type
 const TAB_OF: Partial<Record<Role, Tab>> = {
   hr: "hr",
   wallet: "wallet",
-  // The permission service is run by Jordan's wallet provider.
-  issuer: "wallet",
   agent: "assistant",
   acme: "employer",
   ats: "employer",
@@ -113,6 +118,14 @@ function tabOfHref(href: string): Tab | undefined {
   const origin = new URL(href).origin;
   const role = (Object.keys(boot.origins) as Role[]).find((r) => boot.origins[r] === origin);
   return role ? TAB_OF[role] : undefined;
+}
+
+const pageOf = (url: URL | Location): string => `${url.origin}${url.pathname}`;
+
+/** Whether this page is one where the step can be done. */
+function isHere(step: StoryStep): boolean {
+  const current = pageOf(location);
+  return step.at.some((p) => (p.prefix ? current.startsWith(p.url) : current === p.url));
 }
 
 /** Polls the story; every origin serves it under /_sandbox/. */
@@ -224,13 +237,9 @@ export function SandboxBar() {
     return () => ro.disconnect();
   }, []);
   const step = story?.steps.find((s) => s.n === story.current);
-  // The wallet is opened from another site's page, so being in it is "here" for a wallet step.
-  const here = step
-    ? activeTab === step.tab &&
-      (boot.role === "wallet" ||
-        boot.role === "issuer" ||
-        new URL(step.href).origin === location.origin)
-    : false;
+  const here = step ? isHere(step) : false;
+  // The step's way forward is a button on this page, e.g. Acme's "Open my wallet".
+  const nextIsThisPage = step ? pageOf(new URL(step.href)) === pageOf(location) : false;
   const allDone = story ? story.steps.every((s) => s.done) : false;
 
   return (
@@ -257,36 +266,38 @@ export function SandboxBar() {
       >
         {boot.notice}
       </Text>
-      <Group gap={0} px="md" wrap="nowrap" style={{ overflowX: "auto" }}>
-        <a
-          href={`${boot.origins.home}/`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            paddingRight: 20,
-            color: OJCP.text,
-          }}
-        >
-          <img src={ojcpIcon} alt="OJCP" width={24} height={24} />
-          <Text fw={700} size="sm">
-            OJCP <span style={{ color: OJCP.gold }}>sandbox</span>
-          </Text>
-        </a>
-        {TABS.map((t, i) => (
-          <Tooltip key={t.tab} label={t.who} openDelay={300}>
-            <a
-              className="ojcp-tab"
-              data-active={activeTab === t.tab}
-              href={`${boot.origins[t.role]}/`}
-            >
-              <span className="num">{i + 1}</span>
-              <t.icon size={16} />
-              {t.label}
-            </a>
-          </Tooltip>
-        ))}
-        <Box style={{ flex: 1 }} />
+      <Group gap={0} px={{ base: "xs", sm: "md" }} wrap="nowrap">
+        <Group gap={0} wrap="nowrap" style={{ overflowX: "auto", minWidth: 0, flex: 1 }}>
+          <a
+            href={`${boot.origins.home}/`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              paddingRight: 20,
+              color: OJCP.text,
+            }}
+          >
+            <img src={ojcpIcon} alt="OJCP" width={24} height={24} />
+            <Text fw={700} size="sm" visibleFrom="sm">
+              OJCP <span style={{ color: OJCP.gold }}>sandbox</span>
+            </Text>
+          </a>
+          {TABS.map((t, i) => (
+            <Tooltip key={t.tab} label={t.who} openDelay={300}>
+              <a
+                className="ojcp-tab"
+                data-active={activeTab === t.tab}
+                href={`${boot.origins[t.role]}/`}
+                aria-label={t.label}
+              >
+                <span className="num">{i + 1}</span>
+                <t.icon size={16} />
+                <span className="label">{t.label}</span>
+              </a>
+            </Tooltip>
+          ))}
+        </Group>
         <Indicator
           label={story?.inbox.length ?? 0}
           size={16}
@@ -298,11 +309,15 @@ export function SandboxBar() {
             variant="subtle"
             color="gray"
             size="xs"
+            px={8}
             leftSection={<IconMail size={15} />}
             onClick={() => setInboxOpen(true)}
-            styles={{ root: { color: OJCP.text } }}
+            aria-label="Jordan's inbox"
+            styles={{ root: { color: OJCP.text }, section: { marginInlineEnd: 0 } }}
           >
-            Jordan's inbox
+            <Box component="span" visibleFrom="md" ml={6}>
+              Jordan's inbox
+            </Box>
           </Button>
         </Indicator>
         <Tooltip
@@ -313,9 +328,11 @@ export function SandboxBar() {
             variant="subtle"
             color="gray"
             size="xs"
+            px={8}
             ml={4}
             leftSection={<IconRefresh size={15} />}
             loading={resetting}
+            aria-label="Reset all"
             onClick={async () => {
               if (
                 !confirm("Reset everything? Every party gets new keys and the story starts over.")
@@ -325,25 +342,32 @@ export function SandboxBar() {
               await fetch("/_sandbox/lab/reset", { method: "POST" });
               location.href = `${boot.origins.hr}/`;
             }}
-            styles={{ root: { color: OJCP.text } }}
+            styles={{ root: { color: OJCP.text }, section: { marginInlineEnd: 0 } }}
           >
-            Reset all
+            <Box component="span" visibleFrom="md" ml={6}>
+              Reset all
+            </Box>
           </Button>
         </Tooltip>
       </Group>
       {story && step && (
         <Group
-          px="md"
+          px={{ base: "xs", sm: "md" }}
           py={8}
-          gap="md"
-          wrap="nowrap"
+          gap="sm"
+          wrap="wrap"
           bg={OJCP.surface}
-          style={{ borderTop: "1px solid #28282f" }}
+          style={{ borderTop: "1px solid #28282f", rowGap: 6 }}
         >
-          <Badge color="ojcpGold" variant="light" radius="sm" style={{ flexShrink: 0 }}>
+          <Badge
+            color="ojcpGold"
+            variant="light"
+            radius="sm"
+            style={{ flexShrink: 0, color: OJCP.gold, background: "rgba(232,168,48,0.14)" }}
+          >
             {allDone ? "Story complete" : `Step ${step.n} of ${story.steps.length}`}
           </Badge>
-          <Box style={{ minWidth: 0, flex: 1 }}>
+          <Box style={{ minWidth: 200, flex: 1 }}>
             <Text size="sm" fw={600} truncate>
               {allDone ? "You've seen the whole journey" : step.title}
             </Text>
@@ -372,19 +396,20 @@ export function SandboxBar() {
             </Popover.Dropdown>
           </Popover>
           {!allDone &&
-            (here ? (
-              <Badge variant="outline" color="ojcpGold" style={{ flexShrink: 0 }}>
-                You're here
+            (here || nextIsThisPage ? (
+              <Badge
+                variant="outline"
+                style={{ flexShrink: 0, color: OJCP.gold, borderColor: OJCP.gold }}
+              >
+                {here ? "You're here" : "Use the button on this page"}
               </Badge>
             ) : (
               <Button
                 component="a"
                 href={step.href}
                 size="xs"
-                color="ojcpGold"
-                c={OJCP.obsidian}
                 rightSection={<IconArrowRight size={15} />}
-                style={{ flexShrink: 0 }}
+                style={{ flexShrink: 0, background: OJCP.gold, color: OJCP.obsidian }}
               >
                 Next: {TABS.find((t) => t.tab === (tabOfHref(step.href) ?? step.tab))?.label}
               </Button>

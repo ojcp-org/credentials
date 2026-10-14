@@ -6,6 +6,10 @@ metadata:
     app: ojcp-sandbox
 spec:
   type: ClusterIP
+  # Headless: the apps vCluster allocates IPv4 cluster IPs while the host is
+  # IPv6, so the syncer can't create a Service with a cluster IP. The ALB
+  # targets pod IPs (target-type: ip) and never uses one.
+  clusterIP: None
   ports:
     - port: 80
       targetPort: 8080

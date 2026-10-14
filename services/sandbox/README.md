@@ -13,8 +13,8 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 | Tab | Persona | Origin | What happens |
 |---|---|---|---|
 | 1 · HR | Jordan, at work | `hr.` | ExamplePeople, a Workday-like HR platform Vandelay uses. Signed in as an employee, he adds a record of his job to his wallet, at any time (RFC 0014 §4.1). The platform signs as a `customer_records` issuer. |
-| 2 · Wallet | Jordan's phone | `wallet.`, `issuer.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission happens in the wallet (`issuer.`'s consent screen, rendered as a wallet screen), and **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
-| 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet with an email code. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
+| 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
+| 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
 | 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
 | 5 · Under the hood | Anyone evaluating OJCP | `sandbox.` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any provider. |
 
@@ -36,7 +36,7 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 | `hr.` | ExamplePeople, the HR platform: an RFC 0014 issuer (`services/issuer`) |
 | `wallet.` | Jordan's wallet |
 | `agent.` | JobGPT, Jordan's assistant: an agent platform built on `@ojcp/agent-wallet` |
-| `issuer.` | The permission service, run by Jordan's wallet provider: issues standing mandates (`services/issuer`, with its consent screen in the wallet's UI) |
+| `issuer.` | The permission service's protocol endpoints, run by Jordan's wallet provider: issues standing mandates (`services/issuer`; its consent screen is the wallet's) |
 | `acme.` | Acme Corporation's careers site: an employer running its own provider, with wallet steps |
 | `acme-careers.` | A lookalike of Acme's site, using Acme's name with no attestations of its own |
 | `ats.` | ExampleATS, hosting Globex and Initech jobs on one origin |

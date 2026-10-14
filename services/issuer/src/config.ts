@@ -60,9 +60,13 @@ export interface IssuerConfig {
   /** The issuer's name for wallets to show (OpenID4VCI §12.2.4 `display`). */
   displayName?: string;
   /**
-   * The operator's own consent screen, e.g. `/consent/{id}` in a wallet app on
-   * this origin. `/authorize` creates the request and redirects there; that UI
-   * drives the JSON consent API (`/api/consent/:id`). Unset: the built-in page.
+   * The operator's own consent screen, as a URL template with `{id}`, e.g.
+   * `https://wallet.example/permissions/{id}` in a wallet provider's app, or a
+   * path such as `/consent/{id}` on this origin. `/authorize` creates the
+   * request and redirects there. That screen reads the request with
+   * `Issuer.consent` (or the JSON consent API) and approves with
+   * `Issuer.approveSignedIn` for a person the operator already verified, or
+   * with one-time codes. Unset: the built-in page.
    */
   consentUi?: string;
   /** A banner shown on every page, e.g. for a test-only deployment. */

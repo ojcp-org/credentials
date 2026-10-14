@@ -2,7 +2,7 @@
 
 A self-hostable issuer for OJCP credentials:
 
-- **Standing mandates** (RFC 0008): OpenID4VCI authorization code flow with `authorization_details` carrying `ojcp_standing_mandate`, a consent page the issuer renders itself (or the operator's own, through the JSON consent API), one-time codes for each candidate binding, batch issuance bound to the agent platform's published mandate keys, refresh on identical terms, and revocation from an account page.
+- **Standing mandates** (RFC 0008): OpenID4VCI authorization code flow with `authorization_details` carrying `ojcp_standing_mandate`, a consent page the issuer renders itself (or the operator's own: see `OJCP_CONSENT_UI`), one-time codes for each candidate binding, batch issuance bound to the agent platform's published mandate keys, refresh on identical terms, and revocation from an account page. An operator that already verified the person, such as a wallet provider whose app is unlocked, approves with `Issuer.approveSignedIn(id, verified, selection)` instead of codes; the request may name only identifiers in `verified`.
 - **Hiring credentials** (RFC 0014, baseline profile): employment, education, professional license and certification records, issued over the pre-authorized code flow with a transaction code sent by a separate channel, former-employee offers, and status updates.
 
 ## Endpoints
@@ -38,7 +38,7 @@ A self-hostable issuer for OJCP credentials:
 | `OJCP_COOKIE_SECRET` | Signs the account-page cookie |
 | `OJCP_MESSENGER_WEBHOOK` | URL that receives `{to, subject, text}` for every code and offer. Required in production; without it, messages are logged (development only). |
 | `OJCP_DISPLAY_NAME` | The issuer's name for wallets (OpenID4VCI `display`) |
-| `OJCP_CONSENT_UI` | Path of the operator's own consent screen on this origin, e.g. `/consent/{id}`, for a wallet provider that renders consent in its app. `/authorize` then redirects there, and that screen uses the JSON consent API. Unset: the built-in page. |
+| `OJCP_CONSENT_UI` | The operator's own consent screen, as a path on this origin or an `https://` URL, with `{id}`, e.g. `https://wallet.example/permissions/{id}` for a wallet provider that renders consent in its app. `/authorize` then redirects there. That screen reads the request with `Issuer.consent` or the JSON consent API. Unset: the built-in page. |
 
 The service polls each agent platform's key directory hourly to record when every mandate key first appeared (the 7-day rule) and applies status changes at hourly epochs.
 

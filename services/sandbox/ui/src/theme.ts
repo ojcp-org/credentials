@@ -82,7 +82,6 @@ export function themeFor(role: Role): { theme: MantineThemeOverride; scheme: "li
     case "hr":
       return { theme: createTheme({ ...base, primaryColor: "teal" }), scheme: "light" };
     case "wallet":
-    case "issuer":
       return { theme: createTheme({ ...base, primaryColor: "indigo" }), scheme: "light" };
     case "agent":
       return {

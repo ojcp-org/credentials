@@ -30,7 +30,7 @@ const Env = z.object({
   OJCP_DISPLAY_NAME: z.string().min(1).optional(),
   OJCP_CONSENT_UI: z
     .string()
-    .regex(/^\/.*\{id\}/)
+    .regex(/^(\/|https:\/\/).*\{id\}/)
     .optional(),
   NODE_ENV: z.string().optional(),
 });

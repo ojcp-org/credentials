@@ -9,7 +9,7 @@
  * there directly: one company's own systems, with the owner signed in.
  */
 import { type CandidateElement, onet } from "@ojcp/credentials-core";
-import type { Issuer } from "@ojcp/issuer";
+import { type Issuer, ProtocolError } from "@ojcp/issuer";
 import { Hono } from "hono";
 import { z } from "zod";
 import type { EventBus } from "../events.ts";
@@ -43,6 +43,8 @@ export function walletApp(
 ): Hono {
   const app = new Hono();
   app.onError((error, c) => {
+    if (error instanceof ProtocolError)
+      return c.json({ error: error.message }, error.status === 404 ? 404 : 400);
     if (error instanceof WalletError || error instanceof z.ZodError)
       return c.json(
         { error: error instanceof WalletError ? error.message : "Invalid request." },
@@ -79,6 +81,39 @@ export function walletApp(
       .parse(await c.req.json());
     return c.json({ redirect_uri: await wallet.respond(c.req.param("id"), decision) });
   });
+
+  // ── The permission service's consent screen, as a wallet screen (RFC 0008 §3.3) ──
+  // The wallet account already verified the owner's email, and the app is
+  // unlocked with their biometrics, so approving needs no one-time code.
+  const Selection = z.object({
+    job_families: z.array(z.string()).optional(),
+    locations: z.array(z.string()).optional(),
+    remote_policy: z.array(z.string()).optional(),
+    actions: z.array(z.string()).optional(),
+    per_employer: z.number().int().optional(),
+    applications_total: z.number().int().optional(),
+  });
+  app.get("/api/wallet/consent/:id", async (c) => {
+    const view = await permissions.issuer.consent(c.req.param("id"));
+    if (!view) return c.json({ error: "This request has expired. Ask your assistant again." }, 404);
+    return c.json(view);
+  });
+  app.post("/api/wallet/consent/:id/approve", async (c) => {
+    const { selection } = z.object({ selection: Selection }).parse(await c.req.json());
+    const { issuer, owner, events, host } = permissions;
+    const redirect = await issuer.approveSignedIn(c.req.param("id"), [owner], selection);
+    events.emit({
+      actor: "candidate",
+      where: host,
+      title:
+        "Candidate approved the permission in their wallet with Face ID. The wallet account had already verified their email, so no code was needed",
+      outcome: "ok",
+    });
+    return c.json({ redirect });
+  });
+  app.post("/api/wallet/consent/:id/decline", async (c) =>
+    c.json({ redirect: await permissions.issuer.deny(c.req.param("id")) }),
+  );
 
   // ── Permissions the owner gave agents (RFC 0008), at this provider's permission service ──
   app.get("/api/wallet/permissions", async (c) => {

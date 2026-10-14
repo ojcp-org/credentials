@@ -17,7 +17,6 @@ function Persona() {
     case "hr":
       return <Hr />;
     case "wallet":
-    case "issuer":
       return <Wallet />;
     case "agent":
       return <Assistant />;
