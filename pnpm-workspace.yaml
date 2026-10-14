@@ -2,7 +2,8 @@ packages:
   - sdks/typescript/*
   - services/*
 allowBuilds:
-  cbor-extract: set this to true or false
+  # Optional native speed-up for cbor-x, which falls back to plain JS.
+  cbor-extract: false
 minimumReleaseAgeExclude:
   - '@hono/node-server@2.1.5'
 onlyBuiltDependencies:

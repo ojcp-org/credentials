@@ -7,6 +7,7 @@ import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
 import { z } from "zod";
+import { consentView } from "./consent.ts";
 import { type Issuer, type Narrowing, ProtocolError } from "./issuer.ts";
 import {
   AccountCodePage,
@@ -66,6 +67,16 @@ export function createApp(issuer: Issuer): Hono {
     }),
   );
 
+  if (config.notice) {
+    const banner = `<div role="note" style="background:#fff3cd;border:1px solid #e0c36b;padding:.5rem .75rem;margin-bottom:1rem">${escapeHtml(config.notice)}</div>`;
+    app.use("*", async (c, next) => {
+      await next();
+      if (!c.res.headers.get("content-type")?.startsWith("text/html")) return;
+      const html = (await c.res.text()).replace("<body>", `<body>${banner}`);
+      c.res = new Response(html, c.res);
+    });
+  }
+
   app.onError((error, c) => {
     if (error instanceof HTTPException) return error.getResponse();
     if (error instanceof ProtocolError) {
@@ -90,6 +101,8 @@ export function createApp(issuer: Issuer): Hono {
     const pending = await issuer.startAuthorization(c.req.query());
     const client = issuer.client(pending.clientId);
     if (!client) throw new ProtocolError("unauthorized_client", "unknown client");
+    if (config.consentUi)
+      return c.redirect(config.consentUi.replace("{id}", encodeURIComponent(pending.id)), 303);
     return c.html(
       <ConsentPage
         pendingId={pending.id}
@@ -97,8 +110,60 @@ export function createApp(issuer: Issuer): Hono {
         dataset={pending.dataset}
         expiry={expiryFor(issuer, pending.dataset.months)}
         codesSent={false}
+        host={new URL(config.issuer).host}
       />,
     );
+  });
+
+  // The same consent as JSON, for an operator's own screen (`consentUi`).
+  const consentFor = async (id: string) => {
+    const pending = await issuer.pending(id);
+    if (!pending)
+      throw new ProtocolError(
+        "invalid_request",
+        "This request has expired. Start again from your agent.",
+        404,
+      );
+    const client = issuer.client(pending.clientId);
+    if (!client) throw new ProtocolError("unauthorized_client", "unknown client");
+    return consentView(id, client, pending.dataset, expiryFor(issuer, pending.dataset.months));
+  };
+  const ConsentDecision = z.object({
+    codes: z.record(z.string(), z.string()),
+    selection: z.object({
+      job_families: z.array(z.string()).optional(),
+      locations: z.array(z.string()).optional(),
+      remote_policy: z.array(z.string()).optional(),
+      actions: z.array(z.string()).optional(),
+      per_employer: z.number().int().optional(),
+      applications_total: z.number().int().optional(),
+    }),
+  });
+  app.get("/api/consent/:id", async (c) => c.json(await consentFor(c.req.param("id"))));
+  app.post("/api/consent/:id/codes", async (c) => {
+    const id = c.req.param("id");
+    await consentFor(id);
+    await issuer.sendCodes(id);
+    return c.json({ sent: true });
+  });
+  app.post("/api/consent/:id/approve", async (c) => {
+    const body = ConsentDecision.safeParse(await c.req.json().catch(() => undefined));
+    if (!body.success) throw new ProtocolError("invalid_request", "malformed decision");
+    const redirect = await issuer.approve(c.req.param("id"), body.data.codes, body.data.selection);
+    return c.json({ redirect });
+  });
+  app.post("/api/consent/:id/deny", async (c) =>
+    c.json({ redirect: await issuer.deny(c.req.param("id")) }),
+  );
+
+  /** The person's choices so far, read from the consent form. */
+  const selectionOf = (form: FormData): Narrowing => ({
+    job_families: form.getAll("job_families").map(String),
+    locations: form.getAll("locations").map(String),
+    remote_policy: form.getAll("remote_policy").map(String),
+    actions: form.getAll("actions").map(String),
+    per_employer: Number(form.get("per_employer")),
+    applications_total: Number(form.get("applications_total")),
   });
 
   app.post("/authorize/:id/send-codes", async (c) => {
@@ -106,7 +171,7 @@ export function createApp(issuer: Issuer): Hono {
     const form = await c.req.formData();
     if (form.get("decision") === "deny") return c.redirect(await issuer.deny(id), 303);
     await issuer.sendCodes(id);
-    return renderConsent(c, id, true);
+    return renderConsent(c, id, true, undefined, selectionOf(form));
   });
 
   app.post("/authorize/:id/approve", async (c) => {
@@ -116,24 +181,23 @@ export function createApp(issuer: Issuer): Hono {
     const codes: Record<string, string> = {};
     for (const [key, value] of Object.entries(formStrings(form)))
       if (key.startsWith("code:")) codes[key.slice(5)] = value;
-    const narrowing: Narrowing = {
-      job_families: form.getAll("job_families").map(String),
-      locations: form.getAll("locations").map(String),
-      remote_policy: form.getAll("remote_policy").map(String),
-      actions: form.getAll("actions").map(String),
-      per_employer: Number(form.get("per_employer")),
-      applications_total: Number(form.get("applications_total")),
-    };
+    const narrowing = selectionOf(form);
     try {
       return c.redirect(await issuer.approve(id, codes, narrowing), 303);
     } catch (error) {
       if (error instanceof ProtocolError && error.status !== 404)
-        return renderConsent(c, id, true, error.message);
+        return renderConsent(c, id, true, error.message, narrowing);
       throw error;
     }
   });
 
-  async function renderConsent(c: Context, id: string, codesSent: boolean, error?: string) {
+  async function renderConsent(
+    c: Context,
+    id: string,
+    codesSent: boolean,
+    error?: string,
+    selected?: Narrowing,
+  ) {
     const pending = await issuer.pending(id);
     if (!pending)
       return c.html(
@@ -149,7 +213,9 @@ export function createApp(issuer: Issuer): Hono {
         dataset={pending.dataset}
         expiry={expiryFor(issuer, pending.dataset.months)}
         codesSent={codesSent}
+        host={new URL(config.issuer).host}
         {...(error ? { error } : {})}
+        {...(selected ? { selected } : {})}
       />,
       error ? 400 : 200,
     );
@@ -192,6 +258,8 @@ export function createApp(issuer: Issuer): Hono {
   });
 
   // ── Account: revocation (RFC 0008 §7.2) ──────────────────────────────────
+  // A person who opens the issuer directly is here to see or cancel permissions.
+  app.get("/", (c) => c.redirect("/account"));
   app.get("/account", (c) => c.html(<AccountStartPage />));
 
   app.post("/account/code", async (c) => {
@@ -331,4 +399,8 @@ const AccountChallenge = z.strictObject({ challenge: z.string(), identifier: Can
 
 function expiryFor(issuer: Issuer, months: 1 | 2 | 3): Date {
   return new Date(monthEpochs(new Date(issuer.now() * 1000), months).exp * 1000);
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
 }

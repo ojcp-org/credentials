@@ -22,6 +22,7 @@ How the RFCs fit together: [Discussion #53](https://github.com/ojcp-org/ojcp/dis
 | [`sdks/typescript/trust`](sdks/typescript/trust) · `@ojcp/trust` | RFC 0010 for agents: manifest and key-certificate checks, attestation validation (pinned JWK or X.509 anchor), trust lists with rollover and sticky distrust, status, tier derivation with the two-operator rule, display text. Its resolver plugs into the agent wallet. Also the attester and list-publisher signing helpers. | Every agent; attesters, list publishers, indexes |
 | [`sdks/typescript/core`](sdks/typescript/core) · `@ojcp/credentials-core` | Shared primitives: keys and `Signer`, JWS, SD-JWT (RFC 9901), OJCP digests (JCS), RFC 9421 signing profile, O*NET-SOC hierarchy, salary grid, scope coverage, Token Status Lists, the hiring credential types and their Type Metadata. | All the libraries |
 | [`services/issuer`](services/issuer) · `@ojcp/issuer` | Self-hostable issuer service: OpenID4VCI authorization server and credential issuer, consent page, account page for revocation, status lists, and the RFC 0014 record API with former-employee offers. Hono, SQLite. | Mandate issuers; HR platforms, employers and schools issuing records |
+| [`services/sandbox`](services/sandbox) · `@ojcp/sandbox` | A test-only OJCP world told as one story in five persona tabs: an HR platform issuing an employment record; the candidate's wallet, whose provider also runs the permission service; JobGPT, a ChatGPT-style assistant applying under that permission; an employer verifying the record and receiving the application; and under the hood. Every party on its own origin. Runs locally on `*.sandbox.lvh.me`; deploys to `*.sandbox.ojcp.dev`. Test keys and made-up data only. | Anyone evaluating the protocol; providers checking conformance |
 | [`vectors`](vectors) | Language-neutral test vectors: digests, O*NET containment, salary rungs, scope coverage, Type Metadata bytes, and signed standing-mandate verification cases with expected outcomes. | Every SDK, in every language |
 | [`data/onet`](data/onet) | O*NET-SOC 2019 taxonomy and SOC structure (CC BY 4.0), compiled to one JSON every SDK loads. | Every SDK |
 
@@ -68,6 +69,15 @@ node services/issuer/dist/main.mjs
 ```
 
 `key.json` is a private P-256 JWK; `clients.json` lists the agent platforms allowed to request mandates (see [`services/issuer/README.md`](services/issuer/README.md)).
+
+Run the sandbox locally, then open `https://hr.sandbox.lvh.me:8443/` and follow the steps:
+
+```bash
+pnpm --filter "@ojcp/sandbox..." build
+pnpm --filter @ojcp/sandbox local
+```
+
+See [`services/sandbox/README.md`](services/sandbox/README.md) for what it shows and how to deploy it.
 
 ## Docs
 

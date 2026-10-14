@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ojcp-sandbox
+spec:
+  project: apps-dev
+  source:
+    path: charts/apps-vcluster/charts/ojcp-sandbox
+    repoURL: git@gitlab.com:recruitics/platform/kubernetes/host-clusters/rx-workloads-dev.git
+    targetRevision: main
+  destination:
+    namespace: ojcp-sandbox
+    name: apps-dev-workloads-dev-cluster
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true

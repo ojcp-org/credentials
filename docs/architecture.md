@@ -107,6 +107,10 @@ Tenure comes from RFC 0011 through a `KeyLineage` interface. Without a log and w
 
 `Issuer` holds the protocol logic; `createApp` is a thin Hono layer; `IssuerStore` has in-memory and SQLite (`node:sqlite`) implementations. Status lists, their used indexes and queued changes are persisted, so restarts never forget a revocation. Integrations a deployment supplies: `Messenger` (webhook in production), `MandateKeySource` (polls agent key directories and records first-seen times).
 
+### `services/sandbox`
+
+A test world on separate origins, in one process: `main.ts` routes each request by Host. `SandboxWorld` builds the parties. They include an HR platform and a permission service, both instances of `services/issuer`. The permission service is run by the candidate's wallet provider: its `consentUi` sends consent to a wallet screen that drives the JSON consent API, and the wallet lists and cancels permissions. There's also a wallet (`wallet/`) that collects records over OpenID4VCI and presents them over OpenID4VP, and attesters and a list publisher from `@ojcp/trust`. Providers run on `@ojcp/verifier`, each with a signed manifest, key set and MCP endpoint. Acme adds RFC 0013 wallet steps (`provider/wallet-step.ts`): contact-first bound sessions, `x509_hash` requests under a sandbox verifier CA (`pki.ts`), and encrypted responses checked by `verifyHiringPresentation`. `SandboxAgent` drives `@ojcp/agent-wallet` and `@ojcp/trust` the way an agent platform would, and checks its own credentials' status, so a cancellation stops it. `CandidateView` and `Assistant` (JobGPT) turn its results into what a candidate sees. The pages are one React and Mantine app (`ui/`) served on every origin with a bootstrap naming the persona. `/_sandbox/` on every origin serves the story, timeline and lab. Protocol traffic between parties always goes over HTTPS through DNS, never through in-process calls, so the timeline shows what crossed the wire. The exceptions are a party reaching into its own systems (the wallet app and the permission service run by the same provider) and the lab's incidents, which act as an operator would.
+
 ## Libraries
 
 | Need | Choice |

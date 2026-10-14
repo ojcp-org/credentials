@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist/types",
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "types": ["node"],
+    "lib": ["es2024", "dom"]
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../sdks/typescript/core" },
+    { "path": "../../sdks/typescript/verifier" },
+    { "path": "../../sdks/typescript/agent-wallet" },
+    { "path": "../../sdks/typescript/trust" },
+    { "path": "../issuer" }
+  ]
+}

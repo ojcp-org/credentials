@@ -1,0 +1,132 @@
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+.ojcp-bar a {
+  text-decoration: none;
+}
+
+.ojcp-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  color: #9090a0;
+  white-space: nowrap;
+  font-size: 13px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ojcp-tab:hover {
+  color: #ececf0;
+}
+
+.ojcp-tab[data-active="true"] {
+  color: #ececf0;
+  border-bottom-color: #e8a830;
+}
+
+.ojcp-tab .num {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #3a3a46;
+  font-size: 11px;
+}
+
+.ojcp-tab[data-active="true"] .num {
+  background: #e8a830;
+  border-color: #e8a830;
+  color: #0c0c0f;
+}
+
+.chat-bubble-user {
+  background: #f1f3f5;
+  border-radius: 18px;
+  padding: 10px 16px;
+  max-width: 80%;
+  margin-left: auto;
+  white-space: pre-wrap;
+}
+
+/* The blinking caret while JobGPT's reply streams in. */
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: currentColor;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+}
+
+.phone-device {
+  width: 380px;
+  max-width: 100%;
+  background: #0b0d12;
+  border-radius: 46px;
+  padding: 12px;
+  box-shadow: 0 30px 70px rgba(20, 33, 61, 0.28);
+}
+
+/* A phone is a fixed size: its screen scrolls, the device doesn't grow. It fits
+   the window below the sandbox bar (--bar-h, set by the bar) and the page padding. */
+.phone-screen {
+  background: #f4f5f8;
+  border-radius: 36px;
+  height: min(780px, calc(100vh - var(--bar-h, 116px) - 64px));
+  min-height: 480px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.record-card {
+  border-radius: 18px;
+  padding: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #364fc7, #5f3dc4);
+  box-shadow: 0 8px 20px rgba(54, 79, 199, 0.25);
+}
+
+@media (max-width: 480px) {
+  .phone-device {
+    border-radius: 0;
+    padding: 0;
+    width: 100%;
+  }
+  .phone-screen {
+    border-radius: 0;
+    height: calc(100vh - var(--bar-h, 116px));
+  }
+}

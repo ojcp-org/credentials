@@ -57,6 +57,16 @@ export interface IssuerConfig {
   /** Secret for signing the account-page cookie. */
   cookieSecret: string;
   batchSize?: number;
+  /** The issuer's name for wallets to show (OpenID4VCI §12.2.4 `display`). */
+  displayName?: string;
+  /**
+   * The operator's own consent screen, e.g. `/consent/{id}` in a wallet app on
+   * this origin. `/authorize` creates the request and redirects there; that UI
+   * drives the JSON consent API (`/api/consent/:id`). Unset: the built-in page.
+   */
+  consentUi?: string;
+  /** A banner shown on every page, e.g. for a test-only deployment. */
+  notice?: string;
   now?: () => number;
 }
 

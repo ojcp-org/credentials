@@ -27,6 +27,11 @@ const Env = z.object({
   OJCP_COOKIE_SECRET: z.string().min(32),
   OJCP_MESSENGER_WEBHOOK: z.url().optional(),
   OJCP_OJCP_VERSION: z.string().default("0.3"),
+  OJCP_DISPLAY_NAME: z.string().min(1).optional(),
+  OJCP_CONSENT_UI: z
+    .string()
+    .regex(/^\/.*\{id\}/)
+    .optional(),
   NODE_ENV: z.string().optional(),
 });
 
@@ -94,6 +99,8 @@ const issuer = await Issuer.create({
     : {}),
   ...(env.OJCP_ADMIN_TOKEN ? { adminToken: env.OJCP_ADMIN_TOKEN } : {}),
   cookieSecret: env.OJCP_COOKIE_SECRET,
+  ...(env.OJCP_DISPLAY_NAME ? { displayName: env.OJCP_DISPLAY_NAME } : {}),
+  ...(env.OJCP_CONSENT_UI ? { consentUi: env.OJCP_CONSENT_UI } : {}),
 });
 
 // Status changes apply at fixed hourly epochs (RFC 0008 §7.1).

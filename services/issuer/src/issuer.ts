@@ -62,6 +62,8 @@ const OTP_TTL = 600;
 const CODE_TTL = 60;
 const ACCESS_TTL = 300;
 const OFFER_TTL = 7 * 86_400;
+/** An offer shown inside a signed-in session is used at once. */
+const SESSION_OFFER_TTL = 600;
 
 /** OAuth/OpenID4VCI error responses. */
 export class ProtocolError extends Error {
@@ -223,6 +225,9 @@ export class Issuer {
       credential_endpoint: `${base}/credential`,
       nonce_endpoint: `${base}/nonce`,
       batch_credential_issuance: { batch_size: this.config.batchSize ?? 10 },
+      ...(this.config.displayName
+        ? { display: [{ name: this.config.displayName, locale: "en" }] }
+        : {}),
       credential_configurations_supported: configurations,
       ojcp_issuer: {
         profile: "baseline",
@@ -843,6 +848,36 @@ export class Issuer {
       text: `Your code is ${txCode}.`,
     });
     return { offerUri };
+  }
+
+  /**
+   * An offer for a holder the HR system has already signed in, e.g. an employee
+   * on their own records page (RFC 0014 §4.1, OpenID4VCI §3.5). It goes only to
+   * that session, so no transaction code; it is single-use and short-lived.
+   */
+  async sessionOffer(recordId: string): Promise<{ offerUri: string }> {
+    const record = await this.config.store.get("record", recordId);
+    if (!record) throw new ProtocolError("invalid_request", "record not found", 404);
+    const preAuthorizedCode = token();
+    const expiresAt = this.now() + SESSION_OFFER_TTL;
+    await this.config.store.put("grant", {
+      id: await hashToken(preAuthorizedCode),
+      kind: "pre_authorized",
+      subject: { kind: "record", recordId },
+      expiresAt,
+      used: false,
+    });
+    const offerId = token();
+    await this.config.store.put("offer", {
+      id: offerId,
+      recordId,
+      preAuthorizedCode,
+      txCodeRequired: false,
+      expiresAt,
+    });
+    return {
+      offerUri: `openid-credential-offer://?credential_offer_uri=${encodeURIComponent(`${this.config.issuer}/offers/${offerId}`)}`,
+    };
   }
 
   async credentialOffer(offerId: string): Promise<Record<string, unknown> | undefined> {

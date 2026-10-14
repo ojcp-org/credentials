@@ -1,0 +1,20 @@
+# Append to vclusters/apps/vcluster.yaml, next to ojcp-dev-cert. The ojcp.dev
+# certificate's *.ojcp.dev covers one label only, so the sandbox needs its own.
+# DNS records come from external-dns, which reads the ojcp-sandbox Ingress hosts.
+apiVersion: acm.aws.rx.cloud/v1beta1
+kind: PublicCertificate
+metadata:
+  name: ojcp-sandbox-cert
+spec:
+  forProvider:
+    zoneIdSelector:
+      matchLabels:
+        crossplane.io/claim-name: ojcp-dev
+        crossplane.io/claim-namespace: rx-workloads-dev
+    domainName: sandbox.ojcp.dev
+    subjectAlternativeNames:
+      - '*.sandbox.ojcp.dev'
+      - '*.ats.sandbox.ojcp.dev'
+    region: us-east-1
+  providerConfigRef:
+    name: rx-workloads-dev

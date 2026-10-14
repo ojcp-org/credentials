@@ -12,8 +12,9 @@ Everything tracks draft RFCs. When they change during the comment period (closin
 - **Action mandates.** Statement for approval, presentation, verification.
 - **Provider trust (RFC 0010).** `@ojcp/trust`: identity keys and key certificates, attestations (JWK or X.509 pinned), trust lists, status, tier derivation and display; its resolver drives the wallet's trust floor.
 - **Vectors.** Language-neutral vectors and a TypeScript test that holds the SDK to them.
+- **Sandbox.** `services/sandbox`: one story in five persona tabs (HR platform, wallet, assistant, employer, under the hood), every party on its own origin. It covers the RFC 0014 record into a browser wallet and RFC 0013 presentation to an employer that pins the issuer, plus standing mandates, trust incidents, hostile-agent probes and a conformance run against any provider. Image and manifests for `*.sandbox.ojcp.dev`; not deployed yet. Next: the same flow with a real wallet app on a phone.
 
-Proved by 60 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers, and the RFC 0010 §11 fixture groups.
+Proved by 61 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers, and the RFC 0010 §11 fixture groups.
 
 ## Next
 
@@ -25,7 +26,7 @@ Proved by 60 tests, including end-to-end runs through the issuer's HTTP handlers
 
 ## First adopters
 
-- A sandbox issuer for demos, clearly labelled as a test instance (see Open questions).
+- The sandbox deployed at `*.sandbox.ojcp.dev`, with a "Try the sandbox" link from ojcp.dev.
 - One provider verifying mandates in production code.
 - One agent platform piloting the wallet. Tink is the natural first ask, given its feedback on PR #40.
 
@@ -38,4 +39,4 @@ Proved by 60 tests, including end-to-end runs through the issuer's HTTP handlers
 | **Real attesters and lists** | §5.3: standing mandates need a derived `verified` tier, which needs two independent attesting operators on lists the agent pins. None exist yet. | `@ojcp/trust` implements the agent side; recruit a free business-registration attester and two list publishers (RFC 0010 §10). |
 | **RFC 0011 key transparency** | Tenure for `audited` comes from logged identity-key lineage. | `KeyLineage` interface; implement against RFC 0011 logs when they exist. |
 | **RFC 0009 job codes** | Coverage needs `occupationalCategory` with O*NET codes on postings. No listed provider emits them yet. | Demo against coded jobs; ask providers to add codes as part of 0009 adoption. |
-| **Type Metadata at `spec.ojcp.dev`** | `vct#integrity` must match the published bytes. | Publish `vectors/type-metadata/*.json` byte for byte (RFC feedback note 9). |
+| **Type Metadata at `spec.ojcp.dev`** | `vct#integrity` must match the published bytes. | Publish `vectors/type-metadata/*.json` byte for byte (RFC feedback note 10). |

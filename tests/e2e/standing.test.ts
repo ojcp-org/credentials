@@ -151,6 +151,19 @@ describe("standing mandate, end to end", () => {
       reason: "per_employer_reached",
     });
   });
+
+  it("keeps credentials for applications however much the agent searches", async () => {
+    const world = await createWorld();
+    const employers = ["e1", "e2", "e3", "e4", "e5"].map((e) =>
+      job({ ojcp_id: `careers.acme.com:${e}`, employerId: e }),
+    );
+    for (const p of employers) world.provider.jobs.set(p.ojcp_id, p);
+    await obtainMandate(world);
+    for (let i = 0; i < 25; i++) expect((await search(world)).ok).toBe(true);
+    for (const p of employers) expect(await apply(world, p)).toMatchObject({ ok: true });
+    // The batch is now spent on applications, so the holder reports a refresh is due (§4.1).
+    expect(await world.holder.needsRefresh()).toHaveLength(1);
+  });
 });
 
 // ── Helpers for presentations a faulty or hostile agent could send ─────────

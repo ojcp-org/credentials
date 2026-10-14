@@ -21,6 +21,9 @@
     },
     {
       "path": "sdks/typescript/core/test"
+    },
+    {
+      "path": "services/sandbox"
     }
   ]
 }

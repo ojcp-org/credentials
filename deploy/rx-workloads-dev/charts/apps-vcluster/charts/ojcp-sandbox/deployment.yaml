@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ojcp-sandbox
+  labels:
+    app: ojcp-sandbox
+spec:
+  # Exactly one pod: the whole sandbox world (keys, mandates, applications)
+  # lives in memory, and every origin must be served by the same process.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ojcp-sandbox
+  template:
+    metadata:
+      labels:
+        app: ojcp-sandbox
+    spec:
+      containers:
+        - name: ojcp-sandbox
+          # Public image from the ojcp-org/credentials CI; no pull secret. Pinned to a commit.
+          image: ghcr.io/ojcp-org/sandbox:COMMIT_SHA
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: SANDBOX_DOMAIN
+              value: sandbox.ojcp.dev
+            # Chat mode. Without the secret the demo agent runs scripted only.
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ojcp-sandbox
+                  key: anthropic-api-key
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi

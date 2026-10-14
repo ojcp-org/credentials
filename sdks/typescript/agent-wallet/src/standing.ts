@@ -201,6 +201,20 @@ export class StandingMandateHolder {
     return batch;
   }
 
+  /**
+   * Batches running low (RFC 0008 §4.1: refresh before a batch runs out). A batch
+   * is low when no more than a quarter of its credentials are unused.
+   */
+  async needsRefresh(): Promise<string[]> {
+    const now = this.#now();
+    return (await this.#store.batches())
+      .filter((b) => !b.revoked && now < b.mandate.exp)
+      .filter(
+        (b) => b.credentials.filter((c) => !c.use).length <= Math.floor(b.credentials.length / 4),
+      )
+      .map((b) => b.id);
+  }
+
   /** Marks a batch revoked locally (the user revoked at the issuer). */
   async revokeBatch(id: string): Promise<void> {
     const batch = (await this.#store.batches()).find((b) => b.id === id);
@@ -245,12 +259,15 @@ export class StandingMandateHolder {
   }
 
   async #search(batch: HeldBatch, input: ExerciseInput): Promise<Exercise> {
-    // §4.1: never an application credential; never two resource servers; fresh where possible.
+    // §4.1: never an application credential; never two resource servers; fresh while the
+    // batch lasts, but never from the half kept for applications, each of which needs a
+    // credential of its own per (resource server, employer).
     const fresh = batch.credentials.filter((c) => !c.use);
     const sameOrigin = batch.credentials.filter(
       (c) => c.use?.kind === "search" && c.use.origin === input.origin,
     );
-    const pool = fresh.length > 0 ? fresh : sameOrigin;
+    const reserve = Math.ceil(batch.credentials.length / 2);
+    const pool = fresh.length > reserve || sameOrigin.length === 0 ? fresh : sameOrigin;
     if (pool.length === 0)
       throw new StandingMandateRefusal("no_credential", "batch exhausted; refresh it");
     const credential = pool[randomInt(pool.length)] as HeldCredential;
