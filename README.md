@@ -6,6 +6,7 @@ It implements, as drafted:
 
 - standing mandates ([RFC 0008](https://github.com/ojcp-org/ojcp/pull/40)), with occupation codes and binding actions from [RFC 0009](https://github.com/ojcp-org/ojcp/pull/46);
 - action mandates and agent identity (spec *User Mandates* and *Agent Identity*, RFC 0003);
+- decentralized provider trust: organization identity keys, attestations, key-pinned trust lists and effective tiers ([RFC 0010](https://github.com/ojcp-org/ojcp/pull/41));
 - hiring credentials and their issuer profile ([RFC 0014](https://github.com/ojcp-org/ojcp/pull/45)) and their presentation to employers ([RFC 0013](https://github.com/ojcp-org/ojcp/pull/44)).
 
 How the RFCs fit together: [Discussion #53](https://github.com/ojcp-org/ojcp/discussions/53).
@@ -18,7 +19,8 @@ How the RFCs fit together: [Discussion #53](https://github.com/ojcp-org/ojcp/dis
 |---|---|---|
 | [`sdks/typescript/agent-wallet`](sdks/typescript/agent-wallet) · `@ojcp/agent-wallet` | Agent platform library: request-signing and mandate keys with the key directory, RFC 9421 signed `fetch`, an MCP client that signs every call, standing-mandate batches over OpenID4VCI, deciding what a mandate covers and what to disclose, action-mandate presentation. No UI. | Agent platforms |
 | [`sdks/typescript/verifier`](sdks/typescript/verifier) · `@ojcp/verifier` | Provider library: RFC 0008 §8 standing-mandate verification with the per-employer count, action-mandate verification, RFC 0013 §6.2 validation of wallet presentations, status-list cache. Every mandate refusal is `user_mandate_required`. | Job boards, ATSs, career sites |
-| [`sdks/typescript/core`](sdks/typescript/core) · `@ojcp/credentials-core` | Shared primitives: keys and `Signer`, JWS, SD-JWT (RFC 9901), OJCP digests (JCS), RFC 9421 signing profile, O*NET-SOC hierarchy, salary grid, scope coverage, Token Status Lists, the hiring credential types and their Type Metadata. | Both libraries |
+| [`sdks/typescript/trust`](sdks/typescript/trust) · `@ojcp/trust` | RFC 0010 for agents: manifest and key-certificate checks, attestation validation (pinned JWK or X.509 anchor), trust lists with rollover and sticky distrust, status, tier derivation with the two-operator rule, display text. Its resolver plugs into the agent wallet. Also the attester and list-publisher signing helpers. | Every agent; attesters, list publishers, indexes |
+| [`sdks/typescript/core`](sdks/typescript/core) · `@ojcp/credentials-core` | Shared primitives: keys and `Signer`, JWS, SD-JWT (RFC 9901), OJCP digests (JCS), RFC 9421 signing profile, O*NET-SOC hierarchy, salary grid, scope coverage, Token Status Lists, the hiring credential types and their Type Metadata. | All the libraries |
 | [`services/issuer`](services/issuer) · `@ojcp/issuer` | Self-hostable issuer service: OpenID4VCI authorization server and credential issuer, consent page, account page for revocation, status lists, and the RFC 0014 record API with former-employee offers. Hono, SQLite. | Mandate issuers; HR platforms, employers and schools issuing records |
 | [`vectors`](vectors) | Language-neutral test vectors: digests, O*NET containment, salary rungs, scope coverage, Type Metadata bytes, and signed standing-mandate verification cases with expected outcomes. | Every SDK, in every language |
 | [`data/onet`](data/onet) | O*NET-SOC 2019 taxonomy and SOC structure (CC BY 4.0), compiled to one JSON every SDK loads. | Every SDK |

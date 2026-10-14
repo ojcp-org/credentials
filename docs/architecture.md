@@ -74,7 +74,23 @@ flowchart TB
 | `createSignedFetch` | Signs every request; for a call carrying a standing mandate, signs with the `cnf` key and reuses the KB-JWT nonce (except `submit_application`) | §4.2 |
 | `connectOjcpProvider` (`@ojcp/agent-wallet/mcp`) | MCP client over the signed fetch | — |
 | Action mandates | Statement for approval; presentation with a KB-JWT by the agent key | spec *User Mandates* |
-| `TrustResolver` | Interface only: the wallet consumes an effective tier and its source; deriving tiers belongs to RFC 0010 | §5.3 |
+| `TrustResolver` | Interface the wallet consumes: an effective tier and its source. `@ojcp/trust`'s `DerivedTrustResolver` implements it | §5.3 |
+
+### `@ojcp/trust` (RFC 0010)
+
+| Module | Responsibility | RFC 0010 |
+|---|---|---|
+| `identity` | `did:web` organization identifier from the origin; the single identity key in `ojcp-keys.json`; key certificates (`ojcp_cert`) | §2 |
+| `manifest` | The spec's *Validation Procedure* (ES256/ES384/RS256/RS384, its error codes) plus the `ojcp_cert` condition for derivation; `signManifest` for providers | §2.2 |
+| `attestation` | The seven types with required claims and lifetime caps; issuer keys only from pinned lists; subject binding to the identity key or a logged predecessor; the tenant namespace rule; distrust with the agent's own acceptance records; `issueAttestation` for attesters | §3 |
+| `x509` | Chains validated to a pinned anchor, CA flags, validity, a URI SAN equal to `iss`, SPKI hashes for distrust | §3.3 |
+| `status` | Status List Tokens on the attester's origin, signed by its pinned key, with `exp` and `ttl`, cached at most 24 hours; unresolved is absent | §3.4 |
+| `trust-list` | Key-pinned lists from any mirror, `next_keys` rollover, `iat` ordering, 7-day cap, grants that lapse, distrust that doesn't, operators grouped across lists; `signTrustList` for publishers | §4 |
+| `derive`, `resolver` | Steps 1–5 with the fetch caps, two agreeing operators for `verified`, conformance, security review and 90 days of tenure for `audited`; source (b) from a pinned index during migration only; caching bounded by every input | §4.3, §5 |
+| `display` | Attested legal name and jurisdiction, A-label host, both parties for hosted origins, employer confirmed only by an independent `hosted-employer` attestation | §3.5, §5.5 |
+| `fetcher` | HTTPS only, no IP literals or local names, 256 KB, per-evaluation budgets | §5.2 |
+
+Tenure comes from RFC 0011 through a `KeyLineage` interface. Without a log and witness policy no tenure is known, so `audited` is reachable only through `listing-tenure` during migration.
 
 ### `@ojcp/verifier`
 

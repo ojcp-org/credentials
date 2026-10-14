@@ -43,6 +43,27 @@ Where each requirement is implemented and tested. **core** = `sdks/typescript/co
 | Action statement, `candidate_data_digest`, `binding_actions_digest` | core `action.ts` | vec digests |
 | Action-mandate verification and consumption | V `action.ts` | e2e `action.test.ts` |
 
+## RFC 0010: decentralized provider trust
+
+**T** = `sdks/typescript/trust/src`; tests in `sdks/typescript/trust/test/derive.test.ts` follow the §11 fixture groups.
+
+| § | Requirement | Where | Tested by |
+|---|---|---|---|
+| 2.1 | `did:web` identifier; IP literals have none; `provider.did` mismatch is `domain_mismatch` | T `identity.ts`, `manifest.ts` | attestations group (IP literal) |
+| 2.2 | One identity key; `ojcp_cert` with `sub`, `jkt`, `manifest` purpose, unexpired; counted only with it | T `identity.ts`, `manifest.ts` | manifests group |
+| 3.1 | SD-JWT VC, no KB-JWT, required claims, `sub` and `cnf.jkt` binding, lineage predecessors | T `attestation.ts` | attestations group |
+| 3.2 | Seven types, required claims, lifetime caps | T `attestation.ts` | attestations group (lifetime) |
+| 3.3 | Pinned JWK thumbprints or X.509 anchors with SAN URI = `iss` | T `attestation.ts`, `x509.ts` | X.509 group |
+| 3.4 | Status on the `iss` origin, pinned signer, `exp` and `ttl`, ≤ 24 h, absent when unresolved | T `status.ts` | status group |
+| 3.5 | Own evidence only; tenant namespace rule with a shared identity key; employer confirmation | T `attestation.ts`, `display.ts` | hosted group |
+| 3.6 | Staple from the manifest origin, ≤ 32 attestations, staples before fetches | T `derive.ts` | status group (no fetch with a fresh staple) |
+| 4.1–4.2 | Key-pinned lists, rollover, ordering, 7-day cap, malformed entries, sticky distrust, `distrust_after` against own records, operator grouping | T `trust-list.ts`, `attestation.ts` | trust lists and threshold groups |
+| 4.3 | Accepted attestation; two agreeing operators; NFKC and case folding; single-operator only by explicit configuration, shown with the tier | T `derive.ts`, `display.ts` | threshold group |
+| 5.2 | Steps 1–5 in order; ≤ 8 fetches in 5 s; nothing fetched for unlisted issuers; caching bounded | T `derive.ts`, `fetcher.ts`, `resolver.ts` | fetch-order group |
+| 5.3 | `audited`: conformance, security review, ≥ 90 days of lineage tenure, or `listing-tenure` in migration | T `derive.ts` | tenure group |
+| 5.4 | Sources (a) and (b); the higher wins with its source; (b) only in migration | T `resolver.ts` | tenure and sources group; e2e `trust.test.ts` |
+| 5.5 | Attested name and jurisdiction, A-label host, both parties | T `display.ts` | hosted group |
+
 ## RFC 0014 and RFC 0013: hiring credentials
 
 | Requirement | Where | Tested by |

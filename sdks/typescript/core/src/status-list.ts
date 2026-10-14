@@ -105,11 +105,13 @@ export const StatusListPayload = z.looseObject({
 });
 export type StatusListPayload = z.infer<typeof StatusListPayload>;
 
-/** Decodes (does not verify) a Status List Token; verify with `verifyJws` first. */
-export function readStatusListToken(token: string): {
+export interface StatusListTokenContents {
   payload: StatusListPayload;
   list: OjcpStatusList;
-} {
+}
+
+/** Decodes (does not verify) a Status List Token; verify with `verifyJws` first. */
+export function readStatusListToken(token: string): StatusListTokenContents {
   const { header, payload } = decodeJws(token);
   if (header.typ !== STATUS_LIST_JWT_TYP)
     throw new OjcpError("malformed", "status list token typ must be statuslist+jwt");

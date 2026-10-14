@@ -24,3 +24,13 @@ Places where implementing the drafts needed a decision the text doesn't make. Ea
 ## RFC 0013
 
 11. **First fetch of a status list (§6.2).** It must go through an Oblivious HTTP relay. *Here:* `StatusListCache` takes an injectable `fetch`; no relay client is bundled.
+
+## RFC 0010
+
+12. **How a list's signing key travels (§4.1–4.2).** Agents pin publisher keys by thumbprint, but the list format doesn't say where the key itself is. *Here:* the JWS header carries `jwk`, and its thumbprint must be pinned. *Suggest:* specify `jwk` in the protected header.
+13. **Rollover (§4.2).** "Drop a key only when a list signed by a pinned key no longer names it" doesn't say where a key is named. *Here:* after each accepted list, the pin set is that list's signing key plus its `next_keys`. *Suggest:* state that rule.
+14. **`anchor_sha256` (§4.1).** The encoding and the hashed object aren't defined, and since the list pins only a hash, the anchor must travel in `x5c`. *Here:* lowercase hex SHA-256 of the anchor certificate's DER, and the anchor must be in the chain. *Suggest:* say both.
+15. **Disagreement among three or more (§4.3).** With two operators agreeing and a third disagreeing, the text doesn't say whether the agreeing pair counts. *Here:* any disagreement among accepted identity attestations voids them all (fail closed). *Suggest:* decide explicitly; a majority rule is also defensible but easier to game with a captured attester.
+16. **`listed_since` (§3.2).** The type isn't given. *Here:* an ISO 8601 date-time or a NumericDate.
+17. **Attestation key types (§3.3).** RSA and P-384 anchors are allowed for chains, but the end-entity key verifies attestations only if it is P-256 (ES256) or Ed25519 here. *Suggest:* pin ES256 for attestation signatures, as HAIP does.
+18. **Private addresses after DNS (§5.2, *Key Discovery*).** Refusing private and link-local addresses needs the resolved IP, which portable code can't see. *Here:* the guarded fetcher refuses IP literals and local names; the deployment's `fetch` must refuse private addresses after resolution.

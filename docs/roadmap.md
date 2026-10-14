@@ -10,9 +10,10 @@ Everything tracks draft RFCs. When they change during the comment period (closin
 - **Issuance.** Issuer service with consent page, one-time codes, OpenID4VCI code and refresh flows, batch issuance, status lists on hourly epochs, revocation from an account page.
 - **Hiring credentials.** RFC 0014 types and baseline issuer profile (records API, offers with `tx_code`, offboarding, alumni retrieval); RFC 0013 §6.2 presentation validation.
 - **Action mandates.** Statement for approval, presentation, verification.
+- **Provider trust (RFC 0010).** `@ojcp/trust`: identity keys and key certificates, attestations (JWK or X.509 pinned), trust lists, status, tier derivation and display; its resolver drives the wallet's trust floor.
 - **Vectors.** Language-neutral vectors and a TypeScript test that holds the SDK to them.
 
-Proved by 49 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers.
+Proved by 60 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers, and the RFC 0010 §11 fixture groups.
 
 ## Next
 
@@ -34,6 +35,7 @@ Proved by 49 tests, including end-to-end runs through the issuer's HTTP handlers
 
 | Dependency | Why it blocks | Plan |
 |---|---|---|
-| **RFC 0010 trust tiers** | §5.3: an agent may exercise a standing mandate only after deriving the provider's tier from source (a). No implementation of 0010 exists yet. | The wallet takes a `TrustResolver`; real use needs a 0010 implementation (see Open questions). |
+| **Real attesters and lists** | §5.3: standing mandates need a derived `verified` tier, which needs two independent attesting operators on lists the agent pins. None exist yet. | `@ojcp/trust` implements the agent side; recruit a free business-registration attester and two list publishers (RFC 0010 §10). |
+| **RFC 0011 key transparency** | Tenure for `audited` comes from logged identity-key lineage. | `KeyLineage` interface; implement against RFC 0011 logs when they exist. |
 | **RFC 0009 job codes** | Coverage needs `occupationalCategory` with O*NET codes on postings. No listed provider emits them yet. | Demo against coded jobs; ask providers to add codes as part of 0009 adoption. |
 | **Type Metadata at `spec.ojcp.dev`** | `vct#integrity` must match the published bytes. | Publish `vectors/type-metadata/*.json` byte for byte (RFC feedback note 9). |

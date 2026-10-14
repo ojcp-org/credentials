@@ -20,6 +20,7 @@
     "@ojcp/agent-wallet": "workspace:*",
     "@ojcp/credentials-core": "workspace:*",
     "@ojcp/issuer": "workspace:*",
+    "@ojcp/trust": "workspace:*",
     "@ojcp/verifier": "workspace:*",
     "@types/node": "^24.19.2",
     "hono": "^4.13.13",

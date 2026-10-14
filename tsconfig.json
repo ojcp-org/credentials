@@ -5,6 +5,9 @@
       "path": "sdks/typescript/core"
     },
     {
+      "path": "sdks/typescript/trust"
+    },
+    {
       "path": "sdks/typescript/verifier"
     },
     {

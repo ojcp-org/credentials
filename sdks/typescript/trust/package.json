@@ -1,0 +1,32 @@
+{
+  "name": "@ojcp/trust",
+  "version": "0.0.0",
+  "description": "RFC 0010 decentralized provider trust for OJCP agents: organization identity keys, attestations, key-pinned trust lists, and effective trust tiers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && tsc -b"
+  },
+  "dependencies": {
+    "@ojcp/credentials-core": "workspace:*",
+    "@peculiar/asn1-ecc": "^2.11.0",
+    "@peculiar/asn1-schema": "^2.11.0",
+    "@peculiar/asn1-x509": "^2.11.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@peculiar/x509": "^2.1.0",
+    "reflect-metadata": "^0.2.2"
+  }
+}

@@ -7,13 +7,25 @@
     "declaration": false,
     "types": ["node"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "rewriteRelativeImportExtensions": false
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "../sdks/typescript/trust/test/world.ts"],
   "references": [
-    { "path": "../sdks/typescript/core" },
-    { "path": "../sdks/typescript/verifier" },
-    { "path": "../sdks/typescript/agent-wallet" },
-    { "path": "../services/issuer" }
+    {
+      "path": "../sdks/typescript/core"
+    },
+    {
+      "path": "../sdks/typescript/verifier"
+    },
+    {
+      "path": "../sdks/typescript/agent-wallet"
+    },
+    {
+      "path": "../services/issuer"
+    },
+    {
+      "path": "../sdks/typescript/trust"
+    }
   ]
 }
