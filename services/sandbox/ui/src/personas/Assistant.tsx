@@ -758,8 +758,11 @@ export function Assistant() {
                               {m.card.ids
                                 .map((id) => byId.get(id))
                                 .filter((a): a is Application => a !== undefined)
-                                .sort((x, y) =>
-                                  x.state === "needs_you" ? -1 : y.state === "needs_you" ? 1 : 0,
+                                // What needs Jordan goes last, next to where the chat scrolls to.
+                                .sort(
+                                  (x, y) =>
+                                    Number(x.state === "needs_you") -
+                                    Number(y.state === "needs_you"),
                                 )
                                 .map((a) => (
                                   <ApplicationRow key={a.id} a={a} act={act} approve={setPhone} />
