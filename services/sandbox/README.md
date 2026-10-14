@@ -14,7 +14,7 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 
 | Tab | Persona | Origin | What happens |
 |---|---|---|---|
-| 1 · HR | Jordan, at work | `hr.` | ExamplePeople, a Workday-like HR platform Vandelay uses. Signed in as an employee, he adds a record of his job to his wallet, at any time (RFC 0014 §4.1). The platform signs as a `customer_records` issuer. |
+| 1 · HR | Jordan, at work | `hr.` | WorkSecond, a Workday-like HR platform Vandelay uses. Signed in as an employee, he adds a record of his job to his wallet, at any time (RFC 0014 §4.1). The platform signs as a `customer_records` issuer. |
 | 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
 | 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
 | 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
@@ -37,14 +37,14 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 | Host (under `sandbox.ojcp.dev`, or `sandbox.lvh.me:8443` locally) | Role |
 |---|---|
 | `sandbox.` | The welcome (`/`) and Under the hood (`/hood`) |
-| `hr.` | ExamplePeople, the HR platform: an RFC 0014 issuer (`services/issuer`) |
+| `hr.` | WorkSecond, the HR platform: an RFC 0014 issuer (`services/issuer`) |
 | `wallet.` | Jordan's wallet |
 | `agent.` | JobGPT, Jordan's assistant: an agent platform built on `@ojcp/agent-wallet` |
 | `issuer.` | Protocol endpoints of the permission service Jordan's wallet provider runs (`services/issuer`): it issues standing mandates and publishes their status. It has no pages of its own: consent and the permissions list are wallet screens, and its account pages redirect there (`accountUi`) |
 | `acme.` | Acme Corporation's careers site: an employer running its own provider, with wallet steps |
 | `acme-careers.` | A lookalike of Acme's site, using Acme's name with no attestations of its own |
-| `ats.` | ExampleATS, hosting Globex and Initech jobs on one origin |
-| `globex.ats.` | Globex's careers site, a tenant sharing ExampleATS's identity key |
+| `ats.` | BlueHouse, hosting Globex and Initech jobs on one origin |
+| `globex.ats.` | Globex's careers site, a tenant sharing BlueHouse's identity key |
 | `attest-a.`, `attest-b.` | Two attesters run by different operators: Sandbox KYB Co. and Sandbox Business Registry. Each page says what it checks, what it vouched for and whether that still stands, and shows what it's doing live (issuing, suspending, answering status-list fetches without learning who asked) |
 | `lists.` | The trust-list publisher the assistant pins. Its page lists the attesters it trusts and for what, any distrust, its pinned key, and its live activity |
 

@@ -1,5 +1,5 @@
 /**
- * Tab 1: the HR platform Jordan's employer uses (a Workday-like vendor). He's a
+ * Tab 1: the HR platform Jordan's employer uses (WorkSecond, a wink at Workday). He's a
  * current employee, signed in, and can put a signed record of his job in his
  * wallet whenever he likes (RFC 0014 §4.1).
  */
@@ -31,6 +31,7 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { api, boot } from "../boot.ts";
+import { WORKSECOND, WorkSecondMark } from "../brands.tsx";
 
 interface Me {
   platform: string;
@@ -62,21 +63,25 @@ function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <Box bg="#f4f6f8" mih="100vh">
-      <Box bg="#0b3c49" c="white">
+    <Box bg={WORKSECOND.tint} mih="100vh">
+      <Box
+        bg={WORKSECOND.navy}
+        c="white"
+        style={{ borderBottom: `3px solid ${WORKSECOND.orange}` }}
+      >
         <Container size="lg" py="sm">
           <Group justify="space-between">
-            <Group gap="xs">
-              <ThemeIcon color="teal" size={30} radius="md">
-                <Text fw={800}>P</Text>
-              </ThemeIcon>
-              <Text fw={700}>{me?.platform ?? "ExamplePeople"}</Text>
-              <Text c="teal.2" size="sm">
+            <Group gap="sm">
+              <WorkSecondMark />
+              <Text fw={800} size="lg" style={{ letterSpacing: -0.3 }}>
+                work<span style={{ color: WORKSECOND.orange }}>second</span>
+              </Text>
+              <Text c="#b9c8e6" size="sm" visibleFrom="xs">
                 · {me?.employer.name ?? ""}
               </Text>
             </Group>
             <Group gap="xs">
-              <Avatar color="teal" radius="xl" size="sm">
+              <Avatar color="orange" radius="xl" size="sm">
                 JL
               </Avatar>
               <Text size="sm">{me?.employee.name ?? boot.candidate.name}</Text>
@@ -137,7 +142,7 @@ function Records({ me }: { me: Me }) {
       <Paper withBorder radius="md" p="lg">
         <Group justify="space-between" align="flex-start" mb="md">
           <Group gap="sm">
-            <ThemeIcon size={40} radius="md" variant="light" color="teal">
+            <ThemeIcon size={40} radius="md" variant="light">
               <IconBriefcase size={22} />
             </ThemeIcon>
             <Box>
@@ -153,7 +158,7 @@ function Records({ me }: { me: Me }) {
             {me.record.current ? "Current employee" : "Former employee"}
           </Badge>
         </Group>
-        <Timeline active={0} bulletSize={18} lineWidth={2} color="teal" mb="lg">
+        <Timeline active={0} bulletSize={18} lineWidth={2} mb="lg">
           {positions.map((p) => (
             <Timeline.Item key={p.title} title={p.title}>
               <Text size="sm" c="dimmed">

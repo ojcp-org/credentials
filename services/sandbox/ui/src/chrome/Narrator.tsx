@@ -42,7 +42,7 @@ const WHO: Record<string, { label: string; icon: typeof IconWallet; color: strin
   agent: { label: "JobGPT", icon: IconMessageChatbot, color: "#4dabf7" },
   wallet: { label: "Your wallet", icon: IconWallet, color: "#748ffc" },
   candidate: { label: "You", icon: IconUser, color: "#f783ac" },
-  hr: { label: "ExamplePeople (HR)", icon: IconBuildingSkyscraper, color: "#38d9a9" },
+  hr: { label: "WorkSecond (HR)", icon: IconBuildingSkyscraper, color: "#38d9a9" },
   provider: { label: "Employer", icon: IconBriefcase, color: "#ffa94d" },
   attester: { label: "Attester", icon: IconCertificate, color: "#69db7c" },
   lists: { label: "Trust list", icon: IconCertificate, color: "#69db7c" },
@@ -56,13 +56,22 @@ const OUTCOME: Record<Narrated["outcome"], string> = {
 
 /** How long a line stays, by its length: long enough to read. */
 const lifetime = (say: string) => Math.min(9000, 3500 + say.length * 45);
-const MAX_SHOWN = 4;
+const MAX_SHOWN = 3;
+/**
+ * One action can set off several moments in a second (JobGPT applying
+ * everywhere at once). They queue, and come in one at a time, this far apart,
+ * so each can be read.
+ */
+const STAGGER = 2200;
 const MUTED = "sandbox:narration-off";
 
 export function Narrator() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [muted, setMuted] = useState(() => localStorage.getItem(MUTED) === "1");
   const hovering = useRef(false);
+  /** Lines waiting their turn, oldest first, each not before its slot. */
+  const queue = useRef<Array<Narrated & { say: string; slot: number }>>([]);
+  const released = useRef(0);
 
   useEffect(() => {
     if (muted) return;
@@ -89,16 +98,30 @@ export function Narrator() {
       const said = page.events.filter(
         (e): e is Narrated & { say: string } => typeof e.say === "string",
       );
-      // Sandbox time is in seconds, the same clock as events' `at`.
-      const fresh = first
-        ? said
-            .map((e) => {
-              const spent = Math.max(0, (page.now - e.at) * 1000);
-              return { ...e, shown: Date.now() - spent, spent };
-            })
-            .filter((e) => e.spent < lifetime(e.say))
-        : said.map((e) => ({ ...e, shown: Date.now(), spent: 0 }));
-      if (fresh.length) setToasts((t) => [...t, ...fresh].slice(-MAX_SHOWN));
+      if (first) {
+        // Rebuild the schedule the previous page was following, from the
+        // events' own times (sandbox seconds): each line gets a slot at least
+        // STAGGER after the one before. Lines in their slot now show, with
+        // their countdown carried on; later ones wait for theirs.
+        const now = Date.now();
+        let slot = 0;
+        const planned = said
+          .filter((e) => page.now - e.at < 120)
+          .map((e) => {
+            slot = Math.max(now - (page.now - e.at) * 1000, slot + STAGGER);
+            return { ...e, slot };
+          });
+        const due = planned.filter((e) => e.slot <= now);
+        const carried = due
+          .filter((e) => now - e.slot < lifetime(e.say))
+          .slice(-MAX_SHOWN)
+          .map((e) => ({ ...e, shown: e.slot, spent: now - e.slot }));
+        if (carried.length) setToasts(carried);
+        queue.current = planned.filter((e) => e.slot > now);
+        released.current = due.at(-1)?.slot ?? 0;
+        return;
+      }
+      queue.current.push(...said.map((e) => ({ ...e, slot: 0 })));
     };
     void load();
     const t = setInterval(load, 1200);
@@ -108,22 +131,36 @@ export function Narrator() {
     };
   }, [muted]);
 
-  // Retire each line after its time, unless the reader is hovering the stack.
+  // Retire each line after its time and let the next one in, unless the
+  // reader is hovering the stack.
   useEffect(() => {
-    if (toasts.length === 0) return;
     const t = setInterval(() => {
       if (hovering.current) return;
       const now = Date.now();
-      setToasts((list) => list.filter((x) => now - x.shown < lifetime(x.say)));
-    }, 500);
+      const head = queue.current[0];
+      const next =
+        head && now - released.current >= STAGGER && now >= head.slot
+          ? queue.current.shift()
+          : undefined;
+      if (next) released.current = now;
+      setToasts((list) => {
+        const kept = list.filter((x) => now - x.shown < lifetime(x.say));
+        if (next) kept.push({ ...next, shown: now, spent: 0 });
+        const shown = kept.slice(-MAX_SHOWN);
+        return shown.length === list.length && shown.every((x, i) => x === list[i]) ? list : shown;
+      });
+    }, 400);
     return () => clearInterval(t);
-  }, [toasts.length]);
+  }, []);
 
   const toggle = () => {
     const next = !muted;
     localStorage.setItem(MUTED, next ? "1" : "0");
     setMuted(next);
-    if (next) setToasts([]);
+    if (next) {
+      setToasts([]);
+      queue.current = [];
+    }
   };
 
   return (

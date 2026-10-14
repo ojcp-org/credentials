@@ -298,7 +298,7 @@ export class SandboxWorld {
     const ats = await SandboxProvider.create({
       ...common,
       origin: o.origin("ats"),
-      name: "ExampleATS",
+      name: "BlueHouse",
       identity: atsIdentity,
       employers: [
         { employer: { ojcp_employer_id: "globex", name: "Globex Corporation" }, kind: "globex" },
@@ -309,14 +309,14 @@ export class SandboxWorld {
     const globex = await SandboxProvider.create({
       ...common,
       origin: o.origin("globex"),
-      name: "Globex Careers (hosted by ExampleATS)",
+      name: "Globex Careers (hosted by BlueHouse)",
       identity: atsIdentity,
       employers: [
         { employer: { ojcp_employer_id: "globex", name: "Globex Corporation" }, kind: "globex" },
       ],
       staple: async () => ({ attestations: globexStaple, statusTokens: await statusTokens() }),
     });
-    const atsClaims = identityClaims("ExampleATS Inc.");
+    const atsClaims = identityClaims("BlueHouse Inc.");
     atsStaple = [
       await this.attestA.issue("legal_entity", ats.subject, ats.identityThumbprint, atsClaims.a),
       await this.attestB.issue(

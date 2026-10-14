@@ -171,7 +171,7 @@ function Records() {
             Your employer's HR site can add a signed record of your job.
           </Text>
           <Button component="a" href={`${boot.origins.hr}/`} variant="light">
-            Open ExamplePeople
+            Open WorkSecond
           </Button>
         </Paper>
       ) : (

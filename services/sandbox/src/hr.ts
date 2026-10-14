@@ -1,5 +1,5 @@
 /**
- * The HR platform the candidate's employer uses: a Workday-class vendor
+ * The HR platform the candidate's employer uses: WorkSecond, a wink at a Workday-class vendor
  * issuing RFC 0014 employment records from parts it already runs. It's a second
  * `services/issuer`, on its own origin, signing in its own name as a
  * `customer_records` issuer: its word about what its customer, Vandelay
@@ -21,7 +21,7 @@ import type { EventBus, Inbox, SandboxClock } from "./events.ts";
 import { OJCP_VERSION } from "./provider/provider.ts";
 
 const DAY = 86_400;
-export const PLATFORM_NAME = "ExamplePeople";
+export const PLATFORM_NAME = "WorkSecond";
 export const EMPLOYER = { name: "Vandelay Industries", id: "reg:US-NY:SB-48151623" };
 const RECORD_ID = "vandelay-e1042";
 
@@ -137,7 +137,7 @@ export class HrPlatform {
           "Employee asked for their record in the portal: a single-use, 10-minute pre-authorized offer, returned only to their signed-in session",
         outcome: "info",
         detail: { basis: "customer_records", organization: EMPLOYER },
-        say: "ExamplePeople, your employer's HR system, offered a signed record of your job to your wallet.",
+        say: "WorkSecond, your employer's HR system, offered a signed record of your job to your wallet.",
       });
       return c.json({ offerUri });
     });

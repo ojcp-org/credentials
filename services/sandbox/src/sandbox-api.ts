@@ -59,7 +59,7 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       tab: "hr",
       title: "Get your work record",
       detail:
-        "Jordan works at Vandelay Industries. Its HR platform, ExamplePeople, can put a signed record of the job in his wallet at any time.",
+        "Jordan works at Vandelay Industries. Its HR platform, WorkSecond, can put a signed record of the job in his wallet at any time.",
       href: `${o.origin("hr")}/`,
       at: [{ url: `${o.origin("hr")}/` }],
       done: world.hr.offered || world.wallet.records.length > 0,
@@ -158,7 +158,7 @@ type CaseIdT = (typeof Probe.CASES)[number]["id"];
 
 const ROLES: Partial<Record<Host, { name: string; role: string }>> = {
   hr: {
-    name: "ExamplePeople (HR for Vandelay Industries)",
+    name: "WorkSecond (HR for Vandelay Industries)",
     role: "Issues employment records (RFC 0014)",
   },
   wallet: {
@@ -170,8 +170,8 @@ const ROLES: Partial<Record<Host, { name: string; role: string }>> = {
     role: "Agent platform with a Job search app (RFC 0008)",
   },
   acme: { name: "Acme Corporation careers", role: "Employer running its own provider" },
-  ats: { name: "ExampleATS", role: "ATS hosting Globex and Initech on one origin" },
-  globex: { name: "Globex careers", role: "Tenant site of ExampleATS" },
+  ats: { name: "BlueHouse", role: "ATS hosting Globex and Initech on one origin" },
+  globex: { name: "Globex careers", role: "Tenant site of BlueHouse" },
   lookalike: {
     name: "acme-careers (lookalike)",
     role: "Uses Acme's name; no attestations of its own",

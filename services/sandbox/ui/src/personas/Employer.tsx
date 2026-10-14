@@ -39,6 +39,7 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { api, boot } from "../boot.ts";
+import { ACME, AcmeMark, AcmeWordmark, BLUEHOUSE, BlueHouseMark } from "../brands.tsx";
 
 interface Site {
   name: string;
@@ -101,23 +102,46 @@ interface Received {
 }
 
 const isAcme = boot.role === "acme";
+/** The lookalike copies Acme's look; that's the point of it. */
+const looksAcme = isAcme || boot.role === "lookalike";
+const onBlueHouse = boot.role === "ats" || boot.role === "globex";
 const money = (n?: number) => (n === undefined ? "" : `$${Math.round(n / 1000)}k`);
 
 function Header({ site, tab }: { site: Site | undefined; tab: "jobs" | "ats" | "verify" }) {
   return (
-    <Box bg="white" style={{ borderBottom: "1px solid #eceef1" }}>
+    <Box
+      bg="white"
+      style={{
+        borderBottom: looksAcme
+          ? `3px solid ${ACME.red}`
+          : onBlueHouse
+            ? `3px solid ${BLUEHOUSE.blue}`
+            : "1px solid #eceef1",
+      }}
+    >
       <Container size="lg" py="sm">
         <Group justify="space-between">
-          <Group gap="xs">
-            <ThemeIcon size={32} radius="md" color={isAcme ? "orange" : "gray"}>
-              <Text fw={800}>{(site?.name ?? "?").slice(0, 1)}</Text>
-            </ThemeIcon>
+          <Group gap="sm">
+            {looksAcme ? (
+              <AcmeMark />
+            ) : onBlueHouse ? (
+              <BlueHouseMark />
+            ) : (
+              <ThemeIcon size={32} radius="md" color="gray">
+                <Text fw={800}>{(site?.name ?? "?").slice(0, 1)}</Text>
+              </ThemeIcon>
+            )}
             <Box>
-              <Text fw={700} lh={1.1}>
-                {isAcme ? "Acme Corporation" : (site?.name ?? "")}
-              </Text>
+              {looksAcme ? (
+                <AcmeWordmark />
+              ) : (
+                <Text fw={700} lh={1.1} c={onBlueHouse ? BLUEHOUSE.deep : undefined}>
+                  {/* The subtitle already says who hosts it. */}
+                  {(site?.name ?? "").replace(/ \(hosted by [^)]+\)$/, "")}
+                </Text>
+              )}
               <Text size="xs" c="dimmed">
-                Careers · {location.host}
+                {onBlueHouse ? "Careers, powered by BlueHouse" : "Careers"} · {location.host}
               </Text>
             </Box>
           </Group>
@@ -154,7 +178,12 @@ function Jobs({ site }: { site: Site }) {
         <Text c="dimmed">{site.jobs.length} open roles</Text>
       </Box>
       {isAcme && (
-        <Alert color="orange" variant="light" icon={<IconRobot />}>
+        <Alert
+          variant="light"
+          color="gray"
+          icon={<IconRobot color={ACME.red} />}
+          styles={{ root: { background: ACME.cream, border: "1px solid #f3e2c4" } }}
+        >
           We accept applications from AI assistants through OJCP, when they carry the candidate's
           permission. Some roles ask you to confirm your work history with your wallet; you can
           always choose not to.
@@ -172,12 +201,7 @@ function Jobs({ site }: { site: Site }) {
               {j.description}
             </Text>
             {j.asks_for_work_history && (
-              <Badge
-                mt="sm"
-                variant="light"
-                color="orange"
-                leftSection={<IconFingerprint size={12} />}
-              >
+              <Badge mt="sm" variant="light" leftSection={<IconFingerprint size={12} />}>
                 Asks you to confirm your work history
               </Badge>
             )}
@@ -234,7 +258,7 @@ function Verify({ appRef: code }: { appRef: string }) {
         </Text>
         <Title order={2}>Confirm your work history</Title>
       </Box>
-      <Paper withBorder radius="md" p="md" bg="#fffaf3">
+      <Paper withBorder radius="md" p="md" bg={isAcme ? ACME.cream : BLUEHOUSE.tint}>
         <Text size="sm">{v.purpose}</Text>
       </Paper>
       {error && <Alert color="red">{error}</Alert>}
@@ -270,7 +294,7 @@ function Verify({ appRef: code }: { appRef: string }) {
           </Group>
         </Paper>
       ) : (
-        <Stepper active={active} color="orange" size="sm">
+        <Stepper active={active} size="sm">
           <Stepper.Step
             label="Confirm it's you"
             description={`We send a code to ${v.masked_contact}`}

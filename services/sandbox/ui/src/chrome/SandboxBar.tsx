@@ -79,7 +79,7 @@ const TABS: Array<{
   {
     tab: "hr",
     label: "HR",
-    who: "Employer's HR (Workday-like)",
+    who: "WorkSecond, Vandelay's HR system",
     role: "hr",
     icon: IconBuildingSkyscraper,
   },

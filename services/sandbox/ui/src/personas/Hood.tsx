@@ -250,7 +250,7 @@ function Lab({ parties, reload }: { parties: Parties; reload: () => void }) {
             "Acme's domain changes hands (new identity key)",
             "/_sandbox/lab/incident/takeover",
           )}
-          {btn("suspend", "The registry suspends ExampleATS", "/_sandbox/lab/incident/suspend")}
+          {btn("suspend", "The registry suspends BlueHouse", "/_sandbox/lab/incident/suspend")}
           {btn(
             "distrust",
             "The trust list drops Sandbox KYB Co.",
@@ -309,7 +309,7 @@ function Lab({ parties, reload }: { parties: Parties; reload: () => void }) {
           onChange={setProvider}
           data={[
             { value: "acme", label: "Acme" },
-            { value: "ats", label: "ExampleATS" },
+            { value: "ats", label: "BlueHouse" },
             { value: "globex", label: "Globex (tenant)" },
           ]}
         />

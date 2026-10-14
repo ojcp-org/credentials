@@ -79,8 +79,12 @@ export function themeFor(role: Role): { theme: MantineThemeOverride; scheme: "li
   switch (role) {
     case "home":
       return { theme: ojcp, scheme: "dark" };
+    // WorkSecond's blue.
     case "hr":
-      return { theme: createTheme({ ...base, primaryColor: "teal" }), scheme: "light" };
+      return {
+        theme: createTheme({ ...base, primaryColor: "blue", primaryShade: 7 }),
+        scheme: "light",
+      };
     case "wallet":
       return { theme: createTheme({ ...base, primaryColor: "indigo" }), scheme: "light" };
     case "agent":
@@ -92,7 +96,16 @@ export function themeFor(role: Role): { theme: MantineThemeOverride; scheme: "li
     case "attestB":
     case "lists":
       return { theme: createTheme({ ...base, primaryColor: "green" }), scheme: "light" };
+    // BlueHouse and the sites it hosts.
+    case "ats":
+    case "globex":
+      return { theme: createTheme({ ...base, primaryColor: "blue" }), scheme: "light" };
+    // Acme: ink buttons, with its red kept to the logo and the header's rule,
+    // so red on the page still means a problem. The lookalike copies it.
     default:
-      return { theme: createTheme({ ...base, primaryColor: "orange" }), scheme: "light" };
+      return {
+        theme: createTheme({ ...base, primaryColor: "dark", primaryShade: 8 }),
+        scheme: "light",
+      };
   }
 }
