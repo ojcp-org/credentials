@@ -51,9 +51,11 @@ function recipientOf(
         })
       : undefined;
   const note = `Identity verified${derived.tier === "audited" ? " and audited" : ""} · registered in ${derived.entity.jurisdiction}${derived.weakerPolicy ? " · single-attester policy" : ""}`;
+  // RFC 0010 §5.5: the attested legal name with its jurisdiction, and the host it was verified for.
+  const who = `${name} (${derived.entity.jurisdiction}) at ${new URL(`https://${site}`).hostname}`;
   const summary = hosted
-    ? `${name}, on behalf of ${hosted.name}${hosted.confirmed ? "" : " (not confirmed)"}`
-    : name;
+    ? `${who}, on behalf of ${hosted.name}${hosted.confirmed ? "" : " (not confirmed)"}`
+    : who;
   return { name, verified: true, note, summary, ...(hosted ? { onBehalfOf: hosted } : {}) };
 }
 
@@ -481,6 +483,10 @@ export class CandidateView {
           ? "You chose not to use your wallet, and I sent the application. The employer checks your work history its own way; that doesn't count against you."
           : "You confirmed your work history with your wallet, straight to the employer, and I sent the application.";
       record.workHistory = step;
+    } else if (outcome.status === "refused_by_agent") {
+      record.state = "not_sent";
+      record.headline = "Held back";
+      record.detail = AGENT_REASON[outcome.reason] ?? outcome.text;
     } else {
       record.state = "not_sent";
       record.headline = "Not accepted";

@@ -179,7 +179,6 @@ export class WalletStepVerifier {
       sessions: [],
     };
     this.#steps.set(step.ref, step);
-    await this.refreshStatus();
     this.#emit(
       "info",
       `Wallet step opened for ${job.title} (reference ${step.ref}): verify work history at the provider's own page`,
@@ -266,7 +265,17 @@ export class WalletStepVerifier {
     return step.sessions.some((s) => timingSafeEqual(s, hash));
   }
 
-  async #view(c: Context, step: Step) {
+  /**
+   * The verification page's state. Anyone holding the `verification_url`
+   * (the agent too) may see the step and its state; what was shared, by whom,
+   * and whether a try was declined is shown only in the candidate's bound
+   * session (RFC 0013 §2.2: the agent learns only pending, completed or deferred).
+   */
+  async #view(c: Context, step: Step, responseCode?: string) {
+    const bound = await this.#bound(c, step);
+    // The wallet's redirect carries the response code: whoever holds it may type the contact (§3 item 4).
+    const holdsResponse =
+      responseCode !== undefined && step.awaiting?.responseCode === responseCode;
     return {
       ref: step.ref,
       employer: this.#o.employerName,
@@ -275,22 +284,25 @@ export class WalletStepVerifier {
       purpose: this.#purpose(step),
       asks: EMPLOYMENT_PATHS.map(claimLabel),
       status: step.status,
-      declined: step.declined === true,
-      bound: await this.#bound(c, step),
+      bound,
       code_sent: step.code !== undefined,
       deadline: step.deadline,
-      awaiting_confirmation: step.awaiting !== undefined,
-      result: step.result
+      ...(bound
         ? {
-            via: step.result.via,
-            basis: step.result.basis,
-            issuer: step.result.issuer,
-            shared: EMPLOYMENT_PATHS.map((p) => ({
-              label: claimLabel(p),
-              value: describeValues(valuesAt(step.result?.record, p)),
-            })),
+            declined: step.declined === true,
+            awaiting_confirmation: step.awaiting !== undefined,
+            result: step.result
+              ? {
+                  basis: step.result.basis,
+                  issuer: step.result.issuer,
+                  shared: EMPLOYMENT_PATHS.map((p) => ({
+                    label: claimLabel(p),
+                    value: describeValues(valuesAt(step.result?.record, p)),
+                  })),
+                }
+              : undefined,
           }
-        : undefined,
+        : { declined: false, awaiting_confirmation: holdsResponse }),
     };
   }
 
@@ -411,7 +423,7 @@ export class WalletStepVerifier {
       if (!s.awaiting || s.awaiting.responseCode !== response_code)
         return c.json(await this.#view(c, s));
       if (await this.#bound(c, s)) this.#complete(s, "bound_session");
-      return c.json(await this.#view(c, s));
+      return c.json(await this.#view(c, s, response_code));
     });
 
     // §3 item 4: an unbound presentation counts only once the candidate types the contact.
@@ -428,7 +440,7 @@ export class WalletStepVerifier {
           "refused",
           `A presentation for ${s.ref} was not confirmed: the typed contact didn't match`,
         );
-        return c.json({ ...(await this.#view(c, s)), mismatch: true });
+        return c.json({ ...(await this.#view(c, s, body.response_code)), mismatch: true });
       }
       this.#complete(s, "contact_confirmed");
       return c.json(await this.#view(c, s));
@@ -492,7 +504,8 @@ export class WalletStepVerifier {
         dcql_query: this.#dcql(),
         client_metadata: {
           jwks: { keys: [encJwk] },
-          encrypted_response_enc_values_supported: ["A128GCM"],
+          // HAIP 1.0 §5: verifiers list both.
+          encrypted_response_enc_values_supported: ["A128GCM", "A256GCM"],
           vp_formats_supported: {
             "dc+sd-jwt": { "sd-jwt_alg_values": ["ES256"], "kb-jwt_alg_values": ["ES256"] },
           },

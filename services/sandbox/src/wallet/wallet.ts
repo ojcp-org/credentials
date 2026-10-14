@@ -192,7 +192,7 @@ export class SandboxWallet {
 
   constructor(options: {
     host: string;
-    /** Verifier CAs the wallet trusts for request signatures (hex SHA-256 of each CA's DER). */
+    /** Verifier CA certificates the wallet trusts for request signatures, standard base64 DER. */
     anchors: readonly string[];
     clock: SandboxClock;
     events: EventBus;
@@ -245,7 +245,6 @@ export class SandboxWallet {
   async acceptOffer(offerUri: string, txCode: string): Promise<HeldRecord> {
     const { offer, metadata } = await this.#offer(offerUri);
     const grant = offer.grants[PRE_AUTHORIZED];
-    const configurationId = offer.credential_configuration_ids[0] as string;
     const asOrigin = metadata.authorization_servers?.[0] ?? offer.credential_issuer;
     const as = AsMetadata.parse(
       await getJson(`${asOrigin}/.well-known/oauth-authorization-server`),
@@ -262,7 +261,16 @@ export class SandboxWallet {
       this.#emit("refused", "The issuer refused the code for this offer");
       throw new WalletError("That code didn't work. Check the text message and try again.");
     }
-    const { access_token } = z.object({ access_token: z.string() }).parse(await token.json());
+    const { access_token, authorization_details } = z
+      .object({
+        access_token: z.string(),
+        authorization_details: z
+          .array(z.object({ credential_identifiers: z.array(z.string()).min(1) }))
+          .min(1),
+      })
+      .parse(await token.json());
+    // OpenID4VCI §8.2: request the credential the token names.
+    const credentialIdentifier = authorization_details[0]?.credential_identifiers[0] ?? "";
     const { c_nonce } = z
       .object({ c_nonce: z.string() })
       .parse(await getJson(metadata.nonce_endpoint, { method: "POST" }));
@@ -286,7 +294,7 @@ export class SandboxWallet {
           method: "POST",
           headers: { authorization: `Bearer ${access_token}`, "content-type": "application/json" },
           body: JSON.stringify({
-            credential_configuration_id: configurationId,
+            credential_identifier: credentialIdentifier,
             proofs: { jwt: proofs },
           }),
         }),
@@ -455,6 +463,13 @@ export class SandboxWallet {
       .object({ redirect_uri: z.url().optional() })
       .safeParse(await response.json().catch(() => ({})));
     const who = request.application?.employer ?? request.verifier.organization;
+    if (decision === "share" && !response.ok) {
+      this.#emit(
+        "refused",
+        `${request.verifier.host} didn't accept the presentation (${response.status}); nothing was kept`,
+      );
+      throw new WalletError(`${who} couldn't accept this. Go back to its page and try again.`);
+    }
     this.activity.unshift(
       decision === "share"
         ? {

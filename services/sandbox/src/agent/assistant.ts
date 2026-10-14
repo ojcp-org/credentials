@@ -34,7 +34,8 @@ export class Assistant {
   readonly #agent: SandboxAgent;
   readonly #llm: LlmSession | undefined;
   #next = 1;
-  #busy = false;
+  /** The tail of the actions queue; see `serially`. */
+  #queue: Promise<void> = Promise.resolve();
 
   constructor(agent: SandboxAgent, view: CandidateView, llm: LlmSession | undefined) {
     this.#agent = agent;
@@ -80,15 +81,23 @@ export class Assistant {
     return out;
   }
 
+  /**
+   * Runs an action that changes state after every earlier one has finished:
+   * a double click or two tabs must not apply to the same job twice. Each
+   * request that changes state goes through here exactly once.
+   */
+  serially<T>(fn: () => Promise<T>): Promise<T> {
+    const run = this.#queue.then(fn, fn);
+    this.#queue = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
+  }
+
   async send(text: string): Promise<void> {
-    if (this.#busy) throw new Error("One moment, still working on the last request.");
-    this.#busy = true;
-    try {
-      this.#push({ id: this.#next++, role: "user", text });
-      await this.#reply(text);
-    } finally {
-      this.#busy = false;
-    }
+    this.#push({ id: this.#next++, role: "user", text });
+    await this.#reply(text);
   }
 
   async #reply(text: string): Promise<void> {
@@ -168,7 +177,9 @@ export class Assistant {
           : `${record.employer} confirmed your work history straight from your wallet, so I sent your application for ${record.title}.`
         : record.verification
           ? `${record.employer} hasn't received your confirmation yet. Finish on their page, then tell me.`
-          : `${record.employer} didn't accept the application: ${record.detail}`,
+          : record.headline === "Held back"
+            ? `I didn't send your application for ${record.title}: ${record.detail}`
+            : `${record.employer} didn't accept the application: ${record.detail}`,
       { kind: "applications", ids: [record.id] },
     );
   }

@@ -25,7 +25,10 @@ const YEAR_MS = 365 * 86_400_000;
 /** What a provider needs to sign requests as `x509_hash`. */
 export interface RequestCredential {
   clientId: string;
-  /** Leaf first, then the CA, standard base64 DER (RFC 7515 §4.1.6). */
+  /**
+   * The leaf, then any intermediates, standard base64 DER (RFC 7515 §4.1.6).
+   * Never the trust anchor: the wallet already has it (HAIP 1.0 §5).
+   */
   x5c: string[];
   signer: Signer;
 }
@@ -68,9 +71,9 @@ export class VerifierCa {
     return new VerifierCa(keys, cert);
   }
 
-  /** The pin a wallet keeps: lowercase hex SHA-256 of the CA certificate's DER. */
-  async anchorSha256(): Promise<string> {
-    return hex(await sha256(new Uint8Array(this.#cert.rawData)));
+  /** The CA certificate a wallet keeps as a trust anchor, standard base64 DER. */
+  anchor(): string {
+    return base64(new Uint8Array(this.#cert.rawData));
   }
 
   /** A request-signing certificate for one host, as RFC 0013 §4.2 describes. */
@@ -97,7 +100,7 @@ export class VerifierCa {
     const publicJwk = (await crypto.subtle.exportKey("jwk", keys.publicKey)) as JWK;
     return {
       clientId: `x509_hash:${base64url(await sha256(leafDer))}`,
-      x5c: [base64(leafDer), base64(new Uint8Array(this.#cert.rawData))],
+      x5c: [base64(leafDer)],
       signer: await webCryptoSigner(keys.privateKey, publicJwk, "ES256"),
     };
   }
@@ -105,7 +108,8 @@ export class VerifierCa {
 
 /**
  * The wallet's check of a signed request's certificate chain: the leaf hashes
- * to the `x509_hash` client ID, chains to a pinned CA, and is valid now.
+ * to the `x509_hash` client ID, and the chain, completed with one of the
+ * wallet's own anchor certificates, is valid now.
  */
 export async function checkRequestSigner(
   x5c: readonly string[],
@@ -113,10 +117,12 @@ export async function checkRequestSigner(
   anchors: readonly string[],
   now: number,
 ): Promise<RequestSigner | undefined> {
-  if (x5c.length < 2 || x5c.length > 5 || !clientId.startsWith("x509_hash:")) return undefined;
+  if (x5c.length < 1 || x5c.length > 4 || !clientId.startsWith("x509_hash:")) return undefined;
   let chain: x509.X509Certificate[];
+  let roots: x509.X509Certificate[];
   try {
     chain = x5c.map((b64) => new x509.X509Certificate(b64));
+    roots = anchors.map((b64) => new x509.X509Certificate(b64));
   } catch {
     return undefined;
   }
@@ -125,18 +131,27 @@ export async function checkRequestSigner(
   const given = clientId.slice("x509_hash:".length);
   if (fromBase64url(given).length !== 32 || given !== expected) return undefined;
   const date = new Date(now * 1000);
-  const hashes = await Promise.all(
-    chain.map(async (c) => hex(await sha256(new Uint8Array(c.rawData)))),
-  );
-  const anchorIndex = hashes.findIndex((h) => anchors.includes(h));
-  if (anchorIndex < 1) return undefined;
-  for (let i = 0; i <= anchorIndex; i++) {
-    const cert = chain[i] as x509.X509Certificate;
+  // The last certificate sent must be issued by one of the anchors.
+  const top = chain.at(-1) as x509.X509Certificate;
+  const root = roots.find((r) => r.subject === top.issuer);
+  if (!root || date < root.notBefore || date > root.notAfter) return undefined;
+  const full = [...chain, root];
+  for (let i = 0; i < chain.length; i++) {
+    const cert = full[i] as x509.X509Certificate;
     if (date < cert.notBefore || date > cert.notAfter) return undefined;
-    const issuer = chain[Math.min(i + 1, anchorIndex)] as x509.X509Certificate;
+    const issuer = full[i + 1] as x509.X509Certificate;
+    // Every issuer in the path must be a CA allowed to sign certificates.
+    const constraints = issuer.getExtension(x509.BasicConstraintsExtension);
+    const usage = issuer.getExtension(x509.KeyUsagesExtension);
+    if (!constraints?.ca || (usage && !(usage.usages & x509.KeyUsageFlags.keyCertSign)))
+      return undefined;
     if (!(await cert.verify({ publicKey: issuer.publicKey, signatureOnly: true })))
       return undefined;
   }
+  // The leaf signs requests; a CA certificate can't stand in for it.
+  const leafUsage = leaf.getExtension(x509.KeyUsagesExtension);
+  if (leaf.getExtension(x509.BasicConstraintsExtension)?.ca) return undefined;
+  if (leafUsage && !(leafUsage.usages & x509.KeyUsageFlags.digitalSignature)) return undefined;
   const key = await leaf.publicKey.export(EC, ["verify"]);
   const jwk = (await crypto.subtle.exportKey("jwk", key)) as JWK;
   const san = leaf.getExtension(x509.SubjectAlternativeNameExtension);

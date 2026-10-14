@@ -55,6 +55,16 @@ import type { KeptPresentation, WalletStepVerifier } from "./wallet-step.ts";
 export const OJCP_VERSION = "0.3";
 const DAY = 86_400;
 
+/** A kept presentation as reviewers see it: no record of which path completed the step. */
+type ReviewedPresentation = Omit<KeptPresentation, "via">;
+const withoutPath = (kept: KeptPresentation | undefined): ReviewedPresentation | undefined =>
+  kept && {
+    record: kept.record,
+    issuer: kept.issuer,
+    basis: kept.basis,
+    presentationSha256: kept.presentationSha256,
+  };
+
 export const MANIFEST_POLICY: UserMandatesPolicy = {
   types: ["action", "standing"],
   required_for: ["begin_application", "submit_application"],
@@ -107,7 +117,7 @@ export interface ReceivedApplication {
     | {
         /** Completed with a wallet, or deferred: the candidate chose not to use one (RFC 0013 §7). */
         status: string;
-        kept: KeptPresentation | undefined;
+        kept: ReviewedPresentation | undefined;
         /** The job's rule, applied by a recruiter when reviewing (RFC 0013 §2.2). */
         requirement: string | undefined;
         /** A deferred step's check, done by the employer's own means after submission. */
@@ -136,6 +146,7 @@ const ToolArgs = z.looseObject({
   application_data: z.looseObject({}).optional(),
   job_id: z.string().optional(),
   application_id: z.string().optional(),
+  binding_actions_digest: z.string().optional(),
 });
 
 /** What each tool advertises over MCP (the OJCP tool inputs, abbreviated). */
@@ -158,6 +169,7 @@ const TOOL_INPUTS = {
     application_id: z.string(),
     application_data: z.record(z.string(), z.unknown()).optional(),
     candidate_context: z.record(z.string(), z.unknown()).optional(),
+    binding_actions_digest: z.string().optional(),
     agent_declaration: declaration,
   },
   check_application_status: { application_id: z.string(), agent_declaration: declaration },
@@ -598,6 +610,13 @@ export class SandboxProvider {
           application_id: session.application_id,
           status: "pending_verification",
           mandate_nonce: session.mandate_nonce,
+          // RFC 0013 §2.1: the step's verifier_id must be listed here.
+          apply_path: {
+            type: "provider_hosted",
+            supports_agent_submission: true,
+            requires_verification: true,
+            accepted_verifiers: [walletSteps.host],
+          },
           binding_actions: job.binding_actions,
           verification_steps: [step],
           verification_deadline: deadline,
@@ -616,6 +635,17 @@ export class SandboxProvider {
       const session = this.#sessions.get(args.application_id ?? "");
       if (!session) return { error_code: "application_not_found", message: "No such application." };
       if (!mandate) throw new MandateRejected("missing", "no user mandate");
+      // RFC 0009 §3.6: with a required binding action, the agent must state it presented this exact list.
+      if (
+        session.job.binding_actions.some((b) => b.required) &&
+        args.binding_actions_digest !== (await bindingActionsDigest(session.job.binding_actions))
+      )
+        return {
+          error_code: "missing_required_field",
+          message:
+            "binding_actions_digest is missing or doesn't match the terms on this application.",
+          details: { field: "binding_actions_digest" },
+        };
       // RFC 0013: a pending wallet step blocks submission; a deferred one doesn't (§7).
       const walletSteps = this.#options.walletSteps;
       const step = walletSteps?.stepState(session.application_id);
@@ -683,7 +713,8 @@ export class SandboxProvider {
         workHistory: step
           ? {
               status: step.status,
-              kept: walletSteps?.kept(session.application_id),
+              // RFC 0013 §7: reviewers see whether the step completed, never which path did it.
+              kept: withoutPath(walletSteps?.kept(session.application_id)),
               requirement: session.job.verify_employment,
             }
           : undefined,

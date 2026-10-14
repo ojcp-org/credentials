@@ -26,6 +26,8 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
+// The permission service's own description of its consent screen.
+import type { ConsentView, Option } from "@ojcp/issuer";
 import {
   IconAlertTriangle,
   IconCircleCheck,
@@ -287,30 +289,6 @@ function Home() {
   );
 }
 
-interface ConsentView {
-  id: string;
-  client: { name: string; agentId: string; affiliated: boolean };
-  until: string;
-  jobs: Option[];
-  places: Option[];
-  arrangements: Option[];
-  pay: string;
-  perEmployer: number;
-  total: number;
-  actions: Option[];
-  recipients: string;
-  shared: string;
-  never: string[];
-  ending: string;
-  contacts: Option[];
-}
-
-interface Option {
-  value: string;
-  label: string;
-  hint?: string;
-}
-
 /**
  * The permission service's consent screen (RFC 0008 §3.3). Jordan's wallet
  * provider runs the service, so this is a wallet screen: the wallet already
@@ -436,7 +414,7 @@ function Consent() {
         </Text>
         <Text size="sm">{v.recipients}</Text>
         <Text size="sm" mt={4}>
-          {v.shared}
+          {v.shared} {v.writer}
         </Text>
         <Text size="sm" fw={500} mt="sm">
           Never, under this permission
@@ -454,6 +432,9 @@ function Consent() {
             <List.Item key={n}>{n}</List.Item>
           ))}
         </List>
+        <Text size="xs" c="dimmed" mt={4}>
+          {v.enforcement}
+        </Text>
         <Text size="xs" c="dimmed" mt="sm">
           {v.ending} You can cancel in your wallet under Permissions.
         </Text>

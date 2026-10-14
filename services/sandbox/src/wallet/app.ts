@@ -8,9 +8,10 @@
  * standing mandates, so the wallet lists and cancels the owner's permissions
  * there directly: one company's own systems, with the owner signed in.
  */
-import { type CandidateElement, onet } from "@ojcp/credentials-core";
+import { base64url, type CandidateElement, onet, randomBytes } from "@ojcp/credentials-core";
 import { type Issuer, ProtocolError } from "@ojcp/issuer";
 import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
 import type { EventBus } from "../events.ts";
 import { type PendingRequest, type SandboxWallet, WalletError } from "./wallet.ts";
@@ -37,6 +38,9 @@ function view(r: PendingRequest) {
   };
 }
 
+/** The owner's session with their wallet app. */
+const SESSION = "wallet_session";
+
 export function walletApp(
   wallet: SandboxWallet,
   permissions: { issuer: Issuer; owner: CandidateElement; events: EventBus; host: string },
@@ -51,6 +55,21 @@ export function walletApp(
         400,
       );
     throw error;
+  });
+
+  // Only the owner's device has a session: the app sets it when it opens on
+  // their phone (in the sandbox, when a wallet page loads). Anyone else, an
+  // agent platform calling server to server included, has no way to act as
+  // the owner, so it can't approve a permission or read their records.
+  const session = base64url(randomBytes(32));
+  app.get("/_session", (c) => {
+    setCookie(c, SESSION, session, { httpOnly: true, secure: true, sameSite: "Strict", path: "/" });
+    return c.body(null, 204);
+  });
+  app.use("/api/wallet/*", async (c, next) => {
+    if (getCookie(c, SESSION) !== session)
+      return c.json({ error: "Open this in your wallet app." }, 401);
+    await next();
   });
 
   app.get("/api/wallet", (c) => c.json(wallet.summary()));

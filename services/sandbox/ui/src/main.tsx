@@ -34,12 +34,16 @@ function Persona() {
 
 const { theme, scheme } = themeFor(boot.role);
 const root = document.getElementById("root");
+// The wallet app opens a session for its owner on this device before anything else.
+const ready = boot.role === "wallet" ? fetch("/_session").then(() => undefined) : Promise.resolve();
 if (root)
-  createRoot(root).render(
-    <StrictMode>
-      <MantineProvider theme={theme} forceColorScheme={scheme}>
-        <SandboxBar />
-        <Persona />
-      </MantineProvider>
-    </StrictMode>,
+  void ready.then(() =>
+    createRoot(root).render(
+      <StrictMode>
+        <MantineProvider theme={theme} forceColorScheme={scheme}>
+          <SandboxBar />
+          <Persona />
+        </MantineProvider>
+      </StrictMode>,
+    ),
   );

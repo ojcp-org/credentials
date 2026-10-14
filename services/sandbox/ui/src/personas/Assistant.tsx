@@ -374,6 +374,10 @@ function ApplicationRow({
             <b style={{ fontFamily: "monospace" }}>{a.verification.ref}</b> ·{" "}
             {a.verification.maskedContact}
           </Text>
+          <Text size="xs" c="dimmed" mt={4}>
+            If anything here differs from what your wallet shows, trust your wallet: it checks who's
+            asking itself.
+          </Text>
           <Blockquote
             p="xs"
             mt="xs"

@@ -12,12 +12,14 @@ import {
   CONSENT_WORDS,
   contactInWords,
   day,
+  ENFORCEMENT,
   NEVER,
   payInWords,
   placeInWords,
   REMOTE_WORDS,
   recipientsInWords,
   TOOL_WORDS,
+  WRITER,
 } from "./consent.ts";
 import type { MandateAuthorization } from "./store.ts";
 
@@ -220,8 +222,8 @@ export function ConsentPage({
           <h2>Who receives your applications</h2>
           <p>{recipientsInWords(d)}</p>
           <p>
-            Each employer sees <strong>{contacts}</strong>, and {CONSENT_WORDS[d.consent_scope]}.
-            The agent writes your applications for you.
+            Each employer sees <strong>{contacts}</strong>, and {CONSENT_WORDS[d.consent_scope]}.{" "}
+            {WRITER}
           </p>
         </section>
         <section>
@@ -231,10 +233,7 @@ export function ConsentPage({
               <li>{n}</li>
             ))}
           </ul>
-          <p class="hint">
-            Employers' systems enforce these when the agent applies through OJCP. Elsewhere, such as
-            by email, they're rules the agent must follow that no employer can check.
-          </p>
+          <p class="hint">{ENFORCEMENT}</p>
         </section>
         <section>
           <h2>Ending it</h2>

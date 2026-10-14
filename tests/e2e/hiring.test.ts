@@ -47,7 +47,10 @@ const MAYA = {
 const Offer = z.object({
   grants: z.record(z.string(), z.object({ "pre-authorized_code": z.string() })),
 });
-const Token = z.object({ access_token: z.string() });
+const Token = z.object({
+  access_token: z.string(),
+  authorization_details: z.array(z.object({ credential_identifiers: z.array(z.string()) })),
+});
 const Credentials = z.object({ credentials: z.array(z.object({ credential: z.string() })) });
 const IssuerKeys = z.object({
   jwks: z.object({ keys: z.array(z.looseObject({ ojcp_sign_until: z.number() })) }),
@@ -90,7 +93,7 @@ async function redeem(world: World, holderKeys: GeneratedSigner[]): Promise<stri
     method: "POST",
     headers: { authorization: `Bearer ${token.access_token}`, "content-type": "application/json" },
     body: JSON.stringify({
-      credential_configuration_id: "ojcp_employment",
+      credential_identifier: token.authorization_details[0]?.credential_identifiers[0],
       proofs: { jwt: proofs },
     }),
   });

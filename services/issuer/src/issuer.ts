@@ -615,6 +615,17 @@ export class Issuer {
     const request = CredentialRequest.safeParse(body);
     if (!request.success)
       throw new ProtocolError("invalid_credential_request", "malformed credential request");
+    // OpenID4VCI §8.2: every token here came with authorization_details naming one
+    // credential identifier, so the request names it and not a configuration.
+    const granted =
+      grant.subject.kind === "mandate" ? grant.subject.authorizationId : grant.subject.recordId;
+    if (request.data.credential_configuration_id !== undefined)
+      throw new ProtocolError(
+        "invalid_credential_request",
+        "use credential_identifier from the token response, not credential_configuration_id",
+      );
+    if (request.data.credential_identifier !== granted)
+      throw new ProtocolError("unknown_credential_identifier", "unknown credential identifier");
     if (request.data.proofs.jwt.length > (this.config.batchSize ?? 10))
       throw new ProtocolError("invalid_proof", "too many proofs");
     const keys = await this.#checkProofs(request.data.proofs.jwt, grant.clientId);

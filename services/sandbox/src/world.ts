@@ -184,7 +184,7 @@ export class SandboxWorld {
     const verifierCa = await VerifierCa.create("OJCP sandbox verifier CA (test only)");
     this.wallet = new SandboxWallet({
       host: o.host("wallet"),
-      anchors: [await verifierCa.anchorSha256()],
+      anchors: [verifierCa.anchor()],
       clock: this.clock,
       events: this.events,
     });
@@ -251,6 +251,10 @@ export class SandboxWorld {
       clock: this.clock,
       events: this.events,
     });
+    // RFC 0013 §6.2: Acme keeps its copy of the HR platform's status lists fresh
+    // on a schedule (startup, then each hourly tick), never when someone applies,
+    // so the HR platform can't line its fetches up with an application.
+    await this.acmeWalletSteps.refreshStatus();
     const acme = await SandboxProvider.create({
       ...common,
       origin: o.origin("acme"),

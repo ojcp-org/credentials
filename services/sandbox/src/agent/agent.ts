@@ -8,6 +8,7 @@ import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import {
   beginStandingMandate,
   completeStandingMandate,
+  type Exercise,
   InMemoryHolderStore,
   presentActionMandate,
   refreshStandingMandate,
@@ -90,6 +91,8 @@ export interface PendingApproval {
 /** An RFC 0013 wallet step as the agent may relay it (§4.1). */
 const WalletStep = z.looseObject({
   step_id: z.string(),
+  verifier_id: z.string(),
+  proof_delivery: z.string(),
   verification_url: z.url({ protocol: /^https$/ }),
   verifier_name: z.string().optional(),
   human_required: z.literal(true),
@@ -556,7 +559,11 @@ export class SandboxAgent {
       };
       if (started.result.status === "pending_verification") {
         const steps = z.array(z.unknown()).parse(started.result.verification_steps ?? []);
-        return await this.#relayWalletStep(host, job, employerId, session, label, steps);
+        const accepted = z
+          .object({ accepted_verifiers: z.array(z.string()).default([]) })
+          .catch({ accepted_verifiers: [] })
+          .parse(started.result.apply_path).accepted_verifiers;
+        return await this.#relayWalletStep(host, job, employerId, session, label, steps, accepted);
       }
       const bindingActions = BindingActions.parse(started.result.binding_actions ?? []);
       if (bindingActions.length > 0) {
@@ -595,21 +602,36 @@ export class SandboxAgent {
       application_data: this.applicationData(),
       candidate_context: this.candidateContext(),
     };
-    const ex = await this.holder.exercise({
-      tool: "submit_application",
-      origin: this.world.origins.origin(host),
-      ojcpVersion: OJCP_VERSION,
-      job,
-      employerId,
-      session: { ...session, binding_actions: [] },
-      request,
-    });
+    let ex: Exercise;
+    try {
+      ex = await this.holder.exercise({
+        tool: "submit_application",
+        origin: this.world.origins.origin(host),
+        ojcpVersion: OJCP_VERSION,
+        job,
+        employerId,
+        session: { ...session, binding_actions: [] },
+        request,
+      });
+    } catch (error) {
+      // The mandate may have changed since begin_application (e.g. a limit was reached).
+      if (!(error instanceof StandingMandateRefusal)) throw error;
+      const text = `Agent will not submit ${label}: ${error.message} (${error.reason})`;
+      this.#emit("refused", text);
+      return { status: "refused_by_agent", reason: error.reason, text };
+    }
     const submitted = await this.callTool(host, "submit_application", {
       application_id: session.application_id,
       ...request,
       agent_declaration: this.declaration(ex.userMandate),
     });
     if (!submitted.ok) return this.#providerRefused(label, submitted.result);
+    // A refusal can also arrive as a normal result (e.g. `verification_failed`): only `submitted` counts.
+    if (submitted.result.status !== "submitted")
+      return this.#providerRefused(label, {
+        error_code: String(submitted.result.status ?? "unknown"),
+        details: submitted.result,
+      });
     if (!submitted.result.retried)
       await this.holder.recordSubmission(ex.batchId, this.world.origins.origin(host), employerId);
     this.#lastSubmit = { provider: host, job, employerId, session };
@@ -654,6 +676,7 @@ export class SandboxAgent {
       candidate_context: this.candidateContext(),
     };
     const agentKey = this.world.keyring.requestSigner;
+    const digestOfActions = await bindingActionsDigest(a.bindingActions);
     const { digest, statement } = await statementForApproval(
       {
         ojcp_version: OJCP_VERSION,
@@ -664,7 +687,7 @@ export class SandboxAgent {
         application_id: a.session.application_id,
         agent_id: this.world.origins.agentId,
         mandate_nonce: a.session.mandate_nonce,
-        binding_actions_digest: await bindingActionsDigest(a.bindingActions),
+        binding_actions_digest: digestOfActions,
       },
       agentKey,
       request,
@@ -701,11 +724,18 @@ export class SandboxAgent {
     const submitted = await this.callTool(a.provider, "submit_application", {
       application_id: a.session.application_id,
       ...request,
+      // RFC 0009 §3.6: the agent states it presented this exact list.
+      binding_actions_digest: digestOfActions,
       agent_declaration: this.declaration(mandate),
     });
     this.approvals.delete(id);
     const label = `${String(a.job.title)} at ${this.world.origins.host(a.provider)}`;
     if (!submitted.ok) return this.#providerRefused(label, submitted.result);
+    if (submitted.result.status !== "submitted")
+      return this.#providerRefused(label, {
+        error_code: String(submitted.result.status ?? "unknown"),
+        details: submitted.result,
+      });
     const text = `Submitted ${label} under the candidate's action mandate`;
     this.#emit("ok", text);
     return { status: "submitted", application_id: a.session.application_id, text };
@@ -723,6 +753,7 @@ export class SandboxAgent {
     session: { application_id: string; mandate_nonce: string },
     label: string,
     steps: unknown[],
+    acceptedVerifiers: readonly string[],
   ): Promise<ApplyOutcome> {
     const refuse = (reason: string, why: string): ApplyOutcome => {
       const text = `Agent will not relay ${label}'s wallet step: ${why}`;
@@ -739,6 +770,17 @@ export class SandboxAgent {
       return refuse("trust", "the site's identity isn't verified");
     if (new URL(step.verification_url).origin !== origin)
       return refuse("wallet_step_origin", "its verification page isn't on the site's own origin");
+    // §2.1: the step's verifier is one the apply path names, and the proof goes to the provider.
+    if (
+      !acceptedVerifiers.includes(step.verifier_id) ||
+      step.verifier_id !== new URL(origin).host
+    )
+      return refuse("wallet_step_verifier", "its verifier isn't the site the application is with");
+    if (step.proof_delivery !== "provider_managed")
+      return refuse(
+        "wallet_step_delivery",
+        "it would send the proof somewhere other than the site",
+      );
     const paths = step.wallet_request.dcql_query.credentials.flatMap((c) =>
       c.claims.map((k) => k.path),
     );
@@ -808,17 +850,15 @@ export class SandboxAgent {
       isRecord(vs) && Array.isArray(vs.deferred_steps) && vs.deferred_steps.length > 0
         ? "deferred"
         : "completed";
-    this.verifications.delete(id);
     this.#emit(
       "ok",
       `${label}: the provider reports the step ${step === "deferred" ? "deferred (the candidate chose not to use a wallet)" : "completed"}; submitting`,
       { verification_status: vs },
     );
-    return {
-      status: "done",
-      step,
-      outcome: await this.#submit(v.provider, v.job, v.employerId, v.session, label),
-    };
+    const outcome = await this.#submit(v.provider, v.job, v.employerId, v.session, label);
+    // Kept until submitted: a refusal, e.g. a limit, leaves the record to explain why.
+    this.verifications.delete(id);
+    return { status: "done", step, outcome };
   }
 
   async state(): Promise<Record<string, unknown>> {

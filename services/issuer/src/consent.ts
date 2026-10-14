@@ -43,6 +43,10 @@ export const NEVER = [
   "Accept a job offer",
 ];
 
+export const WRITER = "The agent writes your applications for you.";
+export const ENFORCEMENT =
+  "Employers' systems enforce these when the agent applies through OJCP. Elsewhere, such as by email, they're rules the agent must follow that no employer can check.";
+
 export function placeInWords(place: LocationElement): string {
   if ("anywhere" in place) return "Anywhere, for remote jobs that don't name a country";
   const country = regionNames.of(place.addressCountry) ?? place.addressCountry;
@@ -101,6 +105,10 @@ export interface ConsentView {
   recipients: string;
   shared: string;
   never: string[];
+  /** RFC 0008 §3.3: the agent, not the employer, writes the application. */
+  writer: string;
+  /** RFC 0008 §3.3: "never" is enforced only when the agent applies through OJCP. */
+  enforcement: string;
   ending: string;
   /** Each contact gets a code; `value` is the key for its code on approval. */
   contacts: Option[];
@@ -134,6 +142,8 @@ export function consentView(
     recipients: recipientsInWords(d),
     shared: `Each employer sees ${d.candidate.map(contactInWords).join(" or ")}, and ${CONSENT_WORDS[d.consent_scope] ?? d.consent_scope}.`,
     never: NEVER,
+    writer: WRITER,
+    enforcement: ENFORCEMENT,
     ending: `It ends on ${until}. You can cancel any time. ${client.name} may renew its credentials without asking you, but only on these same terms and with the same end date.`,
     contacts: d.candidate.map((c) => ({ value: JSON.stringify(c), label: contactInWords(c) })),
   };

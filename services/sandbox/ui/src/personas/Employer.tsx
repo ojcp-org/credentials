@@ -69,7 +69,6 @@ interface VerifyView {
   awaiting_confirmation: boolean;
   mismatch?: boolean;
   result?: {
-    via: string;
     basis: string;
     issuer: string;
     shared: Array<{ label: string; value: string }>;
@@ -95,7 +94,6 @@ interface Received {
       record: Record<string, unknown>;
       issuer: string;
       basis: string;
-      via: string;
       presentationSha256: string;
     };
   };
@@ -471,11 +469,7 @@ function WorkHistory({ r, reload }: { r: Received; reload: () => void }) {
           {w.kept.basis === "customer_records"
             ? "an HR platform reporting its customer's records"
             : "the employer itself"}
-          ). Bound to this application by{" "}
-          {w.kept.via === "bound_session"
-            ? "the browser session where the candidate confirmed their email"
-            : "the candidate typing their email on the wallet's device"}
-          .
+          ), and tied to this application.
         </Text>
         {requirement}
       </Stack>
