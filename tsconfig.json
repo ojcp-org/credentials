@@ -1,0 +1,23 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "sdks/typescript/core"
+    },
+    {
+      "path": "sdks/typescript/verifier"
+    },
+    {
+      "path": "sdks/typescript/agent-wallet"
+    },
+    {
+      "path": "services/issuer"
+    },
+    {
+      "path": "tests"
+    },
+    {
+      "path": "sdks/typescript/core/test"
+    }
+  ]
+}

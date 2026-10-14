@@ -1,0 +1,658 @@
+{
+  "description": "RFC 0008 §2.2 coverage of a job by a (disclosed or full) scope. `disclose` is what an agent presents; failures are listed in this order: unclassified, job_family, location, remote_policy, employment_type, experience_level, salary.",
+  "scope": {
+    "taxonomy": "https://www.onetcenter.org/taxonomy/2019/list.html",
+    "job_families": [
+      "15-2051",
+      "29-1210"
+    ],
+    "locations": [
+      {
+        "addressCountry": "US",
+        "addressRegion": "NY"
+      },
+      {
+        "addressCountry": "CA"
+      }
+    ],
+    "remote_policy": [
+      "hybrid",
+      "remote"
+    ],
+    "salary": [
+      {
+        "at_least": 125000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 132000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 140000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 150000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 160000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 170000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 180000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 190000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 200000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 212000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 224000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 236000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 250000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 265000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 280000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 300000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 315000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 335000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 355000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 375000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 400000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 425000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 450000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 475000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "at_least": 500000,
+        "currency": "USD",
+        "unitText": "YEAR"
+      },
+      {
+        "unstated": true
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "RFC 0008 §2.8 example",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "15-2051",
+          "location": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "at_least": 132000,
+            "currency": "USD",
+            "unitText": "YEAR"
+          }
+        }
+      }
+    },
+    {
+      "name": "low end equals a rung",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "15-2051",
+          "location": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "at_least": 132000,
+            "currency": "USD",
+            "unitText": "YEAR"
+          }
+        }
+      }
+    },
+    {
+      "name": "low end below the floor",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 110000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "salary"
+        ]
+      }
+    },
+    {
+      "name": "only maxValue: unstated covers it",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "15-2051",
+          "location": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "unstated": true
+          }
+        }
+      }
+    },
+    {
+      "name": "no salary: unstated covers it",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid"
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "15-2051",
+          "location": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "unstated": true
+          }
+        }
+      }
+    },
+    {
+      "name": "another currency is not covered",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "EUR",
+          "minValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "salary"
+        ]
+      }
+    },
+    {
+      "name": "hourly against yearly rungs",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 90,
+          "unitText": "HOUR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "salary"
+        ]
+      }
+    },
+    {
+      "name": "broad occupation contains detailed",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "29-1221.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "29-1210",
+          "location": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "at_least": 132000,
+            "currency": "USD",
+            "unitText": "YEAR"
+          }
+        }
+      }
+    },
+    {
+      "name": "plain-string occupationalCategory",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          "Data Scientist"
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "unclassified"
+        ]
+      }
+    },
+    {
+      "name": "secondary code is ignored",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "11-1011.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          },
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "job_family"
+        ]
+      }
+    },
+    {
+      "name": "country-level place",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "CA",
+            "addressRegion": "ON"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": true,
+        "disclose": {
+          "job_family": "15-2051",
+          "location": {
+            "addressCountry": "CA"
+          },
+          "remote_policy": "hybrid",
+          "salary": {
+            "at_least": 132000,
+            "currency": "USD",
+            "unitText": "YEAR"
+          }
+        }
+      }
+    },
+    {
+      "name": "region not allowed",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "CA"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "location"
+        ]
+      }
+    },
+    {
+      "name": "text location",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "United States"
+          }
+        },
+        "remote_policy": "hybrid",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "location"
+        ]
+      }
+    },
+    {
+      "name": "remote with no country, no anywhere",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "remote_policy": "remote",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "location"
+        ]
+      }
+    },
+    {
+      "name": "on-site not allowed",
+      "job": {
+        "ojcp_id": "x",
+        "occupationalCategory": [
+          {
+            "codeValue": "15-2051.00",
+            "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+          }
+        ],
+        "jobLocation": {
+          "address": {
+            "addressCountry": "US",
+            "addressRegion": "NY"
+          }
+        },
+        "remote_policy": "on_site",
+        "baseSalary": {
+          "currency": "USD",
+          "minValue": 132000,
+          "maxValue": 150000,
+          "unitText": "YEAR"
+        }
+      },
+      "result": {
+        "covered": false,
+        "failures": [
+          "remote_policy"
+        ]
+      }
+    }
+  ]
+}

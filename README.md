@@ -1,50 +1,84 @@
-# OJCP Agent Wallet
+# OJCP credentials
 
-Open-source tooling that lets a candidate's AI agent apply for jobs **on the candidate's behalf, within limits the candidate approved once**, and lets employers verify that it did.
+Open-source building blocks for the credential side of OJCP: an agent applying for jobs **on a candidate's behalf, within limits the candidate approved once**, employers verifying that it did, and people proving facts about their work history from a wallet.
 
-It implements the agent and issuer sides of OJCP's draft standing-mandate design ([RFC 0008](https://github.com/ojcp-org/ojcp/pull/40)), which builds on occupation codes and binding actions ([RFC 0009](https://github.com/ojcp-org/ojcp/pull/46)) and decentralized provider trust ([RFC 0010](https://github.com/ojcp-org/ojcp/pull/41)), with wallet credentials ([RFC 0013](https://github.com/ojcp-org/ojcp/pull/44), [RFC 0014](https://github.com/ojcp-org/ojcp/pull/45)) later. How the RFCs fit together: [Discussion #53](https://github.com/ojcp-org/ojcp/discussions/53).
+It implements, as drafted:
 
-> **Status: planning.** Nothing here is released. Everything tracks RFCs that are still in their comment period (closing November 11, 2026), so names and formats will change with them.
+- standing mandates ([RFC 0008](https://github.com/ojcp-org/ojcp/pull/40)), with occupation codes and binding actions from [RFC 0009](https://github.com/ojcp-org/ojcp/pull/46);
+- action mandates and agent identity (spec *User Mandates* and *Agent Identity*, RFC 0003);
+- hiring credentials and their issuer profile ([RFC 0014](https://github.com/ojcp-org/ojcp/pull/45)) and their presentation to employers ([RFC 0013](https://github.com/ojcp-org/ojcp/pull/44)).
 
-## What it is
+How the RFCs fit together: [Discussion #53](https://github.com/ojcp-org/ojcp/discussions/53).
 
-Not an app. Three pieces, by who uses them:
+> **Status: working code, unreleased.** It tracks RFCs still in their comment period (closing November 11, 2026), so formats will change with them. Nothing is published to npm yet.
 
-| Piece | What it is | Who runs it |
+## What's here
+
+| Path | What it is | Who uses it |
 |---|---|---|
-| **`@ojcp/agent-wallet`** | A TypeScript library inside the agent platform's backend. Holds the platform's mandate keys and its users' standing mandates, decides whether a job is covered, and attaches the proof to each application. No user interface. | Agent platforms (auto-apply tools, assistants) |
-| **Reference mandate issuer** | A small, self-hostable web service: the consent page where a person approves "apply for me within these limits", plus a dashboard to see applications and revoke. | Agent platforms, identity or wallet providers, or neutral operators. OJCP itself runs none in production. |
-| **`@ojcp/mandate-verifier`** | A TypeScript library for job providers: the RFC 0008 §8 verification steps and the per-employer count. | Job boards, ATSs, employer career sites |
+| [`sdks/typescript/agent-wallet`](sdks/typescript/agent-wallet) · `@ojcp/agent-wallet` | Agent platform library: request-signing and mandate keys with the key directory, RFC 9421 signed `fetch`, an MCP client that signs every call, standing-mandate batches over OpenID4VCI, deciding what a mandate covers and what to disclose, action-mandate presentation. No UI. | Agent platforms |
+| [`sdks/typescript/verifier`](sdks/typescript/verifier) · `@ojcp/verifier` | Provider library: RFC 0008 §8 standing-mandate verification with the per-employer count, action-mandate verification, RFC 0013 §6.2 validation of wallet presentations, status-list cache. Every mandate refusal is `user_mandate_required`. | Job boards, ATSs, career sites |
+| [`sdks/typescript/core`](sdks/typescript/core) · `@ojcp/credentials-core` | Shared primitives: keys and `Signer`, JWS, SD-JWT (RFC 9901), OJCP digests (JCS), RFC 9421 signing profile, O*NET-SOC hierarchy, salary grid, scope coverage, Token Status Lists, the hiring credential types and their Type Metadata. | Both libraries |
+| [`services/issuer`](services/issuer) · `@ojcp/issuer` | Self-hostable issuer service: OpenID4VCI authorization server and credential issuer, consent page, account page for revocation, status lists, and the RFC 0014 record API with former-employee offers. Hono, SQLite. | Mandate issuers; HR platforms, employers and schools issuing records |
+| [`vectors`](vectors) | Language-neutral test vectors: digests, O*NET containment, salary rungs, scope coverage, Type Metadata bytes, and signed standing-mandate verification cases with expected outcomes. | Every SDK, in every language |
+| [`data/onet`](data/onet) | O*NET-SOC 2019 taxonomy and SOC structure (CC BY 4.0), compiled to one JSON every SDK loads. | Every SDK |
 
-Phone wallets for job and degree records (RFC 0013/0014) come from existing wallet providers; this project integrates with them rather than building one.
+TypeScript comes first. Python and Kotlin SDKs follow under `sdks/`, each native to its ecosystem and held to the same `vectors/`.
+
+No OJCP-run issuer exists or is planned: anyone can run `services/issuer`, and providers decide which issuers they admit.
 
 ```mermaid
 sequenceDiagram
   participant M as Candidate
   participant A as Agent platform<br/>(@ojcp/agent-wallet)
-  participant I as Mandate issuer<br/>(consent page)
-  participant P as Job provider<br/>(@ojcp/mandate-verifier)
-  M->>A: "Apply to remote data-analyst jobs paying ≥ $120k until December"
-  A->>I: Proposes the mandate (OpenID4VCI)
-  I->>M: Consent page: verify email, show limits in plain words
-  M->>I: Approves (passkey)
-  I->>A: Batch of standing-mandate credentials
-  A->>P: begin / submit_application with signed request + mandate proof
-  P-->>A: Accepted, or refused (out of scope, over cap, opted out, revoked)
-  M->>I: Any time: review applications, revoke
+  participant I as Issuer<br/>(services/issuer)
+  participant P as Job provider<br/>(@ojcp/verifier)
+  M->>A: "Apply to hybrid data jobs in New York paying ≥ $125k until December"
+  A->>I: Proposes the mandate (OpenID4VCI authorization_details)
+  I->>M: Consent page: limits in plain words, one-time code to the email
+  M->>I: Approves
+  I->>A: Batch of credentials bound to the platform's mandate keys
+  A->>P: begin / submit_application, RFC 9421-signed, with a KB-JWT bound to the action
+  P-->>A: Accepted, or user_mandate_required
+  M->>I: Any time: cancel on the account page
 ```
+
+## Use
+
+Node 22.13 or later, pnpm.
+
+```bash
+pnpm install
+pnpm test          # unit, end-to-end and vector tests
+pnpm typecheck
+pnpm build
+```
+
+Run the issuer locally:
+
+```bash
+pnpm build
+OJCP_ISSUER_URL=http://localhost:8787 PORT=8787 \
+OJCP_SIGNING_KEY="$(cat key.json)" OJCP_SIGN_UNTIL=1830000000 \
+OJCP_CLIENTS_FILE=clients.json OJCP_POLICY_URI=http://localhost:8787/practice \
+OJCP_COOKIE_SECRET=<32+ chars> OJCP_ADMIN_TOKEN=<32+ chars> \
+node services/issuer/dist/main.mjs
+```
+
+`key.json` is a private P-256 JWK; `clients.json` lists the agent platforms allowed to request mandates (see [`services/issuer/README.md`](services/issuer/README.md)).
 
 ## Docs
 
-- [Architecture](docs/architecture.md): components, modules, interfaces, data flows
-- [RFC mapping](docs/rfc-mapping.md): every RFC 0008 requirement and where it lives
-- [Roadmap](docs/roadmap.md): milestones, acceptance criteria, dependencies
-- [Prior art](docs/prior-art.md): AP2, existing credential SDKs, standards work
-- [Decisions and open questions](docs/open-questions.md): what's settled, and what to settle before building
+- [Architecture](docs/architecture.md): packages, modules, interfaces, data flows
+- [RFC mapping](docs/rfc-mapping.md): every requirement and where it is implemented and tested
+- [RFC feedback](docs/rfc-feedback.md): gaps and ambiguities found while implementing
+- [Roadmap](docs/roadmap.md): what's done, what's next
+- [Prior art](docs/prior-art.md): AP2, credential SDKs, standards work
+- [Decisions and open questions](docs/open-questions.md)
 
 ## Principles
 
-- **Open source, neutral home.** Lives in `ojcp-org`, Apache-2.0, like the conformance suite. It lowers the cost of adopting the RFCs; it is not a product with a toll booth.
-- **Reuse, don't reinvent.** Built on OpenWallet Foundation libraries (SD-JWT, OpenID4VCI), `jose`, and Cloudflare's RFC 9421 implementation. The new code is the hiring layer.
-- **No central party.** Anyone can run an issuer; providers decide which issuers they admit.
-- **Tested against the spec.** Every rule in RFC 0008's conformance table is a shared fixture in `@ojcp/conformance`.
+- **Open source, neutral home.** `ojcp-org`, Apache-2.0, like the conformance suite.
+- **Standards first.** SD-JWT VC, OpenID4VCI 1.0, Token Status List and RFC 9421 as pinned by HAIP; P-256 keys and SD-JWT key binding as in AP2, so one holder can carry both.
+- **No central party.** Anyone can run an issuer; providers decide whom to admit.
+- **Same answers in every language.** Behaviour is pinned by `vectors/`, not by one implementation.

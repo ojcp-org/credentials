@@ -1,0 +1,1546 @@
+{
+  "description": "RFC 0008 §8 verification. Every rejection is `user_mandate_required` on the wire; `kind` is the internal failure class and `reason` the only details.reason value allowed. The provider policy and status list token are shared by every case; the ledger starts empty.",
+  "policy": {
+    "origin": "https://careers.acme.com",
+    "manifest": {
+      "types": [
+        "action",
+        "standing"
+      ],
+      "required_for": [
+        "submit_application"
+      ],
+      "action_mandate_required_for": [
+        "accept_terms",
+        "accept_offer"
+      ],
+      "standing": {
+        "vct_values": [
+          "https://spec.ojcp.dev/vct/standing-mandate/v1"
+        ],
+        "max_lifetime_months": 3,
+        "max_per_employer": 2,
+        "max_breadth": "narrow",
+        "taxonomies": [
+          "https://www.onetcenter.org/taxonomy/2019/list.html"
+        ]
+      }
+    },
+    "issuers": [
+      {
+        "iss": "https://mandates.example",
+        "keys": [
+          {
+            "jwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "vaGXmER21xb7hV59EfFlXf3JrBPpH2jyr_8CojPryt0",
+              "y": "5LDg7wlZq82uI8FDJjbcKYvFsbirihpG26FraeLXsDc"
+            }
+          }
+        ],
+        "types": [
+          "standing"
+        ]
+      }
+    ],
+    "ojcpVersions": [
+      "0.3"
+    ]
+  },
+  "status_lists": {
+    "https://mandates.example/status/1": "eyJ0eXAiOiJzdGF0dXNsaXN0K2p3dCIsImtpZCI6InVLWDdHZVBqUFVQWjR1TkxPTnItMzVHLWtXVmdJYzJVTFpRZ0lnQVFMT28iLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUvc3RhdHVzLzEiLCJpYXQiOjE3OTE4OTI4MDAsImV4cCI6MjEwNzI1MjgwMCwidHRsIjozNjAwLCJzdGF0dXNfbGlzdCI6eyJiaXRzIjoyLCJsc3QiOiJlTnBqWUJnS1FJQmhGSXlDVVRBS1JzRW9HQVdqWUJRZ0FBQ2JwQUFSIn19.SPHytmo8-UQiMlgQxeK7Ju74NuTDdtazrOijHd4s19jeJi_JWYHkBs36Lou3yQ1KrywXC3fE9xFtRFOTIJvcgQ"
+  },
+  "mandate_window": {
+    "nbf": 1790812800,
+    "exp": 1796083200
+  },
+  "cases": [
+    {
+      "name": "search_jobs, only the action disclosed",
+      "expected": {
+        "accepted": true
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkwzUWpJQVNyVF9UWXdHWkIwT2h2YUx2QlgxMC1PVHV2Mnl2a2h0TE96bWcifSx7Ii4uLiI6IlJmckRESHExWXRjR3ZCOHBvdlRfTEM0R3BhbmdsZHU1QzFiT2JfS0Fudk0ifSx7Ii4uLiI6IlctUmIyX1NZeE51cjF0MUdWeWhaLUEwVWxkdWxLU01zUnlhM3VQTUo0a3cifSx7Ii4uLiI6InlWeDhRVm9lYmI1TkVLQ3pGU3VmcUR4S2ZfUmxaRUhocW9BaS1jV095azAifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkZTdHlHU2Z1N2dDZ3FZX2xuU2lxSEE3T1F1UkpiYk1KMEVpbHZoOWEtZzAifSx7Ii4uLiI6Ik0yeE5SeXZBOHdBNEx2bUdlQlFDMHBmLWRuZGppVWdXVWp5N2t3RkpIeTgifSx7Ii4uLiI6IlM1UVg1YUN2ZHpncU5WMTdDQVRWUlVzN3lDUGRtSTd1YUlTYXlCOXh3ZnMifSx7Ii4uLiI6IlNXZzZtMXR5ZUQ3ZnFjQlRHYkxjX2x1cDhvb2wxZHBIbWptQTFaSWViSGsifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiM2ZrLUNNMUFleEVPam9VQWpmMXlsek1pVE1IOGc4U0J2WE0xUzNEWkhPZyJ9LHsiLi4uIjoiYzBaNDQxdTA1YnlYa3UyWFJvMldCS3JBMFhTZGNpNkdtNDRyc3Y1Ums2WSJ9LHsiLi4uIjoia1lRSDBqWEp5azFBN1ZnRzJmaU9Bajl5MmdaOFB0NUxoTlB0WG4xY2p3YyJ9LHsiLi4uIjoib2hVd05QUVFnTmFya1lFcGZHcDdWWXVaRXBwT1ZnTXotRDR2X3oyRWVtayJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiSmxjMFJKejZVWUNNa19JZmxKYmpKcFFVOEhHRVZMLWtybmNiTFhTZ05DNCJ9LHsiLi4uIjoiSzE0Qjc2TnkwSEdCUktncEFTWWZzd1J3b2xiR3FPNy1YS3BRUFI0V3J0cyJ9LHsiLi4uIjoiUXE5YVZEcUJoemU1Uk1wY1BkY0I2VUxicWdaYlMySXRpYnVDZGpONWhyYyJ9LHsiLi4uIjoiYWZIUXZ0aDVuZmF0Q2FhMzl0aUlEakhTTkpTaW5SMFppanFyYlBtN3ItYyJ9LHsiLi4uIjoiYXJMbjEyYlk1bDBQUkplSUFnLTZLd3FYVVZxSWZyUWFlNnk1WWowY1hkRSJ9LHsiLi4uIjoieE5TcW1lSjBzWXRNekZTSzdLYzIzRkVsMWhObnNJbVZKOGhULWh5d0lHayJ9LHsiLi4uIjoiellnWjBGelFIUGJhc3NUUE5DM19YWllfLTR5eFlETW8xbWJuS3lpbXpIMCJ9LHsiLi4uIjoienpXeUZicjZseUtpZ1czbk13VUVkYml3NC1MZUt3SzlaQ29LRTlKOFFfSSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiI0OTBReVZBRzQxcTktUGEtb01RQ0FjLUFVVF82YmpRaDZHcnFxTnU1cEE0In0seyIuLi4iOiI3WFlURGFjY0xwN1lmSkhJLXVrV3p3ck5tXzJNMGVUVFdGTUdUYmdCZHc0In0seyIuLi4iOiI4R29RUjhNZW9sd0Iwb2FZUW1halBJMGx2QjY2YzNBeTJ0d2dZLTJKQllNIn0seyIuLi4iOiI4cE55LU1vZzZmaFlTb0hDMmxycHZaWGxtNGxRRmhMVGNnZUh5T3VRdEJnIn0seyIuLi4iOiJCUnRsRFRnd29wbWRTYVNOX3VqVWxtaFFIMDNLbnhQQWNOUHRTSE9fZGxrIn0seyIuLi4iOiJLcVFSM2VKLTdRZTF4ZGdpUTJhbWZVSUpDMTNBOFRmZ0FOUnVTRmdERXhvIn0seyIuLi4iOiJPUlhXaV81NVhnY1RRZnJadW5HT2N1UFN1Mkd0QmxnX3VKZUVySmFTcjhFIn0seyIuLi4iOiJUN3E4X3hpM0l0NU9vc0JpekwzZ19PVDJZSzBkQUlDVTQ0NS0zaTJYZVJjIn0seyIuLi4iOiJVQ3A4SmdlUlA4WWRkMDNoZjRTSXFid3dGakk1bG5WNzJJbE40MkxwcWNJIn0seyIuLi4iOiJWRXpvNUszMFVuZ2kwemxHOU1VSVpwb0o4b0p2MHpyYWV3R3BucUNSckMwIn0seyIuLi4iOiJXSFA3dGNTb296OUd2X1JCZm5uR3l0enVCYjJSNkRmVWpIVElyS1F2ZS1ZIn0seyIuLi4iOiJZN3VjTGJVSDU0QXl6OGtUUk1XdTF5TEtPTW5pdkJuQnVsNFVPcDVWWE9vIn0seyIuLi4iOiJaNnVtOVpwTkhkb1RuNm5OMHluSWZIcTlJS3RWaU45LUNhbXdiSTdoMXNVIn0seyIuLi4iOiJfTWZ2N1h6UGJIeDhnZVVuTGhZSEJVNnBlX0l2N1ZMZk9kal9hdzVWV1NnIn0seyIuLi4iOiJfeXY3UHZfdzN5NVUyeW9CQTBPdDdwSDRTbGdKbVVNX04tems5RzNQdHJFIn0seyIuLi4iOiJiVUtmWHE2c2tiR1k3ZVlKaXdBWWhvZlBxTlJkT3FoYllTZjVRN09JU3QwIn0seyIuLi4iOiJlWF9FMDRiaFhrT0tvY3dodGExbk5vakpETjFNNWRUYkhLUUE4dk5jWVg0In0seyIuLi4iOiJlX3I4NE5ITjlJOVM0Q1dKMkFndWVZelM3c1V4RnNBUXRxTmVGNzFKa2pnIn0seyIuLi4iOiJrRkFCVmMzZ1Q3NGE4bUtCVEFMX2U5UmR4dEZ1TjY1YnFyeUVDclZFXzlVIn0seyIuLi4iOiJtMnJOVzdWOHdPbEVXZW1rcXVNazQ4bUFMWTJ6Z1lpVEt2aVpnYmlmdkRZIn0seyIuLi4iOiJwYWpZZVRvemsweEZ1QW9DcTAzZUdTYTh0YXpJWmQ1SnVDd1BoRzFLYmdFIn0seyIuLi4iOiJxWkhoZWZOTklKd0NRTWxYOU9IRWdKT3IzdE1FSzg2TElERlFFQ2JXdzhnIn0seyIuLi4iOiJyT3lGNEd1eWYtc0VFR3NWOHJfUnNoUjNRdEhSWE13VzdRRXNpWU9XYklFIn0seyIuLi4iOiJ1VElfeFd6NEh0RXhfSzZodDIxdGVBVDBmSkxrcVBtM09yNjVUZzFvU0VRIn0seyIuLi4iOiJ6Vk9fZ3l5TnZZb1duQmdXMURCcmsySUpCNXJxMjVLQm80d0hCNzhldzFnIn0seyIuLi4iOiJ6WHBMVTVkYjJzX2hna3dWbkFqeHQyaDhUeGFKcEFyWTdHamkwRVc0YWVNIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIyb0ZRNGs4eHd5UGJDZFJpaFNnWVFRSmhpTWY2R1RkVjVLQkUyMEFDejZJIn0seyIuLi4iOiI0V2pwX3p0YlQxSENqdEJueFA3RHpnTmtmd0hyQjZGSU5SQjl4STVWaGZnIn0seyIuLi4iOiI2eXVzNzNUOHVTY0xMcnJWY1dSd19XbHU0b3hmSFg2c3VDa1Vvb0NOVE5vIn0seyIuLi4iOiI4YW9BOXRQQ281YThSczhTWHdkUmUyejRRRzVacGVHZXhuZV8yejRucThrIn0seyIuLi4iOiI5NkR4MDRUOGVwNTEyRHNZWUVWZF9WS25RaTFXWVlSZllSVm1xNmF4Z2l3In0seyIuLi4iOiJOSXRiaFRicUJ4ODNOc280MnFod2xUZEpyc19fOEhVVVg4Y2RiaW5mNVRFIn0seyIuLi4iOiJhcjdRMlhqWWFNUldOY19KVEJJU1hEajdBSThrYjdhRVhwQ1M5S196bzM0In0seyIuLi4iOiJrZkc0VV81bkR4dHFlVmpwNFdJMDVqd1BMRzdWbEs4U2l4bktwdlR2c2MwIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.Ksi7Pqj6vQw5SQBtExD3MBv6lrqm-ENHdYl9p4hy0gQHl3uiwbq-av9feRzAiW62auE5hjIGl6euanvoRUyxzQ~WyJFekVWSk1URnVRVUhXRmZlN3N6eU5BIiwiMTUtMjA1MSJd~WyJleG1GS1dxZnFWQVpPSlgzQXl0WGJ3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJ1NUhfTjZTa3IxdmIxTDJ2Q0hPOWZBIiwiaHlicmlkIl0~WyJyS2hRbkR4OUVEeVRWY3hxdVZyaFZBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJVMHZTQWJWY1QwaGtDdlZmU2psVXRnIiwic2VhcmNoX2pvYnMiXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJzZF9oYXNoIjoiYW8wYmNZNkxUelpYTjE2bjRUREY3bk5rMTBSR1Z3bGtya0tHWVhLZi1BbyJ9.ZCcm64QWXyPti4MXT805go2Ztl4WnGJFoEzSeMWAC23taShanUlvtRAkQWHAwd83AChitGn2dUSpFJCVHZb5iQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "search_jobs"
+      }
+    },
+    {
+      "name": "begin_application, RFC 0008 §2.8 disclosures",
+      "expected": {
+        "accepted": true
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjgwcTlhY2gtcEhjU0xpSnR2ZUltVFBndVVQdHpac3lEeVItQXNvSjlKQ3cifSx7Ii4uLiI6IjlPYXRlRVBNTl9SaXcxcHJuMmt4YlZFbWtLN0JRSS1zWlBTLUxtS09teEEifSx7Ii4uLiI6IkxLWm9kQm1VNFpfN203eDMwZTVGSDk2b0VFMFJyb1RidzNsSmNFVnE1c0UifSx7Ii4uLiI6ImN1V2pMRUcyQW52akFfdXotaWVuelZTVDRydVNrZVV5LUE1OWJUelF5OU0ifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjBTOWdQdy00eFBaWjNKOFJuN1FHZk04Ym8wbGNncGl1NTVfdDlHWTlWSEEifSx7Ii4uLiI6IlMzVFB3alhoeGFBRG5LRktDQlFEVnRfYWcwRWNhdFpDeXp5b2NYUTg4MVEifSx7Ii4uLiI6ImI0RUJaaGFqZmRvRG5Cd0V1V1daTkZ1X241NG95Zm1wNUF4dURRRVd1OXMifSx7Ii4uLiI6Imo1T0lQQnUtLWNKYzJaWUFORmphaHBDSXpzcG5kY1Q3V1M4OWpQOXFEM1UifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiNjJpcjNsbXNzamJIakJmTERVc3ZOU201anZaWURUaDBVTnJuQk1paW9mZyJ9LHsiLi4uIjoiUS1HdFpCa0RaMlJOZE56dXl3MlBKbWl2djNBekVlbFdZYWpxS29LN0pXNCJ9LHsiLi4uIjoiVWYwYzNleERuLU5kOGdxMFJYYkRuemZqM3FvZ1lQVVlVa1lSclh0NmpzOCJ9LHsiLi4uIjoiWTJMeDhTZEJzM3dNVEVqMGJ5eFZhakt2ZDBJdXd0TkItSEd0UWZrTURFUSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiLXlncFdESTJScEM3Rkp6clJUamJlLXROaUZtTHlPVWlScU1Yd2FhRkplcyJ9LHsiLi4uIjoiM1ZLd2pSV0lyMjZWLWFtaTZHT3hXakZ2djNKeGNoRWpTR0ZQYzJPU0hRYyJ9LHsiLi4uIjoiR25jbmxiQVVDRUhxRXZmY2FYOHBqLTFNak53cVZfZy1OZnZRcTE1THNZdyJ9LHsiLi4uIjoiWDBVS3h3Zmx0dmlSazdwb2s1bkJ2QXBGZW1RZEp1cGlUSlFPdG55VHV1WSJ9LHsiLi4uIjoiWEd0Mlp3QzE2Zmd2RXRITGdRZmNrdGlzVDgyQzlCWk5sUjVaZ1BPWXdITSJ9LHsiLi4uIjoiakhMbTVrUXhMQTY5RkRKTnAza3hobk9QbngzUDk1YVJpN1d0blcxS3lpUSJ9LHsiLi4uIjoia0lDOHlySmxXaTk3aGJPbjAxWGxlbW82S292d0VZaU1lVEw5T0JWWUtsWSJ9LHsiLi4uIjoibHBPZE5vTThiSzlHUV91V1B5VmNBMDAtWThGU0xVV21UaXJQZlpBRnlYSSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIxMFBoWkM0cGYwVXFnR1F5dGZaTnZUbnFfVTFRT1ZnOUFxQ2tVSmxodGpNIn0seyIuLi4iOiI3V0RuTmpJa3FyUG1EbDAxdVNTd1p6WFRDNGw0YUVRMERBY1VJczZpd3lnIn0seyIuLi4iOiI4VkpWWHhRN01MS0lIMXVaLWx2UGhjNkNPdlJCZkpoWkpLVXJ6TzFZYXo0In0seyIuLi4iOiJCNUN2ci0yNmxYYzR3RjNrTFd2aU1Wb1ZXMl84dUpxdjdocWNIRkVsaDg4In0seyIuLi4iOiJHamlFcEZXU255aEpfYmwyenlsdEJhMUYxMTRNQjBfY1BOZXc4ODRRdXJRIn0seyIuLi4iOiJMT0NWRHBBT0xkS0pQMlVwM3Jia181V2pqbXRHZDh4UVNqSkJKUWpvSXhrIn0seyIuLi4iOiJMaXBOcE0xSUJjbUJ1TkJpVlJ3aDIzeVlNZURvRVBSZUQ0a1E1Q3paV1g4In0seyIuLi4iOiJRcWRMeTBUN2xIY0ZNM25NeGJSMlEwXzFhQk1LZFRwTWJtOENJZW5Ya1JrIn0seyIuLi4iOiJSSjBQYk9YWWF2TlFJWW9jcG1WNDJTWnR4QkVyWHFrUXhvUUQtTGZ2Nmo4In0seyIuLi4iOiJSZFdDUDVnUGtDTXJVOVVfMDRoQVVNNEJjdVFPSlk3dC10empmNUx3M1o4In0seyIuLi4iOiJVOVRqb0ZVX2RZQTc0VDhpdTJhM3FTU0lROVZsTkVuWTZiSC00b1JMbTBFIn0seyIuLi4iOiJVdFpFcTFuY2E3TW5VZnJXY2Z2MEk1VDZaN2h2d1hDQVB6MTRaRzNYek5VIn0seyIuLi4iOiJXQmJyUlJxeUFPNHpzSjE1azBFaGtFbktZVk11OUkwOFVSS3lNNjNiS2VvIn0seyIuLi4iOiJaRXlXNjJlM09KbzZuclk5amFWUjR4RDhUYzJQM0tSamNpRm1vbXhCcXpVIn0seyIuLi4iOiJhN2pQRmk2NFRJRlBKdFBJMXNSMHozT2k2dk9TS1pYTjFZaUpsdlN2cG9NIn0seyIuLi4iOiJiLUtiRGs0SHBaQ3NaSW4yOUo0ZzlOc1NYLWkxekJQYXlfZDZBczNFbUNJIn0seyIuLi4iOiJiMXZlN2FxeWY3SWh5OGxhN1AxQjVjY1lNQkQ0SUxDdnVnU0RxNjRkQlBRIn0seyIuLi4iOiJkT05TMFZUYzlJNzdST0xnenVpdElBWjNIUDNFOENlaGkxXzdaRUlYWWZzIn0seyIuLi4iOiJvYWJTOEtGeEs0cEVqbHFuanhNNE9XQ0Q3cmpDVzdydjZJWVBUUDRBLUdBIn0seyIuLi4iOiJzUTZsY3JaeE9GdlQtTU5QaTRXWHcxSzdvMGpWVGxJLWhyNDVHNlRHMG1JIn0seyIuLi4iOiJ3NGYyZWJLUFdnR29QQklnZWVzNFBOMWNmRzkxeUtmQTV3N0UtU2Y4eXpjIn0seyIuLi4iOiJ4VzBCekJYdUUzVGNhWXloRzhDUE9xa0hzVjhoSEZ1aXZTTEpsUkhlXzdVIn0seyIuLi4iOiJ5MVdfbmNzRXl6NXRpU3RCZlNEZmNsb2hIZDU2dk5nT0VwamFjdHg0T1VrIn0seyIuLi4iOiJ5Q3NkQk5fdW95R0FmMjlkV3llblMweDU2LVhNNTlOZ0hQeElpZUliRnlRIn0seyIuLi4iOiJ5U2RnRjNnQ2xwV2xDYW9CUkxGQ1dBUzZ6dWtrbDhkNzIyQ3pjNVNkRHNvIn0seyIuLi4iOiJ6TXR5RzNmU2VwV0xxSVdRZW53Q0l4Y1p5cE1HSGoydjZObXR6U0tyZHY0In1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiI1NHZkVUtGR19tUUV6elRwS2t4N0ZkanM2X0x1NVZReFVuQVFZb1VlQzZNIn0seyIuLi4iOiJIODN1a2V6QmZZeXQxeEc4dEI4UjFQb3dDbHMxNTNpdFpVRlZWLWw1U293In0seyIuLi4iOiJIUTA5WHZYR3FkNVJJSG5IXzlqNWFUaU83cUxIN2pFM2NxM2stc1dRRnhzIn0seyIuLi4iOiJLMjFHT3BOaEhBUkp3VVpla1dXZUVUZElyQ25CdklBR3pRc1d0V0t0TGN3In0seyIuLi4iOiJMMGhvXzNTbVhiV2ZkNC0zZ25zYWhIYm50di1GQ2xkaFNncVh1X29vd1dnIn0seyIuLi4iOiJSZ2VtQ3k4MjJneHdQY3BOLVkwcGdKVnB6MWNVWlhsNTNmVjBGc3ZTeWQwIn0seyIuLi4iOiJxTDg4S2pBZTZvdjhXRG1HMHVLZTM5YzF6Zk5tLWlPcGtidWNHVWFjMVpzIn0seyIuLi4iOiJ0TnRqVGNiZmRRX1dydXY1dThCRm9YRmF4TjdnOFpodWFSMUtMcktZZ2xvIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9._ObqIGqFWprjI0KjLetzV6m_NwLtRt39tcDiUzbUm6RETEuoJIBJ3FB_jQt-ty-cT7kEo-a5VIDfCVUXM7OPRQ~WyJnd3RhdTdEbS1pVGpSVTR4RHBYbWtnIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyItdGppWDhjMy0ydXlJZWw0LXRxcHl3IiwiMTUtMjA1MSJd~WyJ5X21seFFfSmpzZ3EyN1FDREd6Z0ZRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyIzeURNQnpDMllfcVBHblJOcGRkUWdnIiwiaHlicmlkIl0~WyJJc3QtQUJqTU5Ga2Rrb2FvSXdOeVpBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJLQlZIeUhCbEdDR1dQUnlUc3Fzc0pBIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6InNLS2VSNU42TmU0RTRNbnJZcU1EV2tOTHlPQXlCdzRqSlJmZ1pud3preHMifQ.Ri0vJmkGe9F2ch6Dz9o4RzC8D80Zmg2zBE4qbG1nUVYjv892oaDHvIhlXfk7jP-Zv7tjP0rFxBgv0qUe92glTw",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "submit_application",
+      "expected": {
+        "accepted": true
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IktRWHdKSnpzUUpITXpWX2lEY2d1MlI3OFJOd3d1dk5LRndrMGdYVW5lSmcifSx7Ii4uLiI6IlpYVkJnb3NxVkp1NEpHUzdSMTd6U2VjRTZrU1FYem9lLS1SVDJtUWI2VWsifSx7Ii4uLiI6ImpmUS00cnZpRHVJT0I0QVp4VUNDRFN3YUZxcnJLUnN1NVl0Y3VNM3JjT28ifSx7Ii4uLiI6InhRTHBjUHFUQURseDJ0ck94TkRiUzdTa1pWN2ZXSkRROENLbzdkNnNiRUEifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjY5WEFpSkpTdDNzdlhLUEFIdkRCcFFoY29lc1pPeV92RFkyOWRKZmZLWlkifSx7Ii4uLiI6IkxIcVpfMVBpbzZ5dzJNRFpfMkk1c2Q4aDJLRXFfQkF3a1FXR2NRMFBXTmMifSx7Ii4uLiI6Il9VNXEzZEhTelctZzRkQUZnTnVwUDJzcTBOZWtOQUpqOVZLRlF3cU5fNEEifSx7Ii4uLiI6InN6NEItd3VUYUx0YkQwajEyMjR1SGc5VzJKUUhieWpCRkhuY0VYcE11Zm8ifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiQTc4NzlVZlAtZDNERERjRVNZcVJFc1BJTnptbUV3SzM0aUU2V2p2TzlfZyJ9LHsiLi4uIjoiSkEwQlNySGFfMmctWVhPMmk1ZHFNclk3ekh4ejhhMGxROF8yY0U0cVotVSJ9LHsiLi4uIjoibUdVNE92WGxQUnRWTUtKSmYxUEZuY2F0S253LXhIZm1ydXJ3NU5namYzdyJ9LHsiLi4uIjoibk4wY0tQV0NSX0M1LWxISEthSHk4dFVEaW1BTElIdXlicGJ6bVpHbGY5USJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNENSTjNVc1I1b1lCaDRjbnk4NjlwNm1NM284NUt0OXNHY0E4M1ZIc1NJayJ9LHsiLi4uIjoiNS1ZbWttSUM2dk5YQnQySkcwUGtPUHRXRjA2dTRYNm14QThrNmVGM1plTSJ9LHsiLi4uIjoiN2tsa3JwZ016a25ORXRSUGxVY3l6UVhNRklPQTF5MjRPbS1sQl81RTBaVSJ9LHsiLi4uIjoiOEs1bm1SWVh0S1ZRalpROHVLc2MzbWRFTFpyS3EyZHVwNU9Kc0Q3eU9SZyJ9LHsiLi4uIjoiRGV2cGh4OTlaeWdDYWptdVcyUEI0ZzJfQ1BxbVkzZ2VaQkFibUlRUjM2TSJ9LHsiLi4uIjoia19oTXNKbHFEZW1UaWJZTUVhaTJOUTY2dl9LUDZEY1JXeHpQTmJOeEptSSJ9LHsiLi4uIjoicG1mdjFnQWRsbktHUjZUTnEwVldCTDZYRGYzQVFQOE1oT2p3MHJuV3pOSSJ9LHsiLi4uIjoieHU1QVFaV1pvRVJfckRqV1VKWWQwNGVBWE5nY2hsLVJBNDFRWFRSRzl0MCJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIwbm9HTFBHZ1QwNnV6X2E0N29MM1lxTENVdWJTYnJDRlJhYXEwdFF5T19ZIn0seyIuLi4iOiIySHlxaWo4OGhOc3NoN2l2OExaZ0J2U2RIZ1oyZmFxeGc5bW92UFpXOVdzIn0seyIuLi4iOiIycFZPSUdjQU1YVlJHLXoyY0hOZzVMbHZwcmRVV00zY0tDTU5YeEE3b1I0In0seyIuLi4iOiIzby1RVHV3VmtDa0s2M19DcWhucU1TZUFZT0tOLTMyZ3NRdWhCQlVzV2NVIn0seyIuLi4iOiI2YjNUbFBwQVVXM1F1ZlViNFUzcktsNEJQcFF1cm9keXZ1VE9LTXpOVFdZIn0seyIuLi4iOiI5RzRmVno4aER0VVhFaGlTSk9fanQxTzNvRXJ2bkpQNGZRMGxwQWxycFk0In0seyIuLi4iOiJDMllwVUhXQkhXZF96NVptYTJaVWxNUWVJbG5QTkp5eXVFc2RtM1NqS1FVIn0seyIuLi4iOiJEcDFVcjIzTjNFWXlxU3pZTnZzQXdUZ0tKZFUwNlhfSDlsOGNMOHRwQkcwIn0seyIuLi4iOiJFSVpwU21ZVWJLMk0zTF9sTWlWNDh4VTVGZXBvd0VuaTliWHRobUZFT3lZIn0seyIuLi4iOiJGUjl0N1o0T25JT1g1T0FOX0pGdjZta012eHhJTjZuYmc4M0hZY3I3R3VVIn0seyIuLi4iOiJJUEhLc3VxTFVQT2Y0N3d2VXBZaHVtY1g1MGktUjRsOFlKRW1QNndqdzI0In0seyIuLi4iOiJMbEl3UlE4eVhnWXJPR203bTRxbi1VQnRmcEg1Vy1tYVdmd1paZFV0bGNZIn0seyIuLi4iOiJPMTV4d2RTMFloNGtnQnNIU2c5c2dHWDRTcnB3U0R3ek5QcS0yMXh3aVk4In0seyIuLi4iOiJQSWNNUzRHSnZxc1poRjVDVlAxbC1YNDIxTDlyTHh2d2tnVDJJeFNwbm13In0seyIuLi4iOiJRQ2RxVlp3Tkk5ZHFLSGZGenh3MGx6WjNCcUdLMHNFYmJXRm94NTNLOU9BIn0seyIuLi4iOiJXR3JSSkZCdW90V1hha1VNMU02eFpjSUluVExsQkV5clFpT3ZWZ3lhcjU0In0seyIuLi4iOiJfZTNOVTRENkN1eFdGWlZ6UlpaVlh6ci1yU1dsUU16SHZ1NHAxUXVLYXAwIn0seyIuLi4iOiJmZlRpMnYwUGdSV0F0ek91dDQtYXM5Z2FHU19pSC1zbnB4ZEs4MDl0cHNnIn0seyIuLi4iOiJnLUw3N0NQRWUwd2tjRXJab25HVjNWYmNlOXpvV3I5VnhUNHhjd0FiellJIn0seyIuLi4iOiJnNFBlZDE4b2J0Rlk4UEtNZU9udm5jOVB6eG5FcUo5OW1OT3pKYkU1N1FJIn0seyIuLi4iOiJoQWp2eXZ3dzhNdk9fZHJnT2NCeXI4aFZHR0Z6VDVSdzRSa2RGQkJoYm1VIn0seyIuLi4iOiJobENfWF9nczhvYlFzRVRSVlFBc2tjVnNYY0NOb29vNGRPbi1PWUd1QWNJIn0seyIuLi4iOiJqaVNyS3FYbkw4V0VIZEY4YkVxNkZxR28yeTBheTItaFVaTHJpeHE4cTg4In0seyIuLi4iOiJxYkJKQ3lPT0o2aEpUWXk1MzhIbFQwQzZiMkJyalNUdXZEVXVNRnFhc2h3In0seyIuLi4iOiJyTGd0bVB0bFBrc1R4R0NXVXplNWIycHI5eGd3bkhLVk9vOHNkaWR5a0JjIn0seyIuLi4iOiJ4NlZ3d21EQUdDSkxFaEZoUldZR1hiUHh4enMyRF9ORjFvWHJSUTF6VXp3In1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwREVtcnZHdFNYZXNIM2NvQkprZVdNSjdCZXVKZ1Qxd3Q2RlZEOFF4SjVzIn0seyIuLi4iOiI2cmxfYnI5YVY4TXRzcGQycXpTS1hPSmRabGhWMGVCeVVWeEpLOV9Cdnp3In0seyIuLi4iOiJMVExiRFgyMzJYT05jeDdvVFlXTjZ1bUlTbWZBdVhVblM1NGhkMHpyVV9zIn0seyIuLi4iOiJaNEFiUmQ1TXJzVURaaEk4WExramRGekQtd1U4UF9lSFlLMGY0azBGcnh3In0seyIuLi4iOiJaVC1jQVY2SGJKZHRjV24tRXJ2UnBGMGw3M01uYnlQSXpFR0lpVFA3azdJIn0seyIuLi4iOiJhQXktSVhlWkk1clNRS1VnN0FuWWhVRVEtSkNSSDJiSWZQUTZNdVkwbGQ4In0seyIuLi4iOiJyVEdvbFdqajNwdUY3OXhoUWJJb29BOUNIR2hfMDRxYUYtWVNObEsyQ21RIn0seyIuLi4iOiJ1ejNYRHp1bjl0dHhxa0VWSzNNcG9HZkg0NFdnSDg0aV8xWjU2blFoRjc4In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.-jvZyuk_vWJgSPkpSndHrKVOqCCYiBVKIRIChOnfUZLmOIFhmTF_CbMJPRtgLTTdGUbc4SPJPvO_pbL8JGnR_w~WyJfTkljOGJjR3ZZT25WOXZzV2JBZmxBIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyIzaDk5YXIyU3ExM3VpZ0pzamxjN2pRIiwiMTUtMjA1MSJd~WyJQdTRXd3ZPTEFGaTVMSmI1MGNYYjZ3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyI4X3NyR0NYWEVwYXRvSVJRaFN2TjhBIiwiaHlicmlkIl0~WyJTeF80eFJFdi1mQkxVTUIwYWZNdDh3Iix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJzamVSMUFld24zRUg2SEFGWHhCenBRIiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6Im1uX3hCVmxlc1BBaXV2V0R5eXhVREVEekRURyIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6Z1prTjJrd2V2ajVMTlM0QTVGVm9JR3gzVmJfR1dRM0hmcjNiQmNQTEpZbyIsInNkX2hhc2giOiJ6dXBNa0FUTWNkc1UydGt1aU52c3c2cnFldzh2ZDhNbVY3UzdmTnRDS3lZIn0.3nSzuF7V5N0bdg4ZLpZI9GLg4k-IKg2v_Ec2assdF7Ith8cYjWV_5IkewrBXUT47iZWJDzlhK_3aSbpBccV1tQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "binding_actions": [],
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "jordan@example.com"
+        },
+        "hasEeo": false
+      }
+    },
+    {
+      "name": "no candidate element on begin",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6Ii05dkt4M1I1MjVsdEVUYU91NGNYaWJ1RDNTZmNORHI2U3Eyb000WUhiVGMifSx7Ii4uLiI6Ijd1dFo0UWZtaW9YTXNiWGFocUhVMTFGY29IQ0xNb1ByZWdwQlRFak52MmsifSx7Ii4uLiI6IjlpQmJ1X21EdS1hMGRBbFFNbEJnc0F3U2Jsb01xMFdrY0lpcmEweU4wUjgifSx7Ii4uLiI6IndGTG5UXzVTbmRWSmtZay0yLWdlaExqem9Sb25OS3gzeThaT0ZoSWNFV2sifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkVwdDNDOE52RHE2Wk5EZzE2bjFWWmhzTG1ZUEZ4QlFlUElkb1pQVFpsMEUifSx7Ii4uLiI6IkZSUDZNd1JjeFU1OVk0YjZDeFZWeEcxc09VOFVOYnRKbUtVQlI2LVhWencifSx7Ii4uLiI6Ikdwbk5RN0hDMzhET1N0czNncVNHTGs1LTZ4dXFGYktGYW9OR0RFRExXY2MifSx7Ii4uLiI6Ik9hNzNlQ3VpSUlNUE51RG41WXJSUTAtVmVhT3BSNURlamFtUzVCRF9ubTQifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiMFZucTJqRlVHbUhDZEd0cWgzZ2N1amtmZmY5MFg3bUdtRGsya2xwSTV1USJ9LHsiLi4uIjoiRWFlTFY5THBfZGh2VEtSOUdtZFMxV0VQSHFBQXcwWjgwYnlwYU1SUVNnOCJ9LHsiLi4uIjoicEJUWngtOENpYWFhc21mMW9YQm5PaE1KNFFybmJxNUJRSndpZGtfcmR6byJ9LHsiLi4uIjoieGpRdzJhby1taEh5cTRpVjQ4S2NzckNmNUQtVUI0T3FOTzlMUmhPY05ndyJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiN2VLU3BPX081bkkzaTlSajI0bHg0djNqOGc4emc1YW01Y1pGSUJYVW9CdyJ9LHsiLi4uIjoiOS1zUVIzay1MZkp4M2dlbzUtcTZzR3FZR0NuYkNySFdSUVVoRU84RUo1MCJ9LHsiLi4uIjoiQUdqMTExRnhSUWMtU0o1Y0RCZ3Nid3YzTzFMSjIyV3NhSWJsVjJOSDdjVSJ9LHsiLi4uIjoiQ0RSZkR4aWlOMVpwVXM0Ti1TOHZucXZIM29oT0t3VzBFaUVaUGdENmw4MCJ9LHsiLi4uIjoiYmx6QVlxZTNlZXFKek5TVDdqUDBiM29aM0tJaFpkaWJiYXZDczhvb0hxayJ9LHsiLi4uIjoiZUlQVlBLdVRxYWU0VWdrejZkbEVVSkwwTGQ1cDBxaHNYWXduZ3ZmdE4xRSJ9LHsiLi4uIjoiZzV6WnZpLVVQcjFZV2ZlalZkSkcwdGtEcTRxU1dDOF8tNzE5MkdPeEZEayJ9LHsiLi4uIjoibFo5UDNldTlOVHowRnpFendqVGx3cDVZeWxFd2ppcG9ncTdVNm1xYTJhbyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIzdEdHb0NPR1FKcG1KSVFXRGpOOWlGbmxVeUdkdXhEdmJMalRyVWtvM0dBIn0seyIuLi4iOiI2LUZzcDhCY3A3U1pha044LUJCVE9vOVlGRzE4eUdxNE5ENTBvQkREaURjIn0seyIuLi4iOiI2M0g3TzdGS2NSQmh2cllnMjhaZjF2TFhTcUxXRWhBSHpXaF9DeHdLbk9zIn0seyIuLi4iOiI2VVAya2lFalZDdnI4cGJNaUFyWV9rLTdXRE5vMHdBNkEwV0QycEVnWjdVIn0seyIuLi4iOiJESWtVT3Vabl9adm9nNlhkeEl0T05GaFI3ZzJRV3pxZnBIcnNMOXpnc19ZIn0seyIuLi4iOiJLMjJ0aVRhUmIxaHJ6M0RReGRPZC1CclhtUkgyalRNTXVwSGRFZWxqd2tZIn0seyIuLi4iOiJNMk05OS1GV3pfLS1zNmNDU0pVQ3RWQzhVWC1PUGRfYjk4STFlQzl6XzN3In0seyIuLi4iOiJNeVkzVU9zR2tPcnNWa0l3U290NUdOR0ZHZ2o3N3A2ZFBiRVRyQWdkamc0In0seyIuLi4iOiJRUUhLQ0tuNEdpeWctcjZuYzgxR0JoTXBMcWppZl9QYThlem8tVWdfc2JFIn0seyIuLi4iOiJRbDdZaldTMktYZ2ltUmpueFRjVjMxS081VGUyR3BHUXphRHU5eXBDbGNnIn0seyIuLi4iOiJSVkd6aGp1ejFVblg3M1hOYnFLNFVmMGxzSkRKRlVTR3B5SVRuLTVIYW13In0seyIuLi4iOiJTMUJHMVN0ZWhwb2dVSlIzSkxseTdZZ0FkNEhoU3VscTM0VXNxa1REMGZrIn0seyIuLi4iOiJZQWcxVEdjeThwTFZ5NHZMc1RYclRIVTNqX0N1UkdxeFRsUVRmc3d2YW1FIn0seyIuLi4iOiJfNk9JT3NGTkhtWnVzN2xtR0dIN096RjVHaUt3VEc5d0M4UVJRWU1QenJnIn0seyIuLi4iOiJienpWRDJneE9BaDZacmNCelFtTDNUZlF2bEpjbWZBWjZ2LVcyaElQRHlvIn0seyIuLi4iOiJnR2xqYUgwelR5emd5a0haN0tuTmkxWkdjU3R5bW5tQlo2UERNaTUweTZnIn0seyIuLi4iOiJpNDlBX1dDVGtzS2ZjeWtkTDlsLVdiVUFmc2tTNWZ6QzhoZlVfRk5CTktRIn0seyIuLi4iOiJsQjl5RWxvbGUzU2laSDllOFJwd3VMb0FwYmg5Z1hvOUd5eVRmSWhYS0tzIn0seyIuLi4iOiJsaDJqQmhsYlY5c3NBN05PU0FBVnFyMVdiYzBpR1dRRmFSN1hUNjIxdGlZIn0seyIuLi4iOiJseDBuYmRHTHAwUWpaN1dUaDhTdko5UmhwTU9vWWZjVHdXNlpWLUxXYXpjIn0seyIuLi4iOiJuTlNhU3NkQVJQRUFSY2FjRi0zb0dPT2FSNjFTcEFaZnAzNmpqVTI0b3l3In0seyIuLi4iOiJ0di1RMnpyNFQ5akZjT3pYaDlCOWEtMzhBTlRKY3FpWjl1MjV5eEttLUpBIn0seyIuLi4iOiJ1Qzh2dE1PX2NWQlp3bXZ5Zkd2Z1p6Q3JRS2d5a3JqTmIzcktpQmJmYjIwIn0seyIuLi4iOiJ2NGlaQVE4TFQ1MUtISDdaVmplY1VfMHFEeDBzdUluNzJSblpCTUlVNmFrIn0seyIuLi4iOiJ5S3VDa0NBamRSeEpqVmR6VTNLUDcxblJ1eGphelQ2Z2lTUE5uSnFSc3kwIn0seyIuLi4iOiJ6YUNJLVVlNlFsZXpXU0FmeHgxMDV4ME1zaUpPSmQ4TWExT2JpYTRlWGNJIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiI0c1R4MXdla0NXSy0xWkRmcnBuclZ4akI3R01MaHVGWkVIYkRpRTF0MWlVIn0seyIuLi4iOiJDTlFtN1BfN0xZUktuNEhKRUpVRzBlREdqYnlUQS0wREpFSHZNVVhfVW84In0seyIuLi4iOiJJd29nS0doaVF1MXo1WldpblZoR0RBbm5HUzRETXBOd1lvcnBiSGRJclVRIn0seyIuLi4iOiJLMG9BRDM1cWpTcm53NFZXdUhEQlIweDdTZ0p3VXk0THFtV0U2SVFVWUV3In0seyIuLi4iOiJQTFVBeDNCMjB5Zi1zTTZmZTRsTTJvNElUSUUzRUtsQkFsQjk4RVF6b0p3In0seyIuLi4iOiJZeE9jV2hlUVpZVFVmVFNQNy1FdExmQm1kRU1OWWp0REtLclJZQnpJNDhjIn0seyIuLi4iOiJjeWh1RWdvTGxIekQ3cHF0ZU9zTDBjcWNocDB5TjZqMC1lNTFZaC1Ma3ZRIn0seyIuLi4iOiJvSTNnMXFERjkyMXlMY014T1ZMQUdxaWc0VUcyUG1YeW5OQ2hjcE5SclBrIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.X1wh_BZc4BobNcG2qVNRMpvfxDIZdgibafI5N-4fMV82XTbZ_ECfjLwgbHHE5-ejjR9MPaar_UgZ8C0V3MAAfg~WyJjWU5yUWwzMTA3N3hEdTZONk12Y253IiwiMTUtMjA1MSJd~WyIzdVVZMnhFUm1TWl9adXRQdXdkeVB3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJJN2ViV3JaVHVVR1dBWnZOZERQNm9RIiwiaHlicmlkIl0~WyJXdnhRbFdLbmpXSzFTQ1p2WXhuQ053Iix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJRR0tUeTN6cUpoQUVYajlOaTJxOUJnIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IlRSMU1YVUxvcmRxLWtjWHBwY0dFN3BQT0dpcU9OeGNQSGFqZGhXc2hZazQifQ.3LyopHlKLY_47-ZVh5YeUeJOAckaOSySI-ksBnuUv6xGiO-elUxrwwt39Kp1TFn6hH79eWCy8GvjukINv6XYiA",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "submitted contact differs",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjFIQjRsdlZfLW16ZkZIQ2pDLWo5YWtYRXg3Z3k1bDByd25iMHRYbnZVeFUifSx7Ii4uLiI6IkFMY1NlYWJqV1M3ODBteUZUejRHVHlQclp1UVhkdTcybUhLMUlWYnVMWlkifSx7Ii4uLiI6IlQyb1hIWUhBdno0bHR2Vm1ieF9ORC0zdW1lMHVmSEhlRkJOdmR1Ml9wbEUifSx7Ii4uLiI6ImxTX1had2s0SHFTLUx6MVpqb2FpdHlDQWhoQWRIUVRtZUtjaXY2b1lpNzQifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkFtUnFwbXNnQWVweEtTZXZ0ZTlwY3NtTlEwMms0eDVSZmtpMlZZZWVWa0EifSx7Ii4uLiI6IklWNE1aTWpibGhRakxZNHYzVk5GMlcyYTVVNzRQWW5qRklkbFZzbUY5NHMifSx7Ii4uLiI6Ik9FLXNfUnl6cHl4TEp6SmJ0NUhNYWNYUUdLUzdTVkpwcnlXWWdDaUpVbG8ifSx7Ii4uLiI6ImZXNUlUWV94RHlqRnFuendaSHVyTWZLYlJCRkZPOTFwYUdwWXlrOUFCdFUifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiN2JhUkc4OWxhN1JOZ2QtalYyN2tNS2Y3aXFodjRfV3pfbEhrendNelRmbyJ9LHsiLi4uIjoiS0dBUkRRYkRoYnM1MVo5ZktFeVZxY3hXYk1FLWJKc2tXelNCaDJEeUJwYyJ9LHsiLi4uIjoiYk1QLWJ3a1VjdGNqc2ZMdXIwYTgzOFlUMlcyWVpTdm5yLWp0Z1kzV1BXdyJ9LHsiLi4uIjoiZk9IRXdpSlBHU0pTcS14eC1uVE9kSkk5LXp6c1NYM0RoM3VwWDc5OTRLNCJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiQy1LcHAxUE5QU3U1aTBCLUtUYm9DV0VKVXozN0xLOVBxZWtGcWd4SFdGTSJ9LHsiLi4uIjoiYWhLUjB0VmhNQVFVLVlQc21tS1pld3I1SDUtbUoteXFVSW5odllyaUNhNCJ9LHsiLi4uIjoiYmlKQ1p2aW91LU5vTEFzX1FEaWNfY0Jra0VkdlhNYjZkUm9iaUFEeWZtTSJ9LHsiLi4uIjoibWp1NE9jVWhBU3hYeGRHb0x5VzZDTm1UZ0NBVVNsdnZGd2RSemhjWUFqayJ9LHsiLi4uIjoicHJ5eldZYkpBMTF4TTBULU1nd3Z3TGpjSkZVUUx4TnNaX3FsaWtwdjNxSSJ9LHsiLi4uIjoidzNxbTJMY2dLZmJONk1COUZMdlYzd1E4eV9tTGZRNTBWcTk5RGpmbVlVSSJ9LHsiLi4uIjoieGNWY2h0TFJKcGRBcGV4YlM1MG56LUFNYmNiUGhfTjZ6Uy1YaXdMZXNHcyJ9LHsiLi4uIjoiei1mR3Q5MXdlbzFaY19ocWFCbXdCZm1wYWZuQjV0VGs1SjlyU2lXM2dNayJ9XSwic2FsYXJ5IjpbeyIuLi4iOiItTUJaTExSaUJrLTJhTEtEQU0xTnV5VFI4UlhHTlp2NHlBWUppbWpOX0dZIn0seyIuLi4iOiJCVUJxVkN2N0daWW5aZ1RtZFFfbndHRlhzdWdQX25VekN4Mnl6Z3ZSdG5ZIn0seyIuLi4iOiJDT3pVWDkyeWszQmI2Y05sS2tjd0FmeGIwWjhsdmxwcDRZazVjd2FtWFU4In0seyIuLi4iOiJDczc0bzA1UEpQelhuUGhvT1ZacThsb0JnU0c1cXFNaWpWMWZKX3NOV1FBIn0seyIuLi4iOiJEOG9oOWw1amE1VS1LTDJzRW5XWWdLaHFWdWljVlFvVkJZSUpzWE8xaTZNIn0seyIuLi4iOiJFdnhsenF3bFZWUlc5S2JKQXNuU3ZJM3FvcFljNEFUTHRuLWJ1VHpwclRnIn0seyIuLi4iOiJNVmpVMUFDVlBocGJCRHpSQnBIX3hMTlNXendpLWZJMnZSTnkwTjFEOVhvIn0seyIuLi4iOiJPUzRDQ1U2dWl3bTQ4bFVuMVkwTEVEeVRtNFFOVy1hRWpsUE9CVm02UndzIn0seyIuLi4iOiJPczhPRUo1dnFRM1JiSWkzTHNXUWw1UW1KWVVUZDF6ZlNsdWN4eE5aYlp3In0seyIuLi4iOiJRYzliTFMyWFVpa0dJZHhEV1NVRFR4YnF5RDdLb1VCaVRqOXp4RGZ3RzRBIn0seyIuLi4iOiJSSWtRN05Kc25qMWsySkRZZzBvUmJHdkMzcDdHcTZOZENzeTFnMDdMd3FRIn0seyIuLi4iOiJTWkk1UlhhbFdmY25Vd2dUdVd2dUZHVDZ5ZjJVZFZ2My1rQ19PYWl6emR3In0seyIuLi4iOiJTY01qbG5JR1lBa3RTb3pkb3RhUUVGVTZQal9sNFluS05vd3N6YUtlZGJnIn0seyIuLi4iOiJUUi1pT1QxVDREV21GbGxCTmxJZ2tMOXBzT1JHMFRRVVM4ZDNGcHZzTFBjIn0seyIuLi4iOiJZY3dOS29Nc19ESEZ5bjNFVVBsekJWTkdMR3JZN0tmTXI4aXFqNGtIaG5FIn0seyIuLi4iOiJfU3lkX3JwQTIxOWZ6T3lmM2VpNE1BYmVNanZKN1hBVEtja1FtYkFqUm5VIn0seyIuLi4iOiJhMGVYbUMxSGp0MnBlTVUwQjJydldjcjE5cTN6MzVHNWFfU1p0U2VoTFk0In0seyIuLi4iOiJjWUJBS2d6dGxkb2hSQW1MaGwyem9ROEVyZ0xCaFhuSlpBYzUycjZyamhJIn0seyIuLi4iOiJnay14ODh4WDkydTFzYU4wSzYxeGpLNmg1UXE4QXpFS2FQWEg4RGhwYXVzIn0seyIuLi4iOiJqLU5lZWhibGdBUE41eVBuR1NhNGowX01kNFN2MW15d3VCdGwwSHBzQ3lRIn0seyIuLi4iOiJsZGxwZzdqN005N0lMb3NJS2tRWU5ndWNSRWVPUXNqWm5YVFM5UWVIZTVBIn0seyIuLi4iOiJseGlTQTgxUkJuN3BYU2xYNmd4THh1TmxEV3FlZm94b2VfX2dpaHM2NktvIn0seyIuLi4iOiJvU3pUTm1iNllvVWYwOWhzT05XUUk0Q0pnZTF5YmdsRTJqblEwVUY3bVV3In0seyIuLi4iOiJ0ZFJkWjNmOXRLR0ZVdkdGeVFpRlF6WWxsZEZXVzVlbGhxTG9FWXhXZ2FZIn0seyIuLi4iOiJ3R2MtUG0ybEdlUFN3bHloaXZJSDZjTEQ1UkJsbUJCLWI3U3JiTGpva29rIn0seyIuLi4iOiJ6OUNrbTJ6X0Z3aTdOYi1xM3pGa1UwUzJuWWROVmZwMUZYMDRETGxnbzd3In1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIxY29fSEY3UFhCWGdqV1I4ZzN2VUlqX1hGeWoyNDJjeVZSUzBwTVFjZEc0In0seyIuLi4iOiJEMHRyNXFTUjg3Wk9DNWJES0UxdmkyNGt5NDg1VUdUQkNWcTRDcXA3NlpNIn0seyIuLi4iOiJQMjVFTE1rRVlGZUc0SzFsMURKRHJWR3JWR3NRbzFFaEx5cjE2TUY1R0xVIn0seyIuLi4iOiJRUVFMd1RJS1pZQTN3Mzh2dW4yWl9JNEotYjBtWV9EM2tjOHNQTmNuVVVzIn0seyIuLi4iOiJTQU10eWxOYldEbkYwcnlOeTkzMTRYVFVlbURKTDNieFVLNEU1OFVBTERZIn0seyIuLi4iOiJZWDAyYzFFRU5QR3NvVFpTdTRldlBBeUMzZDQ4TWRycV84UURuTWMzaDRvIn0seyIuLi4iOiJrRWRtQlVteEIwWkJydlVaLVhPNzFXb04wZW1UYm9hMllvRV9oY1BTcVVNIn0seyIuLi4iOiJ6cm93ekVRcDFSUmNJUDBOX2pVMTF3UUltdVE4OUExbVR2c1JZdWRjV2JvIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.0pWugTzhTGPRb3Lbgxrjc-M5AX2fO4i7dx2HnX_RPxPkX4NywQdZ66EPjJw7uR0FdkZhqSwbLXuJ0kHxbSf_mQ~WyI2Vk54WDdXaHJVb1NSZ1dyYUZrZGFRIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJUNUdad1hHTmJ4aGRzM09LbTNmRlpRIiwiMTUtMjA1MSJd~WyJkQVIxWVRkaE1Bd1NwdUthZWFBVnNRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJ4SmNXeWNDOTk2X3F6cU93TGRjbjBRIiwiaHlicmlkIl0~WyJnalRYQmxIamFmWGR2UVE2WW1RZFdBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJGYzNCTnN2SlMxQTVaSlIySzZJdFd3Iiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6Im1uX3hCVmxlc1BBaXV2V0R5eXhVREVEekRURyIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6Z1prTjJrd2V2ajVMTlM0QTVGVm9JR3gzVmJfR1dRM0hmcjNiQmNQTEpZbyIsInNkX2hhc2giOiJ4UWw4Sm8wLVNzR2E1bWdFTWlGdnpybkVmb3NveG9BeU1UUjExYi13WGRFIn0.wDZgEvI5E9s7QBeX1NRtWWapw2Uj8bwX0TIn_wa47fYtu0WdOYeZUw03udbvzpA1YV8J3cvH3kBbeMYUDfHlaw",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "binding_actions": [],
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "other@example.com"
+        },
+        "hasEeo": false
+      }
+    },
+    {
+      "name": "_sd at top level",
+      "expected": {
+        "kind": "disclosure_rule"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkNfOVE5bXlmYjhUUE8tWHpaRWRudzdueXllRGtTS29aMktQWlFFSldKancifSx7Ii4uLiI6ImVpeVk2RjYyQWtCWVRoUTB3N0hSR3hjbElObWptNmt0OTItWGdFOENBR2sifSx7Ii4uLiI6ImtTc1BHczRhN1JVUVlXM1RuekZMQ3BqUVRfMTZHV25IVHBIcGkzczU2MTAifSx7Ii4uLiI6ImxhRGlSTlJuM09sVm1OQ21rLU10U19FVk9jOURVeUlmNmpwWk9oXzlvSFUifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IlZ6bjFUSkRCQWtHTTlUcm9hdTlmWk1jQnRseG5qMjJBLUZSQzlXU3p4WFEifSx7Ii4uLiI6ImxvQ0J3UnBoUHBTYUZkZXEwQ1lMWldrbDZZYXFUYi1CTnlxbGdUN0FPY3cifSx7Ii4uLiI6Im42V2NaSTQ1UG9TTHJNQmY5dXpWQWFzY0xSU3N4T3ZoQWhkcWVsbGlpN28ifSx7Ii4uLiI6InZsVHhKOGJKbDhOUEJKSUFRQWRGcUM1U0ZiaTlHUURRODdiWkluNmozOXMifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiNTJJX0xKdmRXRjNBVFBIaVZjWDBZdzlPdF9FZWpmVW9RTXRha0JOV28xbyJ9LHsiLi4uIjoiSWVweTJHa1dyUjV6MjVfUHVFbjZ5N25CQ3lMeXFEQ3RxR3BtZDZfSGFFUSJ9LHsiLi4uIjoiY0tqVk9jbVZmbTdOd2lHd2ZZS0diVl9yTFN1WUdFTXpPN09MTkN4RGpkWSJ9LHsiLi4uIjoiZm9HZUEyQVpZdDlmTVllNTdxRmpqRFg3LWNNcDJDd0RTVG11a0xqYzlGSSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNlROeWt5MEVUWkk3dW5XNlVkdnh5T1R0VVRmZ2hESHpENW9VUFRfR2lKOCJ9LHsiLi4uIjoiODNxR1VUd0RKRHFrZEF3T1A4SzVJUFZVR2NUQVpRY1VWeEg5VzJoSzNGayJ9LHsiLi4uIjoiOXJqS0JsV05VUmQ2ZEl4MFEzaXBDdVR2TDlzUGN1ZU9ROU1CT0tVUU4yNCJ9LHsiLi4uIjoiSTlTd1VJT2VQUUduTUtNYmxzVWxEbmpQbDhlWlNGYk0tNTlzZUtLZnh6ayJ9LHsiLi4uIjoiZlA3cW5CMXRIOENGZl9wTGxweEpIb2N6RjhOVW5MbFROdHBwVVJDc3U0TSJ9LHsiLi4uIjoia25MTTlFZGdQd3ZQTWdBenN4MDQ3cDNyWjlWTGp0TkVSNkpnMkVILVV5QSJ9LHsiLi4uIjoic0NoMHBwNnVvdTFuQUFHcUVRTV9DMk9HdVd6OHRZRkEtN25PX2lEd05XMCJ9LHsiLi4uIjoidFpMNEw2NmNoalFRM3RSalpnVi1PbTBjR2RWa1dzTkpuTUl6MG1xQWhVQSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIwRUV0RkN0alNfb3kyREtlTFNROHRvOWlHdmRXdXpBYUpWNEZBVGxVcUxzIn0seyIuLi4iOiIySjBVQ29ISXNjQkdLR3NRd1VLVE8zeXZMSl9WcWhCRk1BZ0xpUjl4ZDNjIn0seyIuLi4iOiI2WXBjVUswY1E4b3IyclpKeEc4UFRoVXl6Yng0UlVEV3JEVHhqM2hxVUE0In0seyIuLi4iOiI4bVg2YXBJa1hqZ3JfeDBNN2ZIa3JJaXhjcnFZVWlPNHhkRWdkZkxvbmNzIn0seyIuLi4iOiI5OGxybGVBSGdvS0U1LXVLYTdlOHJ3SFBZRzRVWG9kU0NrZFRKSFR0WUxJIn0seyIuLi4iOiJEbDB0aVpDU2JHVEd1Ymlsd0RId2pHNW0zNGlBTVdHU3pmalJCeVlYZGJRIn0seyIuLi4iOiJGalFVY0R2blp1YldlUld1X0tpbDdSeVQ3R1RCcE5DN2FpdlhLZ2lEMHVvIn0seyIuLi4iOiJJakExZGhVTzNsM1JKZnRRWGJZT1ZCVl92bWctMWhaRjV0NEZ2QlNRN1FRIn0seyIuLi4iOiJKeVA4ZFBEenRKYTdzYV9LR1NmejZoUEtEcGxxc3ViZzFaU254dGJNTXIwIn0seyIuLi4iOiJOYnQxYlBPM19tUGQ3WHNwTkUzSnpZanV6Zk51UFdESHhRd1dtWHFpclM0In0seyIuLi4iOiJOa3BYV28zZnlubFpia2drbF9VME1ENS02YnBRS2JQcWw5aTg4NWNwaE9zIn0seyIuLi4iOiJQVktKOEFRTm00MkJyaVNnN3d4XzczMENOdm1sRWxSQWRjaHpmeGVoakJBIn0seyIuLi4iOiJSSWIwQWtWcG8xOXQtUFM3d1NpUzRILVZXbmg0MXlDU05WTlFVNmZqV2U0In0seyIuLi4iOiJSdXJ2Z25QWWtFQ1UzVHR1aWhXQV93ektETnlsWmZtSFI4bGoxQzR1XzBrIn0seyIuLi4iOiJTSlo0UkxMbFNVMW94RHpDT1hIU3pkXzlJYjdpM2tnSXBpWDE4M2VCbnkwIn0seyIuLi4iOiJTdHNlNU5Yb0R4amJBNFBjNHlmMmdaVkJLX1JFc0N3UWU2bFZTUXVkMHlFIn0seyIuLi4iOiJWYTZtM0VTVVBTODU4VzJlb0tWRzlUaVptYTk3ME5OS2Z0MVFoLXVuUk00In0seyIuLi4iOiJid255cy1iam8yMDdPc1dnVjFqZ254V1R3VnNqWEJUdkJQNTMyZm9JLTVRIn0seyIuLi4iOiJkNzM1ZmpTY29PSGVtVGZRVElJU0J2RDhRLWxlOHJVNVp6alNFOEJnbFk0In0seyIuLi4iOiJkalpVWmJ2ZUNudU5VZjFWUFpSb2pyYmV5ME5Vdl9hRWR0TTd2NlNSZzRRIn0seyIuLi4iOiJqTzBTc2p0Nmw1dmtVYzE3bF9wajVlenJBVzRkUzRlMm1aNlNOSGltdFlvIn0seyIuLi4iOiJqUkNZZ2REMkVjbWhKSUo3Rm5SbmZMSUJhNnZSZEZBSFk5WjhpbVA1eFowIn0seyIuLi4iOiJtYmhmUVZwUzBpZk1QLWlSbHVtc1hkM3hVTVRZcktkZXZOdk9fVWlmTDNFIn0seyIuLi4iOiJ0UFJKa04xTHowWDhFeHVCR05ZWEZnQjN2UWVXVUFqQmpPQVM1ZC1zNjlZIn0seyIuLi4iOiJ1LWdpYldNOUJlcHhuNXV0Ui1NSDJQRG1HUXVMQm5DWFFhaFg4UDNRLVNjIn0seyIuLi4iOiJ6akdEa2ZoSzJYdFRoMmxLLUFFTkZOdUs5LWdRY1dDQ2ktZUFWeWFvNW1ZIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIzcFRrTEtXbWV5OFUwdjh1czEyOWRRY3RaSDFiY3FuOXBzQmVVSk00bU04In0seyIuLi4iOiJBZGU5VkZyc1BSRXJ0X1RubDZSZW5KYVN2ZFQ2TVY3aTRCQmZwVG93ckFjIn0seyIuLi4iOiJMelZJdlpISnJHYllWYVgzajB5SGhnZVhNeUxUUE1RZjNJVXNPTVdNakZjIn0seyIuLi4iOiJTNzVwT1Q5Y3hZTlVOSEN0UGcwUGN3MUZrZ2FfUGNQUHMtSEJ3a3ZESHhBIn0seyIuLi4iOiJuSUFtZnJwd21PMkhRUnNkT3Z1cG82Qi1pSTQyaXJ6NUc0ek1VenFwcks0In0seyIuLi4iOiJwQmZSaWh3ajNTZlBqQ3hnamw0WWtwX1JnTlpmUjNWUWVUaWN6ZzRpMTVnIn0seyIuLi4iOiJxU1RER21UaUR1WG8tRzk0SXFpdC16X0FNSWFmb2VYRmpOcFhUdzBTa29jIn0seyIuLi4iOiJ6eVpkS0ItLWNqSlJzS1JuQnRkcF85OW9rZllpWmlSaWJ5RnJqbV9ySmNjIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2QiOlsiOU81bDhYTnRoVHNsZXVCR1FCcW5lSnVDa2tkMndRME9YVktfelZVY2M5cyJdLCJfc2RfYWxnIjoic2hhLTI1NiJ9.YGhXH1TGVP2esiubZFP1yRSar9Bktx6J1PKA-SVxgfvPqEQWhQz3TyLh59Q9tkwryB5n-oIqWHEsdfsTnBraXw~WyJDemNPUFlPWW9ycm51WmlOOU9Wd0F3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJydWc2bEYwOEpNMEVqQWgxYnA1cEFRIiwiMTUtMjA1MSJd~WyJnLUNfY01oUS11VFJwY0lMY3A3dmxRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyI1ZHZTRFhrMVZmVm41SlRUTVViaEF3IiwiaHlicmlkIl0~WyJfcHFJbjFxSkJRY0NpWmJ0V3FlVnNRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJaOURpS3VRLUxkSVJ2Y25wS3RBZkpRIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6Ik50aG9TdzR6b1RKYmpvT2VkcDd2aHRJZnhPdndiemJ1aXl4R1ZGUWN2QjgifQ.n1cSZCpChFgKiP70wI0a_4Xw7iPz5uixZDc8uaixBqZPI_JFIojRAyzZdE89XSpfZFmDd07mbnm4kfbbI0FIrA",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "digest inside prohibited",
+      "expected": {
+        "kind": "disclosure_rule"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjhBamR5bXlacWU1QXVNcXhyYnRTSnVIamlCb0hYbE5wY3pRQnRfVWVXRlEifSx7Ii4uLiI6ImQyTzZCVW9ZdVZ2aG9XTnBETUVVSktfYTlTNDl0Nl9jMFIyVlgyaHA2eFEifSx7Ii4uLiI6ImtDTHVXR0NXczRJTjNKMWFRMTY0MGt6VmI4TzlPSmV6dTBMN2VIdDV3R0kifSx7Ii4uLiI6Im9ReG41OUs1U2RkSGpDbDJyQnNsa3ZrT0EweEI4bno4bWtjdXhVQ1hvWjgifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6Ii1ROTVURENZOW9FVzZqcXpEeVRxZ3FJRnJIZVJiRmVtekZod2RJSEZJcDAifSx7Ii4uLiI6IkJaVnVrQ2NHTzQ0WWNDNXA4ZzB3V2ZMamttaVc0S3VMbHhwS1I2cm8tQ0kifSx7Ii4uLiI6ImFGVWRMazVxemN1d0VQUktWX0I1Y1FmTjkxNEtSMm9ka29YSVE2ODdVdk0ifSx7Ii4uLiI6Im55NWg5aTVEVGplbXRGQ1VEQ1NzM2ROYWM4aU1OeVhTaDZLQmwxR2RNN2MifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiODVmWnVURzNjQ0xYQjVZemItaHJfRDRMNzNZZlpESkJ0QWhDNXZUQWZzMCJ9LHsiLi4uIjoiOHZaOTFfcXZhbmNKUUdMQVBkZGhYVVNnZ2pHWHZvbDZyWkthY1dzR2pHWSJ9LHsiLi4uIjoiYlJodENPQk1wdktsNERlaGgwbFJISEhzQ1hQeXFRWG91Y21SY2pLc25hdyJ9LHsiLi4uIjoibG80RVhzcUlVTll2eWZiTXprcXNKX3pCZ0lWTVVYYkNEU2lLdkdaWUd3SSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiR1lCeHltTmN1QnQ2UjRBaWd6T19ZYm9qSk9Tck9RNlhCWk85Ukh5LWhvdyJ9LHsiLi4uIjoiSU5SZFgwZVNlaV9ubmFBQlVUekpnb3NJdUFIeVBUbzBoS2FiYmFiY3dHSSJ9LHsiLi4uIjoiTGtwM3lsVDJ5RDZsZVJVOUs0OTFmaVFIQVpjb0JsekZCZGtYSHhvaGxNNCJ9LHsiLi4uIjoiV3VUTzU1QUdBZEVON1VzY2kwLVlpRlJjNVVGMlN1amNfZUZSd0V4SlpCOCJ9LHsiLi4uIjoiaWdYZm1FY0hUeV9ORVBldUhjamNMNFNjSk1oNXhmVm1zb0RRbWNIRDB0NCJ9LHsiLi4uIjoibjRfS0dVTkVNWFNEaEM2dE14eVNLeFM2WnJoV2FrM1NkeldEbFAxTVpkYyJ9LHsiLi4uIjoidkNESlBKWk9yYnp5eDFaYUtoTXNvUFBncmoySXNzdk1sYUk1bUhMcHlwUSJ9LHsiLi4uIjoid3BZdVdUX2h5MGpsZHROMXFGX0RQM3JCcEpvOTQtRWtkaThzVUwzSzNGUSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIwOXNNSFhCdXNYeFFaT0FJbjZ3d2R2ZVk2WUlPWXZmcndhTFpWVlREODVnIn0seyIuLi4iOiIxODMzRUdpU2pMZURKMjdvSDBDRmlwekQwZGotWjJsa3ItaHYzSnY3cHdBIn0seyIuLi4iOiI4cmhxWnBkNHUwNGpDTHM2SmpaeERjc2hYR2p2T211dlBzU3lXZlNUX2dNIn0seyIuLi4iOiI5NU1NT29nRG0wbzZZUG1OZjBpSjJyeVVUR0JmNEJZcDZzaEdNUWd0eE1ZIn0seyIuLi4iOiJBNHJMRWFGRlFWVG1BSnZHdXhEcGExcnl6ckNkR29QaktGMnFYZ2ZkN1RrIn0seyIuLi4iOiJEOFprMjBiNmxDNWM4cEhCYjBCMlVwTGhMZDZZV0tEZnhuZS1ibVJiRmI0In0seyIuLi4iOiJGMTJSZ1JncnBHOXpMNTg5U3NtbTM5N3RleWwzNmJPdGc0NVJHeVFrNVRzIn0seyIuLi4iOiJJeWtHMC1uUmF6QVhsV1lTaUFhQlhEcEV3cnMtcGZvbElPdXRUMFRKSjVnIn0seyIuLi4iOiJLWlNFaV9EZjZINkFMak1xV09IdWJYZW10SVhkSDBBRjV1eHMxSERvNlVFIn0seyIuLi4iOiJNRTBmakVYNmVTTy1YZkNKeTJTVWw0TkVNMWRLbE82UG5lSHVtN2puWUZnIn0seyIuLi4iOiJNWE5nNTh5S3ZGSUMwdVhFX1hfQk1lcHIyRWJYb1JxWEJNRlJJemxkemhrIn0seyIuLi4iOiJOVHk5eDFuNFhKaWNuUTRrbm5BelpwOXdRb3FJeE1oTUVLQlpMUnotVDk4In0seyIuLi4iOiJUS3pWcWJBeEtOR1VqNTZmVUM0aS1nTGlRQkpfM2ZPYWtKMjItQ2RObENvIn0seyIuLi4iOiJVeVpwV2pJTXQwZlVnaXBqbDRQRWhYYUxZMVhrdVNDSENNSXFxOXhxRWJZIn0seyIuLi4iOiJWWVdpX3ZpZ013LU1tcUs4XzZBanBMSkhzUWRDeXJhVlJPVzRyMW1aZ0pZIn0seyIuLi4iOiJXRnE0UlZoS250TkZnMWZEakZ2RDJ5NFRKUC1iVExHb2xNRzdtOEtqVE5nIn0seyIuLi4iOiJXZ1VPQXBMNGRpVFdDSUJ6OENqblc3bVFBNEVDTzhOUU5HaFRUbkU3YXNJIn0seyIuLi4iOiJabE9tdWhjeW4xVVBmUFozeXpzWElocW1TMksyMXJlZ05JUzgzN3V1VFZNIn0seyIuLi4iOiJhZ2tLaDRoUnhnR3ZoTGNlUXhXRGx3MWpIT3k4V1dCdUw4SlBQRkFnVmhnIn0seyIuLi4iOiJkaWVIZzRoMXZGVTVpdFRGM1JmcktmLVlZbldvQlVkcWh4NThaMjFfTHNjIn0seyIuLi4iOiJleHdWYkVhYlhvd01MSnVOR0t0dEszak9WcFBPcEFqS2p4cHJuaFp4ZGkwIn0seyIuLi4iOiJoUF84ay1zWUxqQkZES1dRNC1Jb3llYy1fNGxWczhXLXA5ZlpCZDF0UXlrIn0seyIuLi4iOiJtVjlUNXdMWE9sck9nRzBaUjRrVkJfd001OVlBZFF3RmhOQnI2MGNkRHRFIn0seyIuLi4iOiJzalYxWnppUnJnc3dldXNWUC1XWmJYd2Nsc2wyajJ0MXZkUm1iMlF4a2d3In0seyIuLi4iOiJ3NDNPMHNEV3ZSNFBFSGRFMVlFUlc4anVKVEV6MEYzQVRVeENuX0R4QjlBIn0seyIuLi4iOiJ4Sm03YzRMV2FiUV8yLXBnTW1rWmVLcktvSjJTb0NPLUVKb3lOZjZ1enVRIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIxYVRvUWlxaHBwb3E0Y2E4c2RMZkE5WEpoLWdzc2gxbGpId1puZmpSOXJZIn0seyIuLi4iOiI0WWwzZENwVHdjXzQtMzd2ZUdIcUpVcjNpT3puZHBXQnZqZWpqWVEzemFFIn0seyIuLi4iOiJNN1BDRWMtemlYcXNKa0ViY3dtSUZ5RFItZ3JMSFNURWY3ckhIQ1l6Z01nIn0seyIuLi4iOiJPS1hOQTFQSUhpUWowcmNqSnFHc2MyeWcxQmlIZ2lyU2ZVUDh6UUJyaGhBIn0seyIuLi4iOiJVdlJFeENJYXRiajUwX2xfVHpUeHJ6OXJkWnVNcTBxcDRrc1VjVzdHa0M0In0seyIuLi4iOiJYVjVtbWNJWkxQcWZWT1pGeno5cnN1NHgtYVRXcFA1VEswNjVqMDBpZXM0In0seyIuLi4iOiJmcW9ZYmQ2Z1hkbXluMkx5UU13VWF4YlJvNVExNVBWb2tsRGxER0MtcWFBIn0seyIuLi4iOiJrQ3A4Nkw1eENyWFVPMVlZcUpVTnJHMEQ3c3dBY1VneG1lRDRWejJIOF80In1dLCJwcm9oaWJpdGVkIjpbeyIuLi4iOiIzM2xXY2ZJY0luNUxkVWx4S2NQSHI2WnNuYjFRVnJyQy1oakI3OWluak5RIn0seyIuLi4iOiJPOWVxMFdXTW9LMzdQMk5GanBVbnlPVU5VWnVxNFRSdlFsM2szNEJhWHg0In1dLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.5j-X5BR1ld4yznCm5GXdMM1KlvXicXU2DS2U3g4YI25XwQ_l_YF8_V8_xWrujVIj4a82tbKTIjFymHQIHbcV0Q~WyJBWXgyZUQzWE9vTzlfYUhVVnZCOUh3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJnVHpuUUlQSUc4NV9iYmp5UGJ2VUdBIiwiMTUtMjA1MSJd~WyJtLThEUy16akpnZnY0czJVTTdTSWF3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJTMFM4RUxiVGRCZlNmLUw0d2lzX1R3IiwiaHlicmlkIl0~WyJ2VVR2ZWl2akN4dHZVOE90VGl3YzNnIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJyR185c3NLT3RVVHh5aEtnTnBTMi1nIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6Ikp6QV91Z1d1bTJzRElqWmxsaEhGTy03dU1Nb0paSDFYYm54VnZlYlBKRm8ifQ.zKuNZTNFnwdXH74Gh0SSKw73rwYi9ah76rbRZn5z61xNvoGgFZZJoIcYoa5WbQ0qBlBunnD9op4lMb3QwwsWWA",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "job_families longer than narrow padding",
+      "expected": {
+        "kind": "disclosure_rule"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6Ii1Mbm1PbjFOS0ZlbW5aVjg2Z1dFdzJtRVF3UzV6Tmd6ajd1bUNLaHZUYVEifSx7Ii4uLiI6IjFQLUxpU2JidDRlOFZRM2lHckdrZFJFZUpWQnU5WXVBU2pWMERMRUhUQjQifSx7Ii4uLiI6ImVDWklsUnJXcFZTOEdoQWZGeUtER3hZcnI2dEtZTVdqZHJGZlBtdlBlSTQifSx7Ii4uLiI6Im4xZ2VncHZBdmw4ZlJyVG56ZjRiRldpQ2VLdGgyUmgtNkh2Wnh4cURnTE0ifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6ImJrV291cl9KcnZmT1FSOWh2M1U5MVF3UDdtUVJyaGx6WEViaURiVm5vNXMifSx7Ii4uLiI6ImlWcXREMnc1Z0E4QkNYZGVkcU51Ui1QT2ZXRFZoZTRWM0wtTU80aFoxdGsifSx7Ii4uLiI6InRWaUtfdDRGc1g2TF9IclJ5aHRuN2hUampoMFJiYUtUb0w2dmF3UDQ2SEEifSx7Ii4uLiI6Ind3RkZ1bHJqZmM0d2VYRk96cUdSUUIySEtjVWluZ201Mkc2M194Ri1fakUifSx7Ii4uLiI6InhYenNRcHQ4a3M3WnZsRGFHODVHMXlqZGJ3YkZnNVhXWHNUY0lSVXJHWm8ifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiLXVEeHpQMkNydDdvUFpuREJSR282bTIxOUd5LWJyUjI5TUQwWUdzOVhCTSJ9LHsiLi4uIjoiQm9NNnE1UTJyTWZjbnllTUd6M0ZfQnhDQ1lmNS02Ylh5dV9CSVhZNDV0cyJ9LHsiLi4uIjoiRzBnejBYOU5EU2RkOU53RWNFVmFfX2pMRjZBX0plT0JCcVNLUFRUTFJOQSJ9LHsiLi4uIjoid1RRMlpab0tzZmZXSHJCX0Y0ZkxzTGJMRVY2ZFFfS0h2OXRicGNGLTdGTSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiOHBVUmhRekhKZi1RT0poU1JxcWVDN25iTGdqblMxQjVWaFBqYlVxYlBhdyJ9LHsiLi4uIjoiTkxSODhxWkJiRHUwbU5tak1HVW1UTFI3M2V4dTVoM3UzNHB1Z1BDWC05MCJ9LHsiLi4uIjoiWjQ1SjR4UEFScW5ySjF4cWpuRk43c1l6c1FJQ19xT24yZGlDMXhnNGg1YyJ9LHsiLi4uIjoiZEFsUUE0NkNLNlhNVmh2WFhNN0s0ZExOcFJicjlNRE92VDU3NVlWNk93ZyJ9LHsiLi4uIjoiZ0JuRk00LVFjdDlnVzkwaWQ4TnduZDYwT0hIWlpmOUF0ay1aLXdnd09scyJ9LHsiLi4uIjoiZ3d0cWZmZ2wyaFhDenBmSnNsSnU3WmFpUkVPaE9CbGNZcEFvN3NJa3BaVSJ9LHsiLi4uIjoiaTFReWNsQjRaRDNjV1BRMDRmZHpxT3NhWFBjMU1LdVRSMktiTnRDYTlfOCJ9LHsiLi4uIjoicDk3b21vVDRlNzkwZU1Qb2JrYWZZb2FGZzdKT2xhZXp5ZTViZE91VmFoYyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIzN3dJYjRpQWkxdTZhckVZeWV5bnY5STBfOEE0LXJ0eVR3QW1GQkRURDZRIn0seyIuLi4iOiI1YkdGNWlLTUVTcEVvZUREN1RnUmRnaV9BeFFWaGw1WWtaeVg2Wk9HR0NZIn0seyIuLi4iOiI4eFpzbmFxeXg0cmo2dmV6NVFiLWlyV1lNOHdPeW43c3l1TE1rV0hFUzJJIn0seyIuLi4iOiJCVS14dGRUQ1JxVXpXcEU2NDZ6REJwamJ5bEFSdnJSWkNyQ0NucTRrU2ZjIn0seyIuLi4iOiJFQzR4UkV1bVZKRXlUWHlCSm5tQndZb3pXS0NzZ0w2cmlMeUxiM2RraVg4In0seyIuLi4iOiJGT2JJNVpPdDktN05OUjNNS1JKZWV2NVktQTJaSlliSDgzUUVFZnBzbWY4In0seyIuLi4iOiJGdkVaaTdUMWt5bmFCS09KOE13YWpuVkV3RlQxdGhBdHRaSmJZbnhiU0hrIn0seyIuLi4iOiJPTTE2WmxSVkY2OUhSbzFBMkc5YTd4bzMxM0lkcnRYdmRxNE43YXFod0hZIn0seyIuLi4iOiJPYmRDVzBqd3BwbmJ3dDh1eEk0RXo0dUthd3pPaVdrMlhiMmdiWUpmSndjIn0seyIuLi4iOiJUbXR2ajdVb2ppaHFwOEpmaGpZMlBfWnh1QzJ0aEpMU1NtelRLMGtjaHlJIn0seyIuLi4iOiJaVFVyc09wNDlZV3ZFR3BmZUZ4aHhFOWx5YS1ScHY4c2F5bnNZaW1SelJRIn0seyIuLi4iOiJhU0pCQ29tT3gzTy1RTFEyYVJkWnM4WGFsX3ZWOEtVaDZaLTRyNUhWTzV3In0seyIuLi4iOiJjQ3RkaHA2OEtPM1ctakMxQnBrS3B5S0V2VE5rSFIyYnY4LXV4S0xqWl9nIn0seyIuLi4iOiJkWU5jcml2THRsVm1BYm5UVzgwcVVXdXJxMTdmVi14MW1VZ0RZc0ROTTN3In0seyIuLi4iOiJmaXpMdmxkYUNiN0s5S0VQamw4ZzEtX3FVZG9pVEJKOWVSY0ZQeTktSW4wIn0seyIuLi4iOiJoUjR0eTE4Rm5aQ1RDcDdtQmh4VzFiWS1UcUNXeU1lVTI5bVZ3a1o0R3VNIn0seyIuLi4iOiJpY0w1ckc1MGEyaHZFN3FRS3RUN2NRSlJudEVkZTBRVlhrRERXd1BCYXZRIn0seyIuLi4iOiJqUHdsTVdtT0Ruekg1N1FRZVptY2RDbVlfUlI3djlkNkZ2V0NVVk5UcWw0In0seyIuLi4iOiJqd2hsQkNUN2lqRVpKOXRhQkZQR0N3OE9zamlGY3A2U25QWWlVNHItaktjIn0seyIuLi4iOiJsRldpZG1aNWlURHBBTDUzYlYwZXBhQ3VUa0hfcUplZHJkRWRjTnlScHVjIn0seyIuLi4iOiJsVHNTN25hTXdJcDg3MlRTQWppelhUX2lidWpJSDZQdlBnUkVQMldBVFRnIn0seyIuLi4iOiJxMXRhYTZLTThrbGMxNGNwU1dyWXdrRTV1c1B6VE5FUWpaZ1ZVRlJNeHlRIn0seyIuLi4iOiJxZWRDZ2VDa0EwSEFmdWFLa2xfSkhpaFJkZlBldjgxdG8zT0NkUGJxWDY4In0seyIuLi4iOiJ1OUQwZVZyQnJoY09ZblJCSXR5MnpDaE4tcnBIVjNPalZwNTl6dkVqcTdrIn0seyIuLi4iOiJ5OEZWR0txTG9UeUNZUDFzQVhUNlJkOTVuY2dRVG1GSk9pajBKNGVGLTV3In0seyIuLi4iOiJ5VnBwMThlRmk1NGNHMzJGY3NoTnh2bUtlcnBzRHZNS3dyeTlLY1piUjZJIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiJGTWFsOFl0ekNWa3BLb0h1aE0xM1ZJODR5RUZ4Zzd2ZTl2ZGk4aU5iTmZNIn0seyIuLi4iOiJHLVg4WGF0UkJ4MDVWQUNPeUZ2YWdEY3ltWDBWcGptVGNTa0ljMkZHQkJvIn0seyIuLi4iOiJXQU44R3NZQ3ZIeUtCUWpqbWQ0dU5XLWc2S3M5WkdaNWQ2OTVoQTh1d2RNIn0seyIuLi4iOiJfS0FmS19jYU1rMGw4b2RHdDdsYi1DbTFsLUNRLVkyc1o1N19Fa0FSM1NNIn0seyIuLi4iOiJsdnNtTVNuU04tWWRXQ29HQmNpSFZfVDZfYnI1d09KdXVHaEppR0tjcnlZIn0seyIuLi4iOiJ0aUhVSXc1c1hMMF95d1JDZS1BSXU0OWxNSFRmOW5qQWtkWXNzeDdzTnNNIn0seyIuLi4iOiJ3ZUI1c2JTR1gzSnA0T0Z4MzQteXJUVVV6ejhjUVRScmdDcWVOZFdsbkNVIn0seyIuLi4iOiJ5UmFiTVlJZFU1eFdhZGlMRUxwNzBsLXB4dDB2eVowVDA4QnFJUDk0Y21rIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.BcZEWxEJDJm7PNcwmkatrgRNhRzljnkTDJj_zepseR0Y2UlWIorYLEYbFncNNHslbn5zQWs3AaMfi5zaX7Mc0A~WyJ5RW1OamtranhXckQ3d3cyaGlYeXpBIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJDT0FYOW5fc2ZtWkNyRVBMLVp1VjRRIiwiMTUtMjA1MSJd~WyIxOG9ZMmwwbkFQcnBjZ1paVVRvYXdBIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyItZHhyaHRHMWZ6MjMxWTdhTXJNUVFRIiwiaHlicmlkIl0~WyJzOExmUTFZNG9ZV21YUlJuZkNRb3pBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJFOWlWNWpLV0pkZFdKWHQ5VWdZckF3IiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IkNhUWlVby1ENXpWdVd4c2NrYlB2cm9UZndEOVM0Q19FWHk4a0hUeExKWE0ifQ.1-HA6DJ-lYW06IJ-WuGKvqrdGS80So0HhJWOMCf4gPG6rNHPF9AKMzfjn5efpn8leu9GHmdEKPjeZy6MGhwbgQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "job outside every family",
+      "expected": {
+        "kind": "not_covered"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjUzQkVaNTdadjNOTnBtSmRtbEQ3cXZRMVpsc3V3cXB3ZFNoYXZqX1JydHcifSx7Ii4uLiI6IldSUDRYUjBXNl9BZ2xJbE5nUF9HZFV0Rmx3dGlma1pLczM4WU9ERnBHV0EifSx7Ii4uLiI6ImZYRFduU2l1MTlfeFZxWmVLOEV0QWJSZlM1SGVuSU5CTXJ6Q2ZQaFl0Y1EifSx7Ii4uLiI6ImtHcmhzRktONjVWR1hVUHlPUV9NTDYwbkFvSHVUVjd2UHdTMWxuTWxyLWsifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjlqRmVNN2dWT2VXWUhuUHozSkhzTk1HTFh0ejZhbno3R1VSUzFvLWdwVm8ifSx7Ii4uLiI6ImtmNG1VTHI4YnY0aGg2VlItTkFzWWtwdk9KVzNTYVNqRWFVT043bzVHX0EifSx7Ii4uLiI6InBuWmdkYjFGMnNWRGRrNFdjdVRJSENMQkR2ZjFDSzhkUGNvVnpDRUhpNEUifSx7Ii4uLiI6InRpYk9ucXE1X1l5SVV0eUNRX3hyRUZrZzFYblpoUDhYbDY4WXV5NzJXM0UifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiNWNKSDFENVRUN3RhaHF0eE9Ja1VXN0pOXzl4amVlS05mRGtPbkE1UmpyMCJ9LHsiLi4uIjoiNlRNeTVHWGNYOTVHdFVtMEpsU0lwb21CTExpRVI2cDFqaVhHOUVNaWRtbyJ9LHsiLi4uIjoiRFBfenVkX1J5RGdtU2NGM2puVWZuMXU3VElEUWFub00yTGozMnNxUms0RSJ9LHsiLi4uIjoiRVFwMldOSEY1UDhFQlhBMWlrM0U2dlFvV0ZTRlVMSGJKTG11eEtxYXBhTSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNFNpd0xhTE1SVTB4aksxODFRd2w2a1I1ajdUV0tYNDdZV25hNzFERlZsVSJ9LHsiLi4uIjoiN3dyMkVSQTRPenJ0NG11QXVhVUtVUHZYYnpTOU5ZRDVNbnZxQ3JGVDRMMCJ9LHsiLi4uIjoiOVgwcnBZZTRuaHV0blc4N0c3eWlud3kwNTZ3NENlNGJ2QmNscW9PREw2WSJ9LHsiLi4uIjoiR2pNd2Jpcm9wYWVxU1RmdUJrb05zTGRtNHY1cE5VTkNuVm5RZGJQVVhCcyJ9LHsiLi4uIjoiR3NkZVprWHh0Z20xbVF0ZzY4MUtndFZBTW5WSGZQQ3FxYTJwczNQd0thMCJ9LHsiLi4uIjoiSmJqWHFucmRjMTYyVzJUYkxhSXVVQ05raUNxMVZLd1hFbGY3bWpLS3NOOCJ9LHsiLi4uIjoiWXVkYjJMaVNSVm1LcUl2Y1JEZ1o3UUJjWTBYTFpmM3dra0tTTjFleE5aTSJ9LHsiLi4uIjoieVlwajhNdHhkTllNTnNIRndhN0p4ZG16U1JWZHVnWWxUSTU4QTZwQVR6OCJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIwbEpzWHpOSHVCQ1ZkbktwNFNEdXNEZkc1cHNzLTdoUFc5Zlo3M2ExRXA4In0seyIuLi4iOiIyNkwzaGVESHB2d2hucHNKcWFuYW9zY2k0NG1qT0wyVGJEeUk2WG9Rai00In0seyIuLi4iOiIzQkFQaWFoT1RxZ09BOUU4NGhaRnZuMGwxQWpsclZuYmFveTNwVWZRZVdzIn0seyIuLi4iOiI1V25VWjMtSWpZMHQwU3pmdHNZS200dnVNUWZ5REJxZVNCR2p1ejdpcnBBIn0seyIuLi4iOiI3Y0NzSUFDazlyRTl4dERVVkl5VnVpX1N4ai1HdVVrWkI5cEIxejhSYnVvIn0seyIuLi4iOiI3ZldzekwxdlZHX0NEQ3RiVFdqMlVwc3FBTUV0ZklaRGZQak1hNURMOFBBIn0seyIuLi4iOiJCaGxkbXdfS2dvUF9QN2pJU1VwcGRCdV92MUpROXV4RmVkV2NNYmtsckdFIn0seyIuLi4iOiJIRG8yalctX0JJZGFrc1I3ZXowLTRMZ2FkVlVlR1B2NDJfZllla0JsQzZJIn0seyIuLi4iOiJIU3ZKcFdMMVh3QkwzeHREam1kaFhlRW1SNFBNOGtXT0VJR1AzU3BTRFJzIn0seyIuLi4iOiJJTldyRlhwT1dlYm1SM2lVMWxyMjYwU3Y1UkppV3JWcVlYVjM1azBtQ0NVIn0seyIuLi4iOiJNMTQwdU5Ec1FoVXFvWjFHcTVmbzVlbUpHYWxXRlp6aDB0b1AzUm8ydEtBIn0seyIuLi4iOiJSR3RaMmxVMEpPa1dKSjlJek5QMVNSS0R4UkkyckFNT1lrR1NpekFYQTI0In0seyIuLi4iOiJSaU1HWFRFcmk2d0FHR195NmcxWERjbjJDUTBXbjBuUi1aUEtqaEN3MENzIn0seyIuLi4iOiJVZC04TzhMQzNpQjZ4ZGljbjR5RGNzSWlfd3p6SHRqdWlkaWRXbFgzV0ZnIn0seyIuLi4iOiJXN0VBUXpjME5YblVCdEdzTnoxUjR5TVRCUnd3WEoteGVLOExkRXdzV1RBIn0seyIuLi4iOiJZcnZwbGVTdkFta0FKcmJ5UjF4cy1ybkRDMXR1UTY0SmtEeWpreF9tVFlNIn0seyIuLi4iOiJaMHg4S013cjl1c184eTJQaGF5cFBDNERabURyTEV3dGIwSFNUa3g2b1A4In0seyIuLi4iOiJjTTZZVFUtUThnbmhyWkgzczVxZTdrYXZ5ay1hZlBPblhLNEQwWl9CSnhrIn0seyIuLi4iOiJjbXZyZUpyZk1fb1d1enlXOWpPb0hxY0YxUHBtUkpickk2eG16UHRMZGJRIn0seyIuLi4iOiJkQXU5UV8xWUtTQktXazF4STFoWWc1Uk5rRlZWX0JNdmh3U0hwMUZXZjFjIn0seyIuLi4iOiJoSndNMURmNlFGVXpkcEJJd3VWZnQzdk1adXZnUTFHQ1hXLXdnTFBFc2RvIn0seyIuLi4iOiJsNnZJYUZHamZ6VXZOaXFNbG90bDJKSkdka014MWJwYU9LREdmcHdwWFRBIn0seyIuLi4iOiJsSjdsbzhTOFZJT3dPbU5kSEFLd3pjSkRoa1JtY0laZFNxcVNlY3lDenRrIn0seyIuLi4iOiJsVHNILXFIWktXMU9BYzdJeGZ6QVNiZmllcXFDUlhlSkR6OHBxRWVZdVRJIn0seyIuLi4iOiJubm02cVdxMnFONURTbldQaV9kZVpVOEUyaG5DeERGdlpTWlR4SzBMU0pzIn0seyIuLi4iOiJ2SDlJR2JZLTVsSkdQN3dZSVpHRXlDbHYtUU94cmYzdUU0Ym1uSjN2ajU0In1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiJPbGhBWnI0c1d2M0ZUR19rNGVZR3NGX0xMQ2Rzal94aTVmNGpfcVk2Vk9nIn0seyIuLi4iOiJYZm93czkwTGlKWWxOQVRVZHJTWHktQU1BMTE5eVk3Qk01LVdLMjdudjVBIn0seyIuLi4iOiJhOTZRazVJT0dRU3NSTzZPQVluMkJNcm52Q3dDbzR6WVQ3MDBVSmh5dUNvIn0seyIuLi4iOiJrMHJqZjhScUM0N2w2MFpKM2xWSmE4alMzdldiVWFwUENwN1czTzg0S1BRIn0seyIuLi4iOiJvNkZCVzVlVTU3aTY0bWJuZ05hU2FjR1pkYkIwS09xWjZDUF9PRDU2Q0Q0In0seyIuLi4iOiJwNlUxU3pTaWpzN0hrYkVLd3c5MEVKQTdvalBhdGo4ZTFuSWNrUEJLR3lVIn0seyIuLi4iOiJyTkpKczJfa0RQR1U5N0lMbWFQcVNtTUlrdUhxQ1NZSUpKbllCWldMWGJvIn0seyIuLi4iOiJ0SHdZUG13OE44ZnpidlBWNUxHaDdONmZUUlBNTXpkYWN4NnFNUTJuZzRrIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.8dhqKzwhSHSxaISmfbLRP2VghvZWfuzCeQiXoAplwghQRiDZasj_MN35oZ-Kcas0NsSX4eG1HeN51SFvT6HJhg~WyI2OHY1alRESlhWelo0VlJwem9rYXZ3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJKNFZ4QmJWMFFiLVE5eTVVRFFUTmxnIiwiMTUtMjA1MSJd~WyI1UzZnbFNoR3ZKUE14ODdRU2lPcWRRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJNYVkwQ084blBjOXFNMld0c2RnVl9RIiwiaHlicmlkIl0~WyIwTFprMmU0aWNhTEZabVVZZnZWYk5RIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJmTWxGNW5zRU1oWWZjQjZXcXVfWWZRIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6Im9jNE1ULWNvVUJhSXNUc1dyR0VlTGJ5dWNmMGtCdXNPYXk2dTVlWEJvRVEifQ._GL9rYSkONOZhvIPYVQatZEsV4fydNL9RmKUrOpwcykkzPMa0CSXD1JvIcz2P2_-uv1eBNZpLNFO2UUOOiPYGw",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "codeValue": "29-1141.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "low end below the disclosed rung",
+      "expected": {
+        "kind": "not_covered"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkN6dXl0ek9IZWRuTmx4WEVKcjV0ajlrSVlCbmVtQXdES3lkb1N6RU9GYjAifSx7Ii4uLiI6ImVmcUJaYjBkQjhDd1ZDN1lMLVktTDVtUmxFeENIZDhMWkMwUWZmMl8wem8ifSx7Ii4uLiI6ImdiUnlNNHowOGROZjFiQWtncVdTclFfNUJTeWVacUZIajNMQklaZ05ycVEifSx7Ii4uLiI6Imw2Rk52UTRlNDhIbmdKRzZKWWFiWDJKQVF1enJsUzl1WmNpcVYwWFJRU3MifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IlAxTDZNYlVkWE9EXzNhRnlaVWpHV2djV2g5WG93MWtheU5YcFduMkgtMEkifSx7Ii4uLiI6ImNXcFlaNlp4TGlBRFlIdnhuUXVYY3lmZDd1QWVCbURRNlJQcFZqUVZuZ28ifSx7Ii4uLiI6ImlvNG80eEZkbEE3QmZpLVBGSDBkM01yMG9JQ1l6TU9UZXFzRHc5QVRmSGMifSx7Ii4uLiI6Im9KdDN5Ri1RbmN5VHY3NEQ3NDdELWNqX09YVjh2SGVISHVaYUZ3T3Jsb2cifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiT2UwS21pMmxpTHB2R1ZYUS1EWW5wN290UEZnaGlwbGZTU1RQZnR3Um5ITSJ9LHsiLi4uIjoiVGl1cDAxTTh5Z0JNZEhYR0NQVkt4M2NWSmtrMGd3R2pyTGloTnJ1Q2FQayJ9LHsiLi4uIjoiZFpjbHRLbnZpTndjcUZfVWx5NjVEbGJQYUdSWlFoQmY0NmtZbkRlSUt3RSJ9LHsiLi4uIjoidE04Y1lRZlVmbTVfaWliU2xubmhaLUZsYnU1ZTBrcXlKR1NzS2YyS2FKSSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNU1Oel8wMGhIRVFWLXNCamxGeVV6eE5hemJlQWJwUjY4N1psdjlRM25wZyJ9LHsiLi4uIjoiQXpQdmh3TER5VXRpbzFKYVo3VUp3TkdpMVJSelhoeW1DRm5DdGhhN3dKSSJ9LHsiLi4uIjoiRFZWOEN6a0JCdWRueThLRERzMkM1a3RHbExFMXFEejcwMDN3eGtCNmNKayJ9LHsiLi4uIjoiSmR6R0pWQUVhXzFSdWlIS0hEUUJMb29QeFQwdUcxZlpvZXBKRUxmMXBtSSJ9LHsiLi4uIjoiX2dvazBQcE9uX0tDU2JZVU8wQjZFUzdnWTdIMlhtRE81NFV2RUdIMmlwSSJ9LHsiLi4uIjoiZ0JIbmJ2UXBDb0RtNnJyb0RrUUp3UlZuWGdmMnVheW1reWxjeEkxZGdZdyJ9LHsiLi4uIjoiaHN0VlJ2OTBBSk8yREF3RDFiSGd2dmhxeTdsYThtaU13S3NIWU90X1kzOCJ9LHsiLi4uIjoicUJPRTFRcTY3X0g1aURGTHhWTWJVM2twTlAyWXc4N1p6Q3g0RzZjdk16cyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiItdVczdkJ2UXJOZHoxX2c4NllMSkV1N09hWkVZX3QzbGRfZWhMSlVWX3QwIn0seyIuLi4iOiIxRjI0bUg1SDZWVmVsYThhaVI3MXFZN09rcGJmRWpTN01CLWlJeXZXd3JvIn0seyIuLi4iOiI4NndkM2ktMndwVkZqR3pHTzJWMXhxcndJRW5pX3lYd2s5T0JCdG16bzBRIn0seyIuLi4iOiJJa2N1R1ZCUG4xQ2dJY2xGdFpQZDZXTlN6N25lQTFUbTh1a2cxX2pSUWRRIn0seyIuLi4iOiJLQ3g2eVNXSEd5Zjhjd3lneXVCcURmUFVDbnFfMFk3U1dSdHNkWmNrSUU0In0seyIuLi4iOiJMY3ZSVlBQckhRbXU1VWh3bkJHUUFGcVkxSk43aGQzYXBWSjc5MFlqaGN3In0seyIuLi4iOiJQNHByMnRjSGpOV2xQT1lycTJWcDc5cFB5UDBUd0xyaUZwd2V1eW1fVWtnIn0seyIuLi4iOiJVanZENUpUUEdHUzJpWVAtczZNQTk0cENhanBSM0hPazVVek5WR1d4YUE0In0seyIuLi4iOiJWUk9pZ2hDbGh6QmlzeTNjNU5SdWxVYWU4QWV0THRxQnd1TGtwLUZDTjFvIn0seyIuLi4iOiJadl8zV3NtN09sY3d3WXhBNEY2Q1lhX2tCRlJzcVJzc1lYZkRVdkJpMWw0In0seyIuLi4iOiJfZUVYMF92MFJfanpoNVpIQjNsZ3JzbEI2Q1NQaUpnYmU0QzMyODRjQ0E0In0seyIuLi4iOiJhX19kcTVBd3FEeTBmSEh3WERCZ1NpLVJWV3BJdDdvd2xWeGJ4MExnVEZFIn0seyIuLi4iOiJhY2o4eDlWOG9yd3MySXdDcWh1OXlwTnY3V1FUenpSV3hFOUxWQUxWVm5NIn0seyIuLi4iOiJhd2ZLMDh6TlBMS09pYWhjODM3RlZ1Q3BjVVF6d1RCU1I5cXNlUzdDd0RZIn0seyIuLi4iOiJiWUY4aThpYlotMEJkWC1WNmx3amdmNDdkeDlmNFRtRzhpcFNqZFNrTW5rIn0seyIuLi4iOiJjY1hfZS1QM0puaS1OVS1sclM3aEVHYlJydGFrYWxaYWlhem5HQUFHNDkwIn0seyIuLi4iOiJlRnZsZWZpMW9ndGRNaF9KYm9VSzZXUFhOamR2eTFjVlpTd3E3QVZOZFdZIn0seyIuLi4iOiJpYjFva3VqeUVrVmJPRlRoOF9KeFNBRFZob1NQN3Y5MXRIRjN5WHk0czhnIn0seyIuLi4iOiJrdFJnQU1keGxKa0hrUExyamtHUnJLc044Sk9qZmYxS3lWZktVNHlkUW5ZIn0seyIuLi4iOiJtTkQ3TDF1VzJ2ZFNqeTJhRWcxcGFrRmJGSDB4TkQzTDZBam84Z0FUX2F3In0seyIuLi4iOiJxODdEbFRKbFhxSkJSUnJpU3JDWm1CaTQycjhUcEJxT0x4WVFNNzZNSmJFIn0seyIuLi4iOiJ2SWpvMnhXRWdqSjBmVmNjUjBEWFI0ZUlUMThBeGRwU3ktaUM0emdib1lRIn0seyIuLi4iOiJ4dDVNSVJBVHY0c0xwN09TdVY5eDBKdTVXLTRCT2YwVHJ1dXJkUi03OFhVIn0seyIuLi4iOiJ6LUJJbWdWdWJCUnhYM2pVbGJCRi1nVWpKa1Itc25MR1hTZ2tudmFIamk0In0seyIuLi4iOiJ6NDNzX3o0Y2lma085d3BFNXF5LUU2NnBORG1pQThOQWxNOE5hamFCQzFVIn0seyIuLi4iOiJ6NVc3ZHNLVWk4WDdvRlJONXB6aVRLOUhnU3VzZ1lTM184TWxMZmVaNDJjIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwRWpycWVsT3B0ZTU0ZDVpc1RSYmV0bWNDN0M4NUNhZ2Y0b3BNTlFtbE9rIn0seyIuLi4iOiI0MmhoOTNpNTNzbVd5Qlhjb3I1T3NCLTVmSGhCODdYN3N0cnhhM3JxOEp3In0seyIuLi4iOiJJNFF2S1c5dHJrNlozSW9yQ3VKSXduTTBaaWpWcllQa3dJN3NGbmp2bU9ZIn0seyIuLi4iOiJjblNfcEJkdGNTRmpWY2xBYlBheGRfLTNiWGcwTFo2NlByWlRBdjlrXzBrIn0seyIuLi4iOiJkOGFKT3Nyd2M4eXotd3R1NTBReFE5TmE3M0h0akljZkl3WmlVZHpGM2V3In0seyIuLi4iOiJqNXZnUThMcFVtSzdUZnpvN291NUl6dzJJcTctZXhaTFk4bGZYNEZLRHQwIn0seyIuLi4iOiJxdG9tbXBQaGMyczg0ZG5tTHdlbGlmcWkyZ0lzSEpNTU45RGg3NDQ1RDEwIn0seyIuLi4iOiJycG1tNFUxQlUyTENhb3VYR3ZGTm02VDZ2QUxIZmVpejJ5VkNNVnhUaEo0In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.29Tr-e4phzCtdKfIe5Raxz46OudzPIqrKm3x2JTm_Eb0FmPDu2WOfEqLFn8mFtrCJvWr7kG0gzSswVta-gnR-g~WyI5WmhJME5ORWlQMklPZ3dqWGlYT3R3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJ2QUcyQ2ExV3o3TmUyZjgtU1UzTW1BIiwiMTUtMjA1MSJd~WyJ1Uk5qTXJHbzM1d202ZnotS2tiNE1BIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJFRlgwQ1M5eDlKd0RLWUZUbTN0UU1RIiwiaHlicmlkIl0~WyJvZjd3VFJpcWJHSEpKajVncXJEOGRBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJqb0NOR3c3T3dfV3dHMmhwUnNIQXhRIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6ImY5MGtyaWFrWXI0aGw1OG0tSkR5Rzk0NU4xTzRyZGpoSlhoaUVmcEVwUjQifQ.UXDfgjP4NRR8BDVoCqp5aVtRh3i6K6BJImzv8QKIziQzq6QPvjzNbeQXEhOwQjhhi-WxXfs-Ok2U3WjNAHZ5Kg",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 110000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "binding_actions non-empty",
+      "expected": {
+        "kind": "not_admitted",
+        "reason": "action_mandate_required"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IlZ1Rm5HV0s5MkxCODFETUZoYVFhTGpBdDN4Z2IwdWZ0YXNZQkpkQmRCaFEifSx7Ii4uLiI6ImY2Rjh3UDhfTWdlUXdRVmRYV0VqemVibF9HWWhTZm1oWWdoWVdnMHA2UDgifSx7Ii4uLiI6Imo0YWpyZ1FFS21YMEJ6MWhab1BheGpyQm9WWEl1MXNuNU5BLWNEaDIyRG8ifSx7Ii4uLiI6InFSVmxaWE4zc0NPaXlWb1VTSEd4bVJiMGVPeGlmQ2p3bXpBWTM1SFFEZTgifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjBOWTNEblpCVmNUWE0ybXRtRVpDc05taWtDb3ZYU1VsYThQV1pyQUh1SGcifSx7Ii4uLiI6IlFHMS1BcWdiVk9IMVc0U2pYdkVmWk5NODJYQTJlaFVpM2tFWHpUOFpKODQifSx7Ii4uLiI6ImpSZndFc3BUd1BlYlJFMlltZWxpcTFERmpMdmZNcVdZcl9POFFMQVdSZE0ifSx7Ii4uLiI6ImpleExKZnJxams3VTNlLXdzRDVqVVZQRzlCM2w3b2dzQUdrTjdMNHp3X0EifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiNERNNHhlbDgwRFlDSlhYQ3dyaURtTFNZQXM1dWZnckc5UlFDcEEzZnUxdyJ9LHsiLi4uIjoiRnJGWjRvVkxuaC15NXo4ZU9WUVVJTldsM0ZhMlhFYmJnWkVlRlh5RS0tdyJ9LHsiLi4uIjoiYmtDX3gyY3pRdHN2cGItdnlneE5aNVRYX3NTd3I1VzlFVzlIZG05N1Q1WSJ9LHsiLi4uIjoid3BtcFRzM09FWlc0UFBpWTZma193QjJ1cFAzQkcteVZwSkdNUzd1S2tiOCJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNkQzNnhQNHVjcV9WUU1NX0xOQkN5RGlrdmNpVmJnVnlwNWx3a3o3YnlaOCJ9LHsiLi4uIjoiOGRMZnNIdnh3dGhKbGZiV2Eza1VKMEEzRkdfVFJUcmdOUUZUMmhnanV1RSJ9LHsiLi4uIjoiWHlyT3BuQmJwY1l0RmltNy1ZeERpTXA2U2hqQy0yZlVBQ2RCd0VrTmlrdyJ9LHsiLi4uIjoiWUFYcEZmT2tjbm5CWU9uRmwwREhOUk1JVmh2SlkxbG5FZG1wWnZYSmFwZyJ9LHsiLi4uIjoiY29uTk1OVDVzZDVyT3dUY2hnU2tSamFKWFBEU2FVVUYxa2Z2TTljRVlOWSJ9LHsiLi4uIjoiZGdPUlhLejJVYlo0UVlHMVIwcFNJOHBIZjdvZllKajVUTVNuajMyR1YxSSJ9LHsiLi4uIjoid01WU3VxSHNpU3B0SnN4WEdHNUdoLURaUDl6M251cHlDZlphcEZOT0hfbyJ9LHsiLi4uIjoid3E2Zy0xYjJoR20xdHpSQjlrVWVOMzMzbmtrb3cwbThRN1RqT1Y4TENiOCJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIxWlM0WmtKeDhfbnVJbEhsTFh2U2lrSnp3MjFBOTl4MHkta3liWU43OXVvIn0seyIuLi4iOiI5azBZa01NaG1mN1pJV0lFNTJ2Sm5ObU1jYWJza1Y2bEEwal9saTM0N3VzIn0seyIuLi4iOiJBT3hYWFZfS3UycU5CdWVUaERWVEx2OXl6WFpkNVlxeUwxY24yQlVlZWdvIn0seyIuLi4iOiJCN1AyUWxRb2t5VUwweUFNNkFkU0dlRXJrU2dZQVNROGV3SmswX19Ub1lJIn0seyIuLi4iOiJFbGVlNE8tNVlLYlN6MGZfbnlxVU03NFBPUkczMEtob1ZQZFhlUlFzOGt3In0seyIuLi4iOiJFbzZqbXcyU1B5MjcwT3hIRzlvNGxWdVNyLVBiNFB2Q2V2WG9BUDVGRmRJIn0seyIuLi4iOiJGMXVYQmdUSlhMbk5BSlJJVEpMOElVQUxBSDlRLVQ0ZDY4N0lZb2FhVl9zIn0seyIuLi4iOiJKbFItQ1NNTkI5ekRsN1FrS2VFdldRMUFhTFRCcHVsSUYzMFhXNDg4ZzE4In0seyIuLi4iOiJNMDVQMzlvMm03M3RZUzB4dzFEdVRldUVENEZzbm1VSkJ2WDZtcWtmTFJVIn0seyIuLi4iOiJOalVnQnliekcydXNBdUJ3d0N0dmhGbXljdE9sSjFJbWtuN2M5akM0NTY4In0seyIuLi4iOiJOdkRNQUNKTVpxUkY1X0JCNjhYN2VieEtWUmtlWnpydzU4Q0tuOWoxOGNzIn0seyIuLi4iOiJPdGU0ZXFjWERZZ2ZCamdCRk44X1dsOWRpcFljd2lVTUswcXhzd2FKVzNnIn0seyIuLi4iOiJSOTlITzdfNDhQV3I2ZS1JQlo1UmpZOE0zbGZHUnhNeGtZWVNiSkR4MGVrIn0seyIuLi4iOiJSaFNEZURwSEtNMWFFV1lGUlRScXdaMzRiN01ER0dSOXFvWkpZY281WDBjIn0seyIuLi4iOiJTUnItYnpWM09xbll1dlQ0bEZPaUhLMnFXdXBKQnZRMXNlN3lFWlFvWTZzIn0seyIuLi4iOiJUR1d2V1hQSVhCTlN4TWZ3VENRYktDU2VXUkRoeG9icFNmVmtJVGMwbENZIn0seyIuLi4iOiJUaGlBT1N3V3o4S29jSzlRU052UGRNSl9VdTBLY0pWdjFaTHJNZkZWYTdFIn0seyIuLi4iOiJYbUxvN3dqcmdvemtJNFFnV09tRFpnMEh2cWR1enlXd0lOY1FodmZtYTlrIn0seyIuLi4iOiJlVjV5QzdFZm9uSjR4RmZHcjFhM2VuTWtyZDM1aTZEYm9URFdHOTJ2N2g0In0seyIuLi4iOiJuSE5yS0wtVzBsNDZzZTF2NWs4cldCZVhhbzA0NDRVUHZtWWZYY081cC1RIn0seyIuLi4iOiJuS1FCWTJTUjZxXzk4bEhUcm9hVmwtOW9JckR3ZldoZnh4X3lpdDFsaVlrIn0seyIuLi4iOiJuaXFWZ0Zvd3Y0S0hOd0FYSEQ2VXQ4TE1mLVB6OFBQT1NBa0UtMU9UWTRVIn0seyIuLi4iOiJwY00xaGRJdHBwbXB3SjF4Y0pTVEw3NzBiMEpUTmlFMW5odldGQW9Ib21jIn0seyIuLi4iOiJyX09YU3R4ejI4eWNKN1plRUswUEN0MWZXajdFemV1aHVrVElISzVudjI4In0seyIuLi4iOiJ2aDFrOHVZV0F6MVZuQ2lGU2RQeUNJNXZKQWQtUDh2UzhHajFEVjZXQ0lRIn0seyIuLi4iOiJ5Mld6WjlQQm0xd09rVnMyMmRQR0ZZUk1OOVRhN1ZOd3VZc290d3JoTTBzIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiJKNVBOV0hEUW51TlViZUs3ekQ2S3VZXzRnZUxPRlF0ZEFFWEc3elkyZlgwIn0seyIuLi4iOiJLVDZhNWdkOXRaSjhfVDB3bnpSVjVDWmJETmlER3ZiMUo5UjQ5UTFsN3VFIn0seyIuLi4iOiJNNTB2c3I5Vk9raEFPRzZJUFRzSGVaN0RZb3RlXy1kdlV5QnIyek8wRlRVIn0seyIuLi4iOiJaelhZZ3ppODViV3RaVk9kUjdIYlF0TzBGZzkxSm5kZXJnZVdtNTZlXy1nIn0seyIuLi4iOiJqWTdBc0lhZmlROUphZkxkUGtJNkgzNnhJVERSQWNYTjlKaG5hREpicWtzIn0seyIuLi4iOiJ1UjlfWE9GWmw0VGJTeHNtRDlhb3hVYWNKUlBmNThkak1td2doTzN2S0RrIn0seyIuLi4iOiJ1aHFyMTVIY1ZqZ1hTT0pqRW1xU1FGSEhMbXlNSERkaEJrTlpVd011LW0wIn0seyIuLi4iOiJ3NFg0UExTbHBDTjZYZng3SkktWlFwUk9kT0x2WjY4aDFobVJ6bnp0NnU0In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.gVfk7lVK4-9mf780Yap8JGrVHSeIc_o9cOl7WBDQMqNURR84bMHa2Z69l81nilJdd3GUnp9cTNP2vzOt1MUBlw~WyJwUGFoZnB2b3Z5TGdLQjM3d1p0cjdBIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJzRlpoeC16aWtQMzdfdmZvOE96UU9RIiwiMTUtMjA1MSJd~WyJUeVkxM1dSdng5S1pzaDFCa1U4T3J3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJydTdRc0FIaGs1ampQUkg4V2xOS0RRIiwiaHlicmlkIl0~WyJFUkpzUTk1VWdacGpXLWZ6NFBVSTBRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJwUkNBOGtfdG96VTQ3SjlVWjFuRW1BIiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6Im1uX3hCVmxlc1BBaXV2V0R5eXhVREVEekRURyIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6Z1prTjJrd2V2ajVMTlM0QTVGVm9JR3gzVmJfR1dRM0hmcjNiQmNQTEpZbyIsInNkX2hhc2giOiJKTlZHZklBUHpOZWgwQnJEYzUzSTJpa2Q1eEw4bjc1Z1hzNXRVY3ZrdVFVIn0.APM4vtLsUp-pNcwaKaAKYNN1W9NYCdfhGfigMLXmM7S30RmjkYTrfHbthRQ7YeL7X0LdZdJH_lplhrBQuHZV0w",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "binding_actions": [
+            {
+              "id": "t"
+            }
+          ],
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "jordan@example.com"
+        },
+        "hasEeo": false
+      }
+    },
+    {
+      "name": "binding_actions absent",
+      "expected": {
+        "kind": "not_admitted",
+        "reason": "action_mandate_required"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkM1Mk9ObmNwWWJXczJ6OE5GYzE0TkM4cUJ4V0FnSFpHd0lwdDlaVjN4b1kifSx7Ii4uLiI6IkxYeDg0TFZSbUh5QWwyNFlFbG4wU0JOYmZQdU13N0VWMWlLN2dQRmVISzQifSx7Ii4uLiI6IlZQdjBtOVpvdjNqME5kdldxN3hoYkdxbzN4LUZoN05mRngtTURmZ0M4dEEifSx7Ii4uLiI6Ink1MThwNUtPbVlnNUkwaVV4VlFoWGlRdnVFQV80bVZpWGVzZnJpNDBZbTQifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkdaT0lvUTZJTU42aDRkbWpfaVJubGhqai1sSlJ0VDVtT0tkNGhtcnNwejAifSx7Ii4uLiI6ImQyWjRIc3dhY2M4T1dVWXlDZFM2N0xHbTA0YmtyNWpGdlpYaHFRNEtyVlEifSx7Ii4uLiI6ImhlclgtRkxoT1FCbEdEVkIwQXdGS1BMQ2ZBZWFjc2NDS1lOUEprOUpfLWsifSx7Ii4uLiI6InE3eW14TGt3WURtWFBnRldBMEZFWlEzbFZCTzRrRUtwTnpjdWd3WHRpUTQifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiMjl2RUl5Rm1VOHlXc3ZMaG5pTWtmVTQ2ZTYxZnI5X0l1cC02cWp4U0tFcyJ9LHsiLi4uIjoiNldfVDJMOVNfdE9Wd2JyUUF1cUFicGdWdExEX1hIdzQwbUVRU0xqWmhuYyJ9LHsiLi4uIjoiaHBsSXZXOTZkWS1IRUE1eXg5Z0xPZWVxMWZvVTZMQUlqSjJfM0pPUHpONCJ9LHsiLi4uIjoicXdxa0JpcDZDcVMyNGFRa0dQM1NnLUduSEd1MHdvam44aVhGSE9qVENHYyJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiRTlRX2lYcmZ5d2Z3Zkgta3VvOWhXQXQ0M2xsVjFRVWpCeGhQeHdteDlDcyJ9LHsiLi4uIjoiUURnRzZVamVpWGx3RFZGUmtWbjRUQUlFMWVOd2FLeGM2WUtrNnhMbWVTTSJ9LHsiLi4uIjoiV2U4RWdTRms2YVN3WGZoYmJLeVBOSHdZUGZ6Q1NxelM4QXlRQlk3TnYydyJ9LHsiLi4uIjoiWEFTX05BLWNpNVVDVEEzWEJsSUl3Q3QxckJ0NjA4N0tCZ2xidmxHVFFESSJ9LHsiLi4uIjoiWnpPMUp3R2x3YTF0WC1WZjQ1OF9rRk12Q0lPUFZYX0kwODVFbC1OUElmayJ9LHsiLi4uIjoiaGg4UVZERTRmclRWTFhVVEdVb1pXdy16SV9TeWZuQnF2eGFST0dieFRUUSJ9LHsiLi4uIjoieFNDa2JLSEg0SFRnWW5jTk5qRFVOUUVyWG85S0JBOUhkcjF3NlBRUDVhcyJ9LHsiLi4uIjoieWs2NHRwOGprUEVQQ3BhdGMxSml4bEdmRXoxTDhUNUtBNmtEQmJ5NVpmZyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIzdTVVVVpyMzBLbGt6d05ONUxXa2Z3X2lpQUxSYldRMHZMQ19iRjcyVHdVIn0seyIuLi4iOiI0OEVNWVkxTkZsRUFudWtZVnJGazlwX1hmNG1zSVFXVjJxOVgxY3dkU0hZIn0seyIuLi4iOiI1Q3A1c1lQRWFTakRna0dmX21SdFFxU2FXVnRLTG1vTW0zc3Rmcno2bkp3In0seyIuLi4iOiI4NWZ2QnMyTnU0RzdLYWtseEtVS2s1dmlXTndLQVlTS2pLdGRLeDlJdy1VIn0seyIuLi4iOiI4Umxqc3h3MVB4QTlxRGNJQ2NKalpnWjBmSUlCUTJmMkw3T2xJZVJOd3RNIn0seyIuLi4iOiJGZmFOekNuem4zbUlxaHhXeGdhMEhLRFBzU0wxMXhEU2xER1N1TGtKajZnIn0seyIuLi4iOiJIUHI5eHBWMktENWpqMTJLUW82ZG9VWHAzMHBuWXpzZklXd2tJZ3g3SDVrIn0seyIuLi4iOiJMUVBKQWxpeGRhSWM5RHJIUHNlY2gxMVAxcjg4aHBIOTBCaVhFdjh6MjR3In0seyIuLi4iOiJNVFlFQjBiMURlZUloWWtzb3NBVllQcFR6R28xSi1ERWt0andBR0xjN3NrIn0seyIuLi4iOiJPaEpEa1g4ZnVNMGZLOExxaE5rOWIxZjRDb3hnUExHOXV6ZUNxSDdKRnFNIn0seyIuLi4iOiJSQmZlN0NUVjNVdFI4QkU0Z2tYQ19oaFdzTzBIT1E3QjVDcjVRbW1rYmRVIn0seyIuLi4iOiJTd1NyaGxseXJXbGNteFUxSVIxU25fc1NXcXltOFJVMjNFMURkdHZYeGVFIn0seyIuLi4iOiJZcVVPdktUY3ZPSnpzaTVBUWtBcV9XSzludEhCYVNkRnhJMElCcy1rOEZNIn0seyIuLi4iOiJZeFJOTm42em9QWTJLN0RjV1dkOU42ekstejc5d0p5REFINmd1Qkg1U3ZFIn0seyIuLi4iOiJjWVJlUl9ONi1qY3lfaWxMd1N4T2RJaEx4YWQ1RnZHempOSTNfcmpkX0E0In0seyIuLi4iOiJka3V3UDkwU3RRbkdEb200cFQySTRpOFF6LTk4TWdEZnl0ck1fLTFGLXY0In0seyIuLi4iOiJlLWNtVFBqcnRDVmhYRE9zYnptRGI1RWZfRS1zZGZGZGNCdHVBUDVEWTRRIn0seyIuLi4iOiJqcWVzNDk4LTl3Z3BLQ3pMcW9ndDBmYWtVMXZIM0hycEd4WlZJVkh4ZUxrIn0seyIuLi4iOiJtOUxRQjdxeUt6M2VFeWJucnNVQUlaQVNhbTlGaS1pbmp2UktkUnNtYmlzIn0seyIuLi4iOiJtcXQ5c3l0ZnlOSDBhOFdMTkcxV3F0Tk9vbVVXMDFlcHJsRmF3VGZFb240In0seyIuLi4iOiJtdDNSd3BLcW00ajZFN3lzX2MzYXkycTItUGtZQ2FEYmZxOTBOcXhmYzhnIn0seyIuLi4iOiJwbEdOaWZ0WU9ELWt0cWhPSkdNTFYzNUhpRmVQNlRGT01ITEpldXk1c3ZVIn0seyIuLi4iOiJxenhMVGkxODFjakQwM01kVXNaRjd3ZGxyRk42c09EejNaSkJHOXFXVXVZIn0seyIuLi4iOiJyTGZMQ1Q4Q1pXbXlWS1g3bXRERlNLQlJVUU1JenVfbEFRamE3M3RzRl9VIn0seyIuLi4iOiJzZUJ2T01rQzZaeTlDZjFSYnBia1RfSmJKVkhhZ3FwelE0UkV0SzU5a0l3In0seyIuLi4iOiJ2S0NVTkFtY3ZRQi0xeWExXzBYUXZ6TnN6Q25iNWhNdkt4OVF6Um4xRnhJIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIyRk9NelNGME9DWFZZV0kyUWhFc2szLU9mUW14M2xTak1CemQ3Y01iblprIn0seyIuLi4iOiJQMEpiZGdvaVJjMVF4R0FUdFRnaERlUDdSMzhDeXIteUtmTTlqcjhxLUlBIn0seyIuLi4iOiJTSnNETUE2Q096ZVU1M2Rnd0ZHbWxKTnpsZExWbGkySFNsb2JyNVgwSW5NIn0seyIuLi4iOiJhZWNDWGE3eHNiYzdRelpEeVlyYjVnd2pjUFU3M0oyWnZwRGpOUUZqMmc4In0seyIuLi4iOiJiR216VHFiZEg1QXloYkZyT0pjWkJsSWpJcDNOLXl3QUk1TU9WWGdTU01ZIn0seyIuLi4iOiJkOWNJcXNRcFVVTF9XczZRdGF6bm1mWWVMQm9EbDk4VVlwUHRwZWNuWVRzIn0seyIuLi4iOiJnSDc4NE5BbjdDQUR2cldYVTYyR1pyaDg4M25YY24zNVhHY0d0MHdNQ2NZIn0seyIuLi4iOiJtMGVMOEtVNUxEZXZpTFp2dEdldHVkdFBnU3E2RnR1LU02NGI5cXMtSkRBIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.1mmM1fXOT3AT4dYXJ3_MPWkt_HyGMgkN0DbSazE9zGSkIvnW497uh3GxnpYxEbfKqBY5hAhBjPve9-ECtVIUQQ~WyJVX2s4VFJwbHJLTEdHalVWaXZ6OGt3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJJemV2OUx0bzM4V00xOGtzZnZuSDR3IiwiMTUtMjA1MSJd~WyIxNDhDTGMyNExFWUpOUF9VQnJaT3RRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJhMEdTczRMbWRBRzBvdEZvV2dESUxRIiwiaHlicmlkIl0~WyJFSFJzNmF6Y1lrcEZQZXdGVFA2cFpBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJINi1JYUlENERTMUluRVJBZ0pfb2VnIiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6Im1uX3hCVmxlc1BBaXV2V0R5eXhVREVEekRURyIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6Z1prTjJrd2V2ajVMTlM0QTVGVm9JR3gzVmJfR1dRM0hmcjNiQmNQTEpZbyIsInNkX2hhc2giOiJidE1sUVRvQlZYTnJZcTJjcllRVi0xaUhfLTNTYXFFRHNPQ2N2Qm53dExBIn0.ZFNjDEOvLXxGcqBZx0og0FVleGRxLuy_ZP23fiso7XA69EgXywhv7hin_xn-JMvFz3rrW_jJ4bsNqylhdKrMeQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "jordan@example.com"
+        },
+        "hasEeo": false
+      }
+    },
+    {
+      "name": "eeo under a standing mandate",
+      "expected": {
+        "kind": "prohibited"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjN1cG43eWM0OE8ybzZjSFZySHl3X21nYkJQWFE5djFDdm1Hc2VKY0h0aDgifSx7Ii4uLiI6Ik5jMWFhQU0xaXFsWVBUX3FuRk5sT213V3JoWmRMVVh6bDV6d1MtU3ZaSzQifSx7Ii4uLiI6InB0VHp6a3dvd1JHbTJNNFJuYU5ydzdMcmFKS0UtLXktR3VGZUFWa3NPemMifSx7Ii4uLiI6InZnZTdXRVBqVW94aUE4VFlLa24xS3hoa3ZJYVFnT0hYT0xmTGhYd0Y5c0EifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IldBeDVMSmVzckJsZ1UxM0JSR2FmNUpzRGNYX2xBVWhnRWJkd0tjSVF0V00ifSx7Ii4uLiI6Il9KYTFjeTZkQzJ1OHNUNHU3bjRDNmZKcm5KbmhoUkZ0Wm5tTklsM3Jha00ifSx7Ii4uLiI6ImUxNmowZHlUUW1ZQ2xXbmRMcEE4YW5fdklOZFcya3ZEdU53cWtua0ZGTjQifSx7Ii4uLiI6InNnTVE0bkNiVDRXa3dRY0FiQUxsdFdfRFNraENqcWlZUHpEZTdib3NDV2sifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiLTJPQUZLNVJjNmNvZ1M5WlJWTTNhb0xCTlpSYU9WQ3VXa2FWMjk5NE5ZVSJ9LHsiLi4uIjoiOC1aVDlBUkloSFRmUkMwVVFvQ0hkVnZNS3ZaSHZnSXNYMk5Xd0xJZWVxbyJ9LHsiLi4uIjoiUXA5eUNJUUlzR2YyMl94NWdpOWx0NmE3WFJ6VzlIbkVFZHVuWldKdHg5QSJ9LHsiLi4uIjoiWjVwSlFPSDYzWFMwVFRlY240Q2daWjRYS0dDU0lKeGtjNGZHekdlaGhEayJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiMm1JWkY5Y1RQaU5GaHV5bDRwakltX0w5cng5Qmt1UHhYTVpaR0UwUGJkMCJ9LHsiLi4uIjoiNTlfYTN1VXZPVDJDTTBPc2FGVElLZFh6R3l1WXk3blNNOVlIWi1XeWNPVSJ9LHsiLi4uIjoiNW84cWs4OFlFUW9zNXNFLWdhT0tpbURPdWZmRmROWFhQVEJHb2Q3RGQ1USJ9LHsiLi4uIjoiQjR4Y281Y1lEQXMxVFhsWjVkZ2M2c0tJTUU5Q0Q2NDMxdDRqbUl0ZTFQVSJ9LHsiLi4uIjoiTFI5SkwwaWJJekJQNzdkemJGTGZaQUZpRWI4WndEMlN6M01rUjdwci1icyJ9LHsiLi4uIjoiTTl6cVVKQi1zc0g1MUJ5Rk9ZMVhISlBUdFA1cmRycFdORTRwMUVPdHE5byJ9LHsiLi4uIjoiVUxubURjTUFoVWZEMDV5VXI5elVsczNPQ0R0OFFJVm5mUzluNUpEMVhQVSJ9LHsiLi4uIjoieEJoY3dxV0VNVmhXSWdtSnFGZ3FMTE5YZkZ1ZkNEZUdMaEp0Q05LeDUzTSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiI0X0dUZHhDdmV3MXQwdEJweFBFT1dZeVBwV0dvTkNXRHpDbF9HWlBNRkNFIn0seyIuLi4iOiI1REhoNUljU19Iemo1VjVoUzJSWlNrX0wtYUtfYnozeDFXckZxazd5SHdrIn0seyIuLi4iOiI1TVdPdHQ5eTdrMVpMbVp4U2FmUmdrVUc3OE9vTUEzeTlZSk0tdDR6WDZJIn0seyIuLi4iOiI1UlU0Z3V6cTJ3Tkw3MDF0REM2bWtRdnRsUVhjTmRsXzZ4ZEhvVGdLNDhBIn0seyIuLi4iOiI1bm81SG14Z2VSa01OaWxRV2dMcXlNaGhMdVdES3E3RzE2SnFkT2I1RnEwIn0seyIuLi4iOiI2cFZjYk5RQl96ajl6Znp2bU1BTkk5QW10YXpYOTdrUHVyQUZoN3E3Yk5NIn0seyIuLi4iOiI5TEswdWNYckpYbUZ5OXZTWUFIZDVwOTloc2lLYWwxLXo2LU1oVlRsNUF3In0seyIuLi4iOiJBbVFFWlNDWjlSYzY2N09HRXBZblBQcXZia2ZzbUlldGg4SDZoVDBNbVFRIn0seyIuLi4iOiJCeS1uN25XaWNjZjkzSEgzNVp1UTd6Q2FNUllTdTlxLWU4X1lhaFFMY1pFIn0seyIuLi4iOiJHOEg4MVJRM1I5VkhGMjBqaC1RczFpNjg1emR4bEZNbVdORkx0SW9aUzhvIn0seyIuLi4iOiJHWjVqODY5TFZlNnMtU0RMYmN1S2lXQ1haNGFxUFVHdDBDU0tqVFZ4WjA4In0seyIuLi4iOiJHdENzeXVLejJDMFl2MUYyVkZtYUw4ZVRISW1ESi1ScWlHY1FmeDB4ZTZrIn0seyIuLi4iOiJINlY2c1hjY2Jlb05LUlZJSW1KUURiOTJVYWNyWFVqeWcwa1Bhb3dnNkZFIn0seyIuLi4iOiJMUkJOY0d5NEV1MkZqZkFiTmdLeUhhQk5YLXZFNlNLc0xoZ19GSHk2UzVrIn0seyIuLi4iOiJPbVFDRVdGdzdubVFLWmUzRnAyckZpdnBqTk9wWWpvc2JSZl93S2VaSUZRIn0seyIuLi4iOiJRbS03Y1FqOHB4a3RvRTRYMEJ1VXlVVUdNR2puc0ZwRjhSVEUyMWE4YmRFIn0seyIuLi4iOiJUUmpFOFRtMUxFVVBXdXF4YmV4a2hKU2o4bEYyVHZXS2UyQTJUY3RMN3cwIn0seyIuLi4iOiJWc3ltTjFhd3Y4VDlpWUUwMEZLTEZyM3IzemFLV094Um5VNkRGSnQ1Tk8wIn0seyIuLi4iOiJjZm5NQ2VubVY0VUxLOTNMY2gzdEhKZ21pSG55X3Y2Y1U4R3B4aUxoYWlzIn0seyIuLi4iOiJoOGlwQmEyd1ZndXZPMzdqWTVSaWpYM1l0dWlQWVIwWnZ4Z3VYZHZwbUpBIn0seyIuLi4iOiJocmpRTFZwb1IyNmZ0TWIyWDRiNmE4RkthRHVvd0N5ZjBFcVNmYkxjMzZzIn0seyIuLi4iOiJrbFJlUmkydms4MzNKd01lWXRFNkthRjhVWXRobmZ4dmVPa0N2M3BQYUlnIn0seyIuLi4iOiJtcVBqY0Y4RFBDSmFtN0xaOHQ5QTBNRHJPZ3JjWER2cGppcWFzZEhGZXU0In0seyIuLi4iOiJ4am8yQzJENjVqaW9VTGx1SGE0ZDlsX21ZcGozZjFJSWc0V0FwaXZDUlVZIn0seyIuLi4iOiJ5RVhqUjBuRWhWN25keHpPS01fZHdLNW9HajRtcm5sOGNocS1uUGNNa25jIn0seyIuLi4iOiJ5X3E2SWxldzRTN1dsQ3RnVUdWZnFWWHpRSHB0UllVTlhzSDR0X0JCOUNzIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwems3NXZFQ185LVVsYmJWNnhrMVYtUTkxZk1EUlk1TlNkTDMzUmlNRUZBIn0seyIuLi4iOiIxb2xzSEx0M3lZZ005a3NIdnV4ZUswUEdaUDdFcFlWdFZzXzMzRVo2aVhNIn0seyIuLi4iOiI4U1I3S19Ic1RjRkpNYWgyMjVscWJPZ3dRQnY3N3dicWpTQVY3X2hidTA0In0seyIuLi4iOiJCb0s4T0RaT3AtcEtycjlUVTNKUnZSVG5hSWFvR3dpd0Q5NUFZb3VXZ2pBIn0seyIuLi4iOiJUZ0ZIRThQTV9wRm55MV9nZjNWd1hsbU80eGRvZG9KUXNUWGhNaGo3X3JNIn0seyIuLi4iOiJYSmxsUHYzcDNqTjJ2OWMzNTlYakk0bFVRc0E0MGhqMUI0N2xRSHhOVXVBIn0seyIuLi4iOiJaTjZNU3BNQUUxaC1VU0xxYVFFTnZ2WmNlZFc5NDl1MUozYTJVNDJnbVFvIn0seyIuLi4iOiJ4cTlreURwMkdaOFYxMWYzZ3JQRm1DZXhZVnpoU2lTRTZiTUJkdmhWSUpVIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.zKtRbpfh3Mx-Wn3hNps1Y_OS3zv7z40pTuIjseXxnrkvIW-kNbIuBAb-_z4ZIRSPrzuH5VHfORwDf41EwGXtAw~WyI4Y2s4WVhlTHo0N1ZnUHBkNEpqd093Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJNZlUtdUxzOWNuUmdRdXVDS1JtclBRIiwiMTUtMjA1MSJd~WyJzV2hLT2RsWVgtN243UGpaQTV3YjZRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJNMFFzb25hSFJUR0tib2NITWZaN2tnIiwiaHlicmlkIl0~WyJxajFNU2o2T2tLaXp4emhQUGRSMmZRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJPcVNscV83TkxZeWI5YVZmOVFWWG5nIiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6Im1uX3hCVmxlc1BBaXV2V0R5eXhVREVEekRURyIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6Z1prTjJrd2V2ajVMTlM0QTVGVm9JR3gzVmJfR1dRM0hmcjNiQmNQTEpZbyIsInNkX2hhc2giOiJranlzZGVSTmJjdDVQMFY2d3lhbnRuenNyaDhBM2xGZ3NhWVpHWEVFUDVnIn0.OqAwn1Q5S4vgCA3AJpDhu3NCXy1FAh8flC2nbWmF7J8FrJXt6G2uNkyLCTjtimoKML9-eaoPs6tj7l4xn8SfNQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "binding_actions": [],
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "jordan@example.com"
+        },
+        "hasEeo": true
+      }
+    },
+    {
+      "name": "per_employer above provider maximum",
+      "expected": {
+        "kind": "policy",
+        "reason": "exceeds_provider_policy"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkY4cmdmSl95eWJZZEEwWUJ2Mm5kSUpoN1ZhQzkzTXNxNk5sY0JHSGVuVVkifSx7Ii4uLiI6IkdSbU03VE14TmJ6WWpFNmdVLVF6WU0yRkxUMkhiWkFKVUsyYzNqZ3NfYmcifSx7Ii4uLiI6Ikdad0ZnZ3k4Zkt4UWhQZnk2MzBWcmh0ekU0V0FRVURDMUV0ajFYdGRkalkifSx7Ii4uLiI6IndWYTJFZ2hhbklaZWZSaGdDUWE2UEE4V0d6alNHNDAwUVpjYjNaN1JDZE0ifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkRPZ1BEN0gyYXJMWjFQSkRJSExRRDBGXzQ1M0pjY0dxNVVXS3Y1LTJabUEifSx7Ii4uLiI6IkwtbnkwVk5EbzRRVTlyMTZiZFUtVlI2VUZWeHpDVkVFWFkyMFRYVXBob1UifSx7Ii4uLiI6IlU3MllLb2hMUzg1SUdUdXk0Njh2NElHcmtERTk3SE1IWl9KblJvY0Z2eU0ifSx7Ii4uLiI6Imtad1F2dWhxQnBMTEp6b3RBVkhmOWdJbDBlWmRXclpXQndqVDNtaXVhV3cifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiRUZVaEVOOGVOanJsZGl2bzFnWE41TGxtTXNHSUZnX1ZHM2ZtNjhqV2J6YyJ9LHsiLi4uIjoiXzFyQk1LbTdhSmo5eFNPamZlUGU0Z2liMlF5d2sxX2EzMW00N1hDcWo4MCJ9LHsiLi4uIjoiZDdfWlYyTV9pNHowWDEzODloNGxWLWhnTnFXU1FwMmR1V3h1c3BwTDYtUSJ9LHsiLi4uIjoiZ2F5bmdGOW1la0hzZ2xRbFdtMDlYaW9vYU5zV1ozUUtLc3BiOFJ6eEMyWSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiLXFGTE9nYUxDV2gxNUEtNUlaa0RHelhWV1JoVFBwT1hrVkRGYkZBc2lLQSJ9LHsiLi4uIjoiSy00R0RwREkwbFFLdHNUX1ZESXA2MmttYUZQUTd3TjVDTGpLRFFJN3pjayJ9LHsiLi4uIjoiTk5VemI2NUtXc21WZUI3RUpWZ3ZtT0NNbVFCRTQzTFdOOEJUNFEwbFJBayJ9LHsiLi4uIjoiUFREdGR3c05yakdkZnVJSVlkaENWOG0wbW5Ib1pwbGg1ajBXaHczdVZGVSJ9LHsiLi4uIjoiVWxJUWRJalVtd1ZJNzVYa2lCUzFiVjRsNG9qcTJ4dzB5N3lPcGlqbExRTSJ9LHsiLi4uIjoiX0tPenQ2OGhob3l1OWVfblhCT2tGZHo2dXUzR1QxRFkzY0xLczc4SFZlNCJ9LHsiLi4uIjoiY2JVQ08wVEdJZkpPZ1ZscU1CZjByMmVlTU9RYzNWZk90WUEzdHc0MFpPcyJ9LHsiLi4uIjoidXpESEdFOGMweDRfUlBqN2V4Tm1EQW9raUJIY1NSX2J3MUVrN1I1R28zVSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIta2ROdUsxSzJIa1ROcVBFUFhmaWVtbzlxNFB3c2JqemJoUUhxbXdIZk1VIn0seyIuLi4iOiIzNEVzZkE3QUgxdXdWb1R5dnpzQTdfSWQ0NzFlRndlTENSRjJ0cEFLSm5FIn0seyIuLi4iOiIzWlV3SS1MTXN5WFV0OC1WVTdTQTF4OXZxWXR2bTRWOVlSTlJsUlBweFZvIn0seyIuLi4iOiI0azQwekdWaE9oZ3NjellHR0E1SW53QkZNN0I3aTNzVDRTMjNQSDFBT3pRIn0seyIuLi4iOiI5UDZ6MXhPVGF3WlFTTEhXQnVwbFVrLVNQOV9WelVBV0M5cHd4NEtpcDd3In0seyIuLi4iOiJBV3JNdHB4cDdyaVVhMzRTS0ZJU2hkYXFPNWZ3aVcyaElaMjRkdXVSMGFzIn0seyIuLi4iOiJFMURReG1NdkFxMmsxQU1TTThEbWkweEo4STZSSDBSMnlxZW1sMmoxT0RZIn0seyIuLi4iOiJGR3E0Z255X0x0d09Gc1MyVzMyYm15VVpleHJXQWdobmI1Q2NCYm9Vem4wIn0seyIuLi4iOiJIWVJiWkM5WS10Q1Fhc1FRVnJ2emxwZHZ2VUdvdzRCcUFvTm1wLWUtZUQ0In0seyIuLi4iOiJIWjNOZFF4bE9WYlJ1WjUzTXZGZEItOHVHWVJsNkJ5UlhfODB6Q1JvRFg4In0seyIuLi4iOiJMbUpzV1d6czYzRXBacjBLX2RmS0lVVVZxd2dxYUtQUGdEZmVZbGxnLUF3In0seyIuLi4iOiJOU2t1OUxKbmItdXU5T0Jkd21aaWJQQzFxQ3dzYWZwQWg2dmprc0FydWprIn0seyIuLi4iOiJRVVJxZ0VyR2VOS1RtaG1DUTNfWU5idU45QjlUV01udWF0UWJ1TEQtWmFVIn0seyIuLi4iOiJUUjVidzlzRlpCRHI0dFR3LUZIVFpmeGRUSkcteVJTUUwzTUlNU2NQaDZRIn0seyIuLi4iOiJVVzBNUGotUFpwN2V3UjYzLXJwNG04dWphX1R0YmdZZjBva2lqaE5waVpBIn0seyIuLi4iOiJXT2c1bWZfNTF3T0hNNklRRTZIRVg5M0JyaDhGemtRSDhkTEtncWd3UU5RIn0seyIuLi4iOiJYWG53UDNLMGVhUWpkdlBjOG1KT1dUaTc2TU1ZWElGdkNXTmphcENPM09zIn0seyIuLi4iOiJfMUdiRGJ4TElrUUtwR2lJRW5FSGdJUjhhUDZXOU01bXJVUVkxWVJzX3VJIn0seyIuLi4iOiJmMGw5NHBCVUo0VlpYRjNYcHZEV09nVmFoVW5PX2llQlVwZW9wWkl2UXFvIn0seyIuLi4iOiJoYmNwcXNIaktVT2lidl8wQmZaTnVKc0xmMmM5ZjRWMDA4V3Vqal83SHR3In0seyIuLi4iOiJoc0dHUDI4SU02amNGMDVxSUVheUF1LUhhRjh4YUpHbG5RenpVenpqallFIn0seyIuLi4iOiJpbnpOVzJrWDVxTHkwbFhJVC1RM2RPdElhSl9KN3JLNEJkQlFQZWZFRFV3In0seyIuLi4iOiJsZ2hRcHluYktxZFlfbmduQzZybFdQMHh3OFhPbG53WXZIQkppeGRPWDhZIn0seyIuLi4iOiJxQ1VoMHdUX1E1MW9FYWpHamxQTnQ2eDU2NUlxNEp5ME0xLXVwTXhGeW5RIn0seyIuLi4iOiJ0T3VlbWx3al9KZGZRVFgtUWk2WHFlWFhGeVBxUGlsYjZpWTBFWGIzNnVJIn0seyIuLi4iOiJ3c0FYbWVNczROUVluZWFscHdtSE9XaUotNUo1YXlrQ19STk5KSzZQNFFvIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6M30sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiI2RVhjNm5LV2VRTlJKMXJLNnIxVmRyQzcyN0V6clk4NEgzN3M3dnlBb0pZIn0seyIuLi4iOiJOUU1ROXNFS1dLZE5LQUtHSW1wYTZEdE9ZZlp3N203WmluNE5JUlhoTWxBIn0seyIuLi4iOiJSbFdZRU9PQmRoanRYMENZTjdNRDhKRVFIaUc5d1dUdmMwQmtrYkxVZllZIn0seyIuLi4iOiJjSERrY2J6VEVOWi01bWRsRktTUGtOLXd3VzhwU0l3QnVYX3VWd1lfVjZjIn0seyIuLi4iOiJjUkd2ZXVEblgxVEJLRG1LSWZzaDdoQjV2eld6cG1CbHpjMk5BeVg5eWpVIn0seyIuLi4iOiJjc0E3SDF4OWhxMmY4VVpfUmxIR2ZLS295elBsT24ta2hlWGRTY19LRnZvIn0seyIuLi4iOiJwcWxhTGdEd3hGMWxyRkRhWmFiOU11Tng2V08zM2hoWURMbXZVLW1oOURvIn0seyIuLi4iOiJxbWNLaHhDWV9rNlFrc1NsalVzTm5fMUMzTHQydlB4eDFzVnF0dXlWLUZNIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.Wkn1wO-TOvCTeJCfSMtaud-NrSxyXnx2vxTGY3-_9t7KbzhVboInRtSOJjDUOI_1C0AlzkuO0QzQ-3sKKL2lrA~WyJ0WjlaZzBnbGJ3SldPRms2QkdTWXB3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJRMGJJbGRBdFhEbndkaHhlUkJXZFJBIiwiMTUtMjA1MSJd~WyJMOWo3bGZ3cVdyOFNtYlJXVzk4Q1NnIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJ3SDhJdjVmQjExdW16TnpKVVZxUTFnIiwiaHlicmlkIl0~WyJISzBfUWRuTnRjS29Xd1JEMEh3WmVnIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJydEhyOG9NTmg3VzBIWU1QaURHNG5nIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IkZONEJlSE5nVGhWWF9zcHBTOTE3d0I4Q2lLVERCb25jS2dGYnY0SUNYcTQifQ.U7Y4ZK6XTljAMDumn8x4QIX6TYyywxVT_CC1emptCzQiJ9onNC5sa-FTxbDk6pKxB31fdA24aeEO3MmcFws-lg",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "wrong audience",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkMwT3Fxa3p5Q01zWVlPVG9odTRoU2FKQXM5M1Z5dzhwaG5pZEp6ZHZWNlEifSx7Ii4uLiI6IklEb0VLeXJzbjBleGlSX2laZC0xblJQYkswb2l6R2ljaGZBazloZTUxUm8ifSx7Ii4uLiI6ImJkSHRkM2J1Wlk3OGF1RktFWk90aWJXM203WHBjWG0wVzZvMGNYcjI0dkEifSx7Ii4uLiI6InZLLURVTEctYkFYQUN5VVdISHlzUTV4Q29iQ2xPNk9JR3ZRRDJ4alFyTGMifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IldCMTF5NGh4eHJQWVJySWJsajkyZ3ViQUtEc243T2xDVndzQW53bXVtU1kifSx7Ii4uLiI6IlgtSnBWUHg4QnVmMU9PR05QcVQzOGF2bjhBZ3FWVWJjUDJ3cTg3eGFwSE0ifSx7Ii4uLiI6Il9FSGdqb2FsaVZQb1pKeXBFVUtxVnRLcFY5enpBQ2xzSXh0T1hQWlJpSGsifSx7Ii4uLiI6InktWGFRUFNTbi0telpacVM0Mzd4cV9DcTJmb3ZxckJNMTRPLTJhSTlCb3cifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiUVdlOGhBUWJYVEtaWUtHaFdGWjhDYWVXLWtwYVNITmJGa3JLV0dSM0RUSSJ9LHsiLi4uIjoiY2Fac0dReldTRXRtWUNKem95NVQwQmVEVnNIX203Z01PS0NyRlNLaUs1dyJ9LHsiLi4uIjoiZkRGbEZDT1pGRkF6OUNGN2o5cFpxcHcxRUo3TlJvb1RibzNjSFFfYVZiayJ9LHsiLi4uIjoiZmhoeEhESnVvamUtTHlaYUxmR0xWUm1VUVdXT0dYR29aZFlNUUQtdVBuSSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiMnJIZzNzdTJkRVo2R1BqX2VHdnB0WGdDM1d1Tl9NTkszM0VXODdJUHcwTSJ9LHsiLi4uIjoiOXZuV0c2OFNieVZYTTlMOHMwMldwNkhyQ3FmaEhMeUpMWW9FclZCRzFLVSJ9LHsiLi4uIjoiQUJYWG9YWUdvTlNLU2dUc2ZCLV8zU3hTTU1leldYNUhLRFZxTENUNFpPMCJ9LHsiLi4uIjoiRUEtSW9aTDgtX2xnTHRVaDdheFhKS19SdUxWN0pRd0gtNHZQQWdRemU4VSJ9LHsiLi4uIjoiVWJVSDFlSEhNY3JyODZKdjlZN1BOTExDMUVJbFdlOF80QmdHcnF3dktUQSJ9LHsiLi4uIjoiYmRTUkVoSkc1Qkc2QmhYTWV5aGs4cnpFbmhrWlk5Z3oxLTUxblNNaC1HTSJ9LHsiLi4uIjoiY09VZEJoYjBkMkd1WVNTcGV0aUZ5bm5Vb2JUWUVaTzBvdHhoWjRpTXBQdyJ9LHsiLi4uIjoib0JlWng2YXA4UHJXaENNN3k4dTlKVmRwWWwwNkY4V3JjZV9aY0UzdjZJWSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiItN0tOanJoY2kzS2oyeVNVRmdsRUdyTmRaMGlYU01qUnVqR2hQMmtyMDdBIn0seyIuLi4iOiI1QWkwenhBZHhoY0NuNFlfd1Awa0ZyaHRkYmlZdzhoMUdNNTh1RW5KQm53In0seyIuLi4iOiI2Wlc0NVJSVDNvSmV0S1BNbHhBd3VpWm9jY0JUOFJZUXhmSnpiVUFqZUpZIn0seyIuLi4iOiI2ejJlNEs5NHhCSS1xZnpwRjRIYzY4Yl80R1dfZkkwdXVQZW1iUEZ3T2xJIn0seyIuLi4iOiI3bVJQMTBjMndoWmlBNmZJNk9oVWVwSzg2Vjl5YU1QV2dDc3lPLTluOEdvIn0seyIuLi4iOiJFWk5YUWdQTWVXaWJzUUhYMWlmTFFSSjltYWJzSjZNa1lwZ2I4eXZiXzZRIn0seyIuLi4iOiJIVHI0S2NZd2NtQmRXX2c4SlZXd296dVVIZjN1aE52RjV1aDJ5T3lvaGNZIn0seyIuLi4iOiJJSWFiaTdhWGVKbE00Ny1zRnowWTlaOEsxZFBLLVgxM1dZczFjQ2w1U1FVIn0seyIuLi4iOiJNUGNwZzh2TXNYb1VqOEI5ZG5UaTNvMmdCRWdHWWR2RUNFN09TZ1hDZF9FIn0seyIuLi4iOiJReW5JdEZ2MGVDdDFtVFJYOG5KUWItZ2E3OUw4N2JudDZjWGYxenMzU1pzIn0seyIuLi4iOiJSZ3FMSjNmRm9FMDUxOWFWS2JOWHREb1diQWJMZjVjNGdZNGlfWTY4MkJrIn0seyIuLi4iOiJUYkZVeHcxQTdVbUl3Qkl4UEt2UnRXQW9RNGplTDJxQ2ZIN0IyRENWMHlzIn0seyIuLi4iOiJVRzE1MHpXbkRIbzk3YnAzZkFzclgxWlN0R0lwOFUtY2k3a0tFMjhQeFFzIn0seyIuLi4iOiJXYVdnVXpWT1NBMk9JX2w4SVYwVU5wWWtHSC1JMkVYMTV4ZldOemNSeDRBIn0seyIuLi4iOiJZMWMxejQwNjE0Ylo0WVp0dkR6SjZYWjdOZmhtX1lTMzVjajZZZVFDVm1rIn0seyIuLi4iOiJiX1J0V2dxQlItc1IteGVMd3lFU0xZLVlVM0drV1NMWTJPOXJHVFE5WEZVIn0seyIuLi4iOiJibkE1bGZfcWpxQ2JhbTJpbjNQaHBsbXRDYWJmRXRvZUQ2SUNCVU9oSHRzIn0seyIuLi4iOiJvRV9WRlZ3VVYxY29FelNqMEh3SlliVld3ZGNsTDBCV3FYUVRmSnZvUE1jIn0seyIuLi4iOiJxVjdkTVZzbEh6ZndXQzJxMHdOMTdiVnpEWlNvVmh4cFMxQUVQTjZKajF3In0seyIuLi4iOiJyV3NNeDdvOV90c3h3SVJCWW9fNFVVVTFUYzItY1AzdDJBOEloUkwyLWhJIn0seyIuLi4iOiJzQV9EZDFXN3VSa3M2ZGR5UG56dXhxbXV6SzQyUzRUTk9BMXJyRGJTVExRIn0seyIuLi4iOiJ2MENmV2pNWFJXUmMwN0VNWmVRZTJ1RW5hc0xIMXVqalQtMmFFRUdlTWRZIn0seyIuLi4iOiJ4bGhieWhiWFNPdmViVnVVMDRJRkJ3OXNQS1Nod1BiLWN0OGo5UU9heXlNIn0seyIuLi4iOiJ5OEFlWHJoTXpaQnhMdDlPSWxYZXk3WGRmR1QzaDFlQlVGdk1mRTNWWnNnIn0seyIuLi4iOiJ6M1Y1bktiU2ZLMk00bzZRUFVQclRhalNqODFja0tjSGVPNHZ0V0hNTXhRIn0seyIuLi4iOiJ6UmpUQVd6TnZLLURwNm1oMG1qQU9jNzRsd183TkdzZmViMUhFSGZVRDQwIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIzZWZiYVhpcS1IYUhjSXY5U0RIdDhoY1ZNQ0pIRGhPMnhUako4bnpuSFJ3In0seyIuLi4iOiI1X01ZdmJnUVo4MVJ3ZFVQUF9ZNWQzY1hXRS1rT0FVMC1TSHdaeFNuaFVjIn0seyIuLi4iOiJVanNBQi1WYTctWUJrQkt4UklmT1RGbFpkWFZhZ25rRTJOUW5YNG5uSnMwIn0seyIuLi4iOiJfUTBBVmRNTzEzTnJka2pXcE94elVuY2FobXhWYXpjTTBOYklOcmxjMnk4In0seyIuLi4iOiJpSGVtLUhXT01DMmZDUmo4OVFVd0s1STQ1QjB1YVV1RnJCTGF3SWpsRi1JIn0seyIuLi4iOiJrSy05aHkyTEFoR0pzTlZTVHZxNEJBZzhoODUtbzRtZnkwQjdkd2t1YkdZIn0seyIuLi4iOiJyLVFRS0RZaEh1eXBsT0wtYk9OTGhWN2tzdUlmODYxci1hcGQ1YVpIQm5vIn0seyIuLi4iOiJ3Zlp0a3FpOXFaY05yT3BZbENaQi1DWWI1VGVUTHphdldkMmc5YnpVRUlJIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.DV7F0qhjmeq9AAptXNipqC8dEn8kHO3iJoUsM-gLx-6y4EraygBBO_g18ClA7zKCSxCHvG_Ki3BT_kBBOp5sNw~WyJiLXFFallpbHgtLTJ1S2VhbnpCWkFnIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJfV04wYkx3d1A4Skd3RDhEemN1TFl3IiwiMTUtMjA1MSJd~WyJ2aUI5WU5jU1UwdW9idXY4T01iVGRRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJPX0RDRUZPOWV1MVVIWjIyekZpaUVnIiwiaHlicmlkIl0~WyItQVJRcm81dktpVzRVeWN1RDZRZkdRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJFUjMyci01Uk8tV0J3U3h5dnZlWl9RIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMub3RoZXIuY29tIiwibm9uY2UiOiJzaWdfbm9uY2VfMDEyMzQ1Njc4OWFiY2RlZiIsImlhdCI6MTc5MTg5MjgwMCwib2pjcF9hY3Rpb24iOiJzaGEyNTY6WTZidHVKUENxb0tfRlpXZlNzYVlLbHVJVUhHbUZpcGNWWlpFSG9BcUZDRSIsInNkX2hhc2giOiJGcUxfNFdnMXVYemM0aXV2dHlxQU1CNmtLajNVYlkxa19VeE1fUFA2WkpnIn0.csunBFI-H-gnq4HrF9Wz0YFnqxmUeOEuMZHzycYOnFmDF_vnK4oOVw2mdw_wKf9v2VxJ4VOGFc4O_lJPLb-4lA",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "ojcp_action over another job",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjFyTXZ6bFpndWF0bFkyZ2xIakl0bGJXQ1c0V0JFMU1GLVdQa2h5UnNrNlkifSx7Ii4uLiI6Ik5VcUVxY05oN0FHU3o4WlZnaDl1Q1NsR0VyNXc3OUZNY0NvYzczZWVLeWsifSx7Ii4uLiI6IlJMOEUwcVdQczRsNXB5OTJ3b0hEWWk3RG9ZV3NPQlgtb2lDWU55eFdpRG8ifSx7Ii4uLiI6IlQtb25TMWxjcnNoSHEzT2tRcFZrRUJXN2lEdGtzblAzbG1Db1dXU0JudW8ifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjdURGVINXBtbkdrTUpvMXZEMnFveUdsamZNRUF1UWJuZ1d0SzFRRDNGS3MifSx7Ii4uLiI6IklnN21WbF9iOXFJZktnUWpUVTBNNUtISG1UbG5mWXFERWt2cXhVOHo2RFkifSx7Ii4uLiI6IlJqUVplYzU5UFRLcDlCMGRhNy1HekU1RVlzZWNwX1VIOTVGYThMMk5uajQifSx7Ii4uLiI6InZJb3VCblZGQ3ZLX1p4Uk04Qk5qUHMzQUFPZHk1NzNTRmdkVjdiZFFTSmMifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiM0JCZ3I5T0lBd3ZQNGdrdmlTOG1ZNWRiRldETGFuU2Zwb1kyZXM1SFFTMCJ9LHsiLi4uIjoiSjBrRGpCSmJJWk1WVTM2NnE4aHE3SlItOEExMVV1bDgzOWU2X05WTzRycyJ9LHsiLi4uIjoiVjlWeHRJdHRXUUlPYjRZVFNPNFA0LWg4cUNjWVU5MTRHN0c5ZUpWSW0zQSJ9LHsiLi4uIjoib3VJX3drTUNQQk5PdXYwUjB3U0x1SFdhMTBpbHA2cDloRXpHSGgxTURmMCJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiMDBqZ3BCQjZ3Q3lKMDF4S0xRYzdvLTZSd1lDNk5oakh5ckIyVjNxbDlsZyJ9LHsiLi4uIjoiME5zSlNZaEtBYnpzelpRVXVfa1kzZEwyZ1ZhQkd4ZGxTYUhDZmZTc0gtNCJ9LHsiLi4uIjoiNzZTaFpNTlkyMmZPc1UxQWlUVXU1YnY2ekRMWjJrNkNKN1BpdWppTG5rcyJ9LHsiLi4uIjoiUEFBR1U3SVpfYnFSSEgxdXVEWUItcll4OFh6Y1VqNHlmNmQ1bG9QUHNqdyJ9LHsiLi4uIjoiWWZ5bUpkNzVkTjJBUXR5TTA3dC1vbE9FSUE1Z0ZiVndvWmFwYWhjZ2FHVSJ9LHsiLi4uIjoiaHphdEtMaE1yUXdZdVRndHVaYkg2V1NTSGhrXzNURDRjZmF4di15RTh4NCJ9LHsiLi4uIjoia3F6Q1pkRHdzMmpjR1F4ZTJjb1lDcUlic3EzUlZXcHltMkl3TXBNVmhhWSJ9LHsiLi4uIjoibzBvc0UwaWtYaTgtNHl1ZG5BaXpONHNRV3JwYWpKRTZ1OVJjLTJaSDdkNCJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIzZTFWTngtdmVMU25DZVMwVS1PWGJLTzNNU2xHRW9VVm5jVXRCNXF3WVkwIn0seyIuLi4iOiI4eEY5cUtsUHFRZzhkVWcyY3QyaXRSdjB5M0NUYXpyVVA0QkVYMUFZZ1RRIn0seyIuLi4iOiI5VC0taHRwYm5jMkxjUnVNYXQ2bmxod2YydnM0bDNZSXgzODFLUVBCOV93In0seyIuLi4iOiI5WFl6dmZJVFhnU1hyNGVBaXZDeEpRS0w1azRubjZfVm5EbkhnUDh0WUJJIn0seyIuLi4iOiJCU3RVYUVQVlY4V1IwRnYwZERhX2VzcTdxQVo2dG1NWXluWWd1Rm5ONzNBIn0seyIuLi4iOiJCeHNZckE0WTJSWUplbmpGbVdDcFZVSmN6MjRJSG5JdzBLTXRvWnJOSnpJIn0seyIuLi4iOiJIcXNXYUxOMXVYd0JETTMzLVcxMWxNZ3Q4RXRyMWJNZDhsaUZoa0wzYWNRIn0seyIuLi4iOiJJQmxuVmZPNGRaSTRKVDYzYVlRcWZnTENfMFMyZ2xseGVnRHNVOVZ1SzdnIn0seyIuLi4iOiJKQlVTNElnR1R0cGRrc21ETEdpZkhOcllYWUZoZDhTUnk0WFMxNmFZaGhZIn0seyIuLi4iOiJLVUFrdlVsU2pwV0hYc1EyT3UyV1R1WTFhM1JtbHJDWDhrazZtUUltUGdnIn0seyIuLi4iOiJLX2cyTFI3c2U1ZWY5VVhuaC1SZXpJYzVuZzIwcm01Wnk5c0ZRTEROM3V3In0seyIuLi4iOiJMS216cERpUkRzcm9qNW5fODJjTDZ0bjJhRjFSaEUwazh0amRMTG9LSjAwIn0seyIuLi4iOiJPc3M1eWtNQ0VjX0JJcFlWWWhKUWI4VVFNVXpwUGQzWGl4Zm9lV0lwR25VIn0seyIuLi4iOiJPdGFnbGtaOE5PakNOM3dvM2RhTlRUbjdTTmI0VHVmYm52STYxdkRpUEl3In0seyIuLi4iOiJRdVVFRmhoUkJ5WHZVenNKOGsxMnMtdThZTHBoQ29HM3d3QUlrVy1UeEM4In0seyIuLi4iOiJSMWExMURtdE4tS244Ym1tQnFxeDlLVnJpWDhLdWZvcnAyZWJRNUhfNjVBIn0seyIuLi4iOiJSUWlyWWZqVVZXZk1BbUVwNG9JZmZWbW9oc3FsXzhQQkNWV2l5VjdRMGJzIn0seyIuLi4iOiJfRzNHM3g1cDN5VUJ3OElRUkNtRkVmUU5PbE1IWDFZMi1oSnNnMW83bU1vIn0seyIuLi4iOiJhWXhRYUdtbW1WSkR2OFpiSEVYXzZYNm54TjZXMVlRMDRKYVdBdVp3dl9ZIn0seyIuLi4iOiJiQTdkc2NEMXE0cW5qRVFKSTRVQUJLMTFGSmVCY0MxbnY5Qy1PR1RKTkNJIn0seyIuLi4iOiJkOFFJVVFDdEJjVFB3NFM4NU5rT2VMNzRRY3JaMlJvSDVLbDlrdWQzdU13In0seyIuLi4iOiJlazNOR0R2Sm84N2s2R2dkX0dSN2ZMNUM4QmNmLUFIdlctSHBlRUhvWHpjIn0seyIuLi4iOiJqc1QzRXl5TkNUcVV0ci1VZ3IyX1FLZWd2XzROSm05YTRqMXEySFJia2NZIn0seyIuLi4iOiJtRHpBeXc5QnpFQjh5bzd6WXpEYkdzN3FwanJlMk8xeDdmVWFWRXloQVh3In0seyIuLi4iOiJtSUdPVTVoSEFEWUZCWDhqN05aRTlkYkN3WHpqQVRseFdmWGRnc0xVNEw0In0seyIuLi4iOiJ1ZHZseGQzcFZEQ19BR0psRW14T01Zam81NEg5cnp6RDZwTV81ZTJwUjZNIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIxbTU1V1ZzTExtMW1yWjF1akljeC1lQXJkd1BXckcxNHBVQV9qdk9KVlh3In0seyIuLi4iOiIyaFVHZTVqR1FFNTZSZjNGZ25PMXlhZy1yUXYwbUpGY2xyTmNreWlPemtVIn0seyIuLi4iOiI1X1dHOHZONUV1SWY1NnVhR1RjUFRBRzdvaUNyTTBTMG5qX29oeGIwbjhnIn0seyIuLi4iOiJFc3NSMmc0MkRoN09EV3RWcTZrZ2pYTnBvbGE5YkkwSVlUcmVtbTFnTHEwIn0seyIuLi4iOiJIaWpGblhFLVV6NzJLZnRuVnhPX29nU2YyaF9TcWtadmZ6LWRDd0pHMUJVIn0seyIuLi4iOiJNYm8xN0RjUkt6M0M4QW9seTA0MVhlVi04bEZCNEJKUWMzS0hOUHVjMEZ3In0seyIuLi4iOiJVMHhYMXJPUTUxQ1BWUER2MC1UM2xtTm9wUVlrRExXTHBPZktBSmNQYlRvIn0seyIuLi4iOiJkSlUyZ0plR2ZBdjZCYUU0eGpveENrbzlmMy1qRlhycDJabzdUcXduUXE4In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.IkmwFKXrO04xPOxUjMht920FZPQ3ALfI8fObqgzEErQ2Rc6p5GvVSnPI-Rn90vEHKsCO1uqF33tPCvN6zziRJg~WyJPZFpCUGhvZGI0YzFZM3B5T3ROZW9nIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyIwQlp1Ui1UMmd2SnFlWTJ6bzVRVW5BIiwiMTUtMjA1MSJd~WyIwcEduWTUwanJldlVTb09USDQtREhRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyI5MXVIQmdGeTdWeXF1STV0ZWV2ajRBIiwiaHlicmlkIl0~WyJGei1MQXB4Y0xzT3pLUTROWWFUdkZnIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJoT2xNSlVxUmJYUkl4cjVqa3BSXzJBIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpjMVlVeGlDTDVIUTlDSndxaWtHTzBBYkNjajhQVGVQcWRZSTh0eWl3QlFRIiwic2RfaGFzaCI6Il9KSzFuT0FiQWZUa2hhbFJPSGY1Mk1ObDRXU1VWdG5rSDhRR1p4SDhmNXMifQ.UYOSHwBZNkLe4zdZtk0uGyxkN5SYUGlVaO0ZD_Y4YGsq-BWSWAzBGnVq1MuDSjQtKurWUsC2q5vjusCl8g8m1A",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "KB-JWT nonce is not the signature nonce",
+      "expected": {
+        "kind": "replayed"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6Ii1wTG5GaXZNSFJWTHpMRU51VGJNRWNZV0pHejhvSHlZeU9lbTBQSjRQbXcifSx7Ii4uLiI6IjRwMjhhNFBQQTF3N1l3VDhLWTVCcFVidzFHTV9vU3FfcUhSOGhZeXpVYm8ifSx7Ii4uLiI6IjlzUUVKOXI2N2R6Ullsam5wZWJIUXpzMkR0dVo4WE1vQjZNdkQ4OWowU2cifSx7Ii4uLiI6IkVEbDlUNWFtRmN0MmRfak1TOUtEMncydDJJaW82bHVoUHVRZ0tBVzg2WTAifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkVUNEw0UnhybHdqVXU3djduYk1LeVFYM3ZjUWJkT2JGU2gtRXdqSEE3ZVUifSx7Ii4uLiI6Ik1zNVhqWEdQODVmWEtPaXJSUTQ4RFlzaU5STmZ1R3VsZTVHOHplMXV6U1kifSx7Ii4uLiI6IlZVWVpBcVJxWi1sVDNKTEw1dldlQnF2R1pZVzhfTnA3MnNiZW9MRC1OSTQifSx7Ii4uLiI6InRTNDlabDhGSEJOX3JkUDE5T0xydnNHcjlVOTdPVHBKQm9JRTBoY1d1bGcifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiRzVlOVpLXzhkZVM3NzExU2lSdV9iM3Y0ZTRid2F4a01EOUdHcDZNMFFkVSJ9LHsiLi4uIjoiR216bkQ4dzBOd1E4Mk1zS2ZRNmJYSGZndmh1TTVldFlrMFhldzVLZFRXayJ9LHsiLi4uIjoibExYNFdzZ1BOSmpmQk1YQVNYYzRhTWxkVnRJTVZrQ1dFNmdiWGlfYXVOcyJ9LHsiLi4uIjoid18xRWNBbkZaRnZ1M2c0T0JtNXdYS2g1V3dxbVZJVTk3N0w1aEVkZFV5VSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiMHJIOFJrblJlWjE1UWFpRWdJN2x1cjd4bF93R25mWWltQTZEUW1aQU9nMCJ9LHsiLi4uIjoiRENGX2NCQzZGdExZcGpnVnhmV3RiNzFsdEtLb202RENSWE9uM21TakdNcyJ9LHsiLi4uIjoiS2hDaTJiSW9HWXRkOHh5UmJwdXVrVzJQSlBuNWVMZ3RiRm1nZWc2ZWZtWSJ9LHsiLi4uIjoiaTg3NU5kNlZqR1ZrUnEzaVlYSnpZYVhrUmo1ZkFybllEd2E3bGpGUVQ5USJ9LHsiLi4uIjoiajlNWlhpc0x0VXVETUh2ZHpJSG1FcHRvdjJURU1zQW45X09qclEzU3cxNCJ9LHsiLi4uIjoibDBld0lXekVENlI2TW12RWhEbG9oWTQ3Y2FLd3U4ck1IdzNqcDVkZVl5ayJ9LHsiLi4uIjoibmM2Q08yV0VNb0pSVUdNRGQtX3VsMkhnaEFKYmNraFpJOTVMX0czOUc3NCJ9LHsiLi4uIjoielJIdnFDdVJGZzZfWGF2Qjd0NlNWbFRXTGRVZ1ZZaXBhZU85T0c5cXBEdyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiI0U3ZMT0FrakhmNFhnYzJ6Vk05NVFMcnRVZGRSbmFTQUM5bE1NNlNGZzBZIn0seyIuLi4iOiI1dDUzTUt6bi1PMU9EcDNNSWg1c0UwYWhNMjJMQ3l2TW04NlR0UkJ4ck1nIn0seyIuLi4iOiI2OE5qYTRCdGN4MFNjdVdWalRxdGt6VU5nNVFyajN6LUpZbnNxWVNFTVB3In0seyIuLi4iOiI3WnlraGFYMGhUUTJqTUNqMWhKa2lQTE9aYUJKMnpIY2JMMDM4ZXFfaFJvIn0seyIuLi4iOiJFNnRFTDJGc0F3aEgzNVhLWWhFMkx3NEgwVGNCMlIxNkZ4aEdYQjVOcjhnIn0seyIuLi4iOiJKUGt4SEtHSzRDSU1RbjRxUW40R1pKbkhXbFprbFlXTVJhbTZPYmZSUWpRIn0seyIuLi4iOiJKcDNMLTVVX0VPTlhIRDAxbXJvSnZJcXFxaHBZQjBlMzdVMktDbng5eXFzIn0seyIuLi4iOiJQZ0E2QWRBRjFEYkpyYWlWZ0lqQ3Y1QWZxNDJ3Y0pzQUxRMmFHTmtSUEw0In0seyIuLi4iOiJRbDV0OUZJVlRIeTJRUmlkQ3dpTy1qeEc2dlpPS2I2VWl1RFA4OHoyZVRrIn0seyIuLi4iOiJST0JpQXUzZXFSajA5WHZsRk5qQTZkcmtENFU0YmlMbDNjQ2tOek5CaFBFIn0seyIuLi4iOiJTZ3cyTFVjWS1ZVkxqYzBVcGpKdHRRSHJrTzBjZHVldGFKc1FJR3pNYmZzIn0seyIuLi4iOiJUWTRKLTlnNEQwX3FScC1ObzVnd0laUDZfVWRsS0VJaVg3SU52RHFPeWhrIn0seyIuLi4iOiJVX1pIZEhId0RWWTZTbzRTd2hnaml6MGFOT28tLU1tZTZqb2I0ZklZbFY4In0seyIuLi4iOiJXOS1qSkVHd05XWHhhZ2dWcjdjdEVtWXlfaXlpMHg0SGo4ajRDS1BkMmNVIn0seyIuLi4iOiJYV0pUMFdlWVZDbG1feHhrY3pZbU1hbnhpNDBldDNOTXByTTJESzMyVzI4In0seyIuLi4iOiJZSm1oV3k4NE9zVW1zWm5IN0kyc3prTkVPU09JVGdCc3JrZzNJUUNmS1BnIn0seyIuLi4iOiJZa3RzMThEeUhfcUNIYU53TzBzTnJwaTU3cHRsZnlSV1hMV01RQXU1WGNVIn0seyIuLi4iOiJiLVJpUHFrd0VxR3FpWWFoNTFlWC10Y2wya2o2TW1mVUI4VmJvYVpSbXljIn0seyIuLi4iOiJnV1Ytc2toeFN3b0tic29FRklGOHc2S1M0RTBkTnZyQjhvenZoUnEwTFBnIn0seyIuLi4iOiJoUTdlcVpsSTd5MUxQaHdCQzJyLXdzTnNiQXRMdWFFQ3dvZkFPajZUYTU0In0seyIuLi4iOiJqMVhFS2k2cGJ5N3dyNW95UHF4bkI4akI3d2JLNkNpUHF2eWJjTFZzckZ3In0seyIuLi4iOiJqVFM4dTlyVWZ4V0xqQWhiRmt1YXduNXBlbWxKQmNrWXNqbjMtRXJSemw0In0seyIuLi4iOiJsUnh6TFFtb2EyZ0JWMk5ubnVYU1dHdDc5b3Voa19oX3VMX3FyNGpiTmlZIn0seyIuLi4iOiJtMmZVTFk2TDd6c091NHhmdndaNUFrZm85MDZ0eUtBN1FCcnpueEdqbkE0In0seyIuLi4iOiJvM0F2REtEQWNDbl9TbFdRUDhxM0RDMmo1LWQ0QjBId2toSkhCUV9xV2tBIn0seyIuLi4iOiJvejhvR2JoaXVWSk1pMDJub2NBZHhDR1d4WDFwLTJLVUlNQk1kOGpOM3prIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwbUdKU19CV2J2RDVxR0ZKZnBNaC1LSElVNER2WFlsQkxPWlA0YmhGWkxVIn0seyIuLi4iOiIyVk9wWm5yLU1rMlpuQmktdXRZajFhQXNURng0aEF1ZEdETkZBRngxaTNNIn0seyIuLi4iOiJENUtFSUpkczllUXhVWWdrZUJQQm9ibXR5Y1BSYVE2Sk1ITU9jVjN0eGk0In0seyIuLi4iOiJGcDBZaHBrb2YtMDZIUXVabEtCekRaM041WVpFVGQ1ZWo3ckFCOG40WkhRIn0seyIuLi4iOiJIUGx4NHpuMVVlaHhnbWZ0Qzd1MU1kUW1hQjg0NnBndXRic09KZENET1pzIn0seyIuLi4iOiJPXzdSWGxjSWR2SlpKYnpLNnBNdmFpQWt4bk1rWmlVQXFyNHctclZGMFJRIn0seyIuLi4iOiJ3dTB0dm45MU9kMVMzTmdJUUVzN05ad0I4V0ZVU2ZEQWV0SmNDUGZvVC1zIn0seyIuLi4iOiJ6b1ZHUnFHbnBTLW0tM1NHaWpwWXdMUEItelczM25pUi12eEloMDUyb0VJIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.qA2nLZ2kxk5i-byBOyVgSo3qEfhBtB0d5l6XPNAylzLR00dX_8GsElZwxjIPeAsN-wphHhOdh3quyOTJHNG4WQ~WyJkYTRpQS1zcENuVWt4ZkVsS2pEX25BIiwiMTUtMjA1MSJd~WyJ0QjZfVEJfazVjSlBHSUpLRnFGYmNBIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyI1Zmp0UjVRWDZVX0cxVjdEc0RTbjR3IiwiaHlicmlkIl0~WyIzTUNReVY0MDNsZzV4SXlJZi1vVUZBIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJ3dkVpOGRXT3VaY1dnRW5KOU5GUlZ3Iiwic2VhcmNoX2pvYnMiXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNvbWVfb3RoZXJfbm9uY2VfdmFsdWUiLCJpYXQiOjE3OTE4OTI4MDAsInNkX2hhc2giOiJudzFUTm9YQ1R3V1VRbEZIcmhUOTQyZm1oSGJvNkxJTUVUYWo2WllnX3lNIn0.s0ROiDChfhbBDymvX-Jexq8gSmhoxO4yrn20jKYqq_ay2DADLybdYst7ffdyvhcJ5LOro_PPAb2hWzTtG8MWiA",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "search_jobs"
+      }
+    },
+    {
+      "name": "KB-JWT nonce is not the mandate_nonce",
+      "expected": {
+        "kind": "replayed"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkgxcHY2NjBUd2FCbDl5dEczckhLWWh6M3V2NzBvaTU1SS15Qmh0ZWdXVjgifSx7Ii4uLiI6IlloQWRrRHBuMG80cUJUUm5yZ3Awc0hzUzhneVN0Rl9pT3plcjVaNlRiNVEifSx7Ii4uLiI6ImljU21pcWQxOUdoeVBWYjdmTE5FLTdFamsxbWJsZHlUT2xULS1OMUFlZTAifSx7Ii4uLiI6InZTNWtFVEtfSjVHM203ZFNoRFRNMkxlR1pLdEkwUEszY0hQQ2dFcFd1WncifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IlBLVU5nU1VQVm50a2pUVkoxX1czdkwwWWVULS1QV2dpLWxSUFAtbVA2T3cifSx7Ii4uLiI6IlJJdDN5dXVDMDBTUUVyU3NKM29FVk1Ubk96LUNwdndsRm9hTkg3Z2d1VHcifSx7Ii4uLiI6Im8zY040LU9DOTZYTVl1bnRVcVp2bnVVVDFoRzRjSk1jYmlybW1Xb1YwZm8ifSx7Ii4uLiI6InMyNnZrdW9ra0JpMzNGaUt3c0lKbjFfcmpmWTFrbFlvZWFWaUswbGR0bm8ifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiT21GN1RyRmZaQVpzMWwySDVWRXJBT2F1Zmd2UnZNX3RJcTM1dXdOVlNFbyJ9LHsiLi4uIjoiZTRJMUlzeDVPN2x0Z3RybGRLd1RPXzVnSVhDN0g0Y1QzaUp2T1p5cVVpdyJ9LHsiLi4uIjoidnNyVTg0MnQ1cGtOSE1OU1UxT3l2S2tpUHNGYUZFemdFRzhzYjZlbFJobyJ9LHsiLi4uIjoieEQtOXVkV0hES042SnlkOEtnWlloY1J5bVJyQkYzWVUxUlc5akpReTk4RSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiLTFsbXRzbU5POGNnaV82LVBJR0RSXzZOY0JNNF90eHRQOHNXdEFJLUNTTSJ9LHsiLi4uIjoiMVFpS1pzdWQwSm9tb3lhUVNIYUc1SnhpMXppeEw4LWMzSERzdWRYQ0ZodyJ9LHsiLi4uIjoiM1pIRENuYTFhU0Y3YTc5WEw5QzBod01melVpYkZvQXZQSHhwYjhUZFI2USJ9LHsiLi4uIjoiZUhZSTlVYkdFOEk4Mjl2N1Y3VnFvaGFHaWliTXhETmxHbFFLZFJkNy1NNCJ9LHsiLi4uIjoiZzh6aGx2Tmo5TkhaWXpqcW5GOTJTcWhXRVV0WjI0cW9acFoxazU1XzFBUSJ9LHsiLi4uIjoiZ1hhZXBfb0ZOM09KZDJPR3B5aVlBRDcwaGRCQjJQVXlMU1A5ZDBLUGo4RSJ9LHsiLi4uIjoid3o0bGdkUmJjRmNtcTJNVTJJWWVRWF8wdkFsdklHV1FIVHl5d0NhMzdpVSJ9LHsiLi4uIjoiendSaGhyU2djWFZKZjZjSFYyUEFBMklacVlGQ0VSdjM5MUU0U2k5Zk1VVSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiItZ1ZLS0NhbER3QTB0a0w2LXZWQzBBSlU4SkZEVmhYNnE0dzNub0cwSDE4In0seyIuLi4iOiIxTUtsTkVhRHFKWG9hUFNNSmpZdGdTOXBDLWtOX2VTRXRKT2N6dVpjZ2JnIn0seyIuLi4iOiIyMnhGU1lGSC1DRGZ0QmwwTmloSDNwM0VFVUNsQzZyaWxhbEliUG9WVU84In0seyIuLi4iOiIyUUFGWHliV1pzYnc2cG4yUHBUWlhrQklXNndnRF8zcnJlYW5yaVdhMVFZIn0seyIuLi4iOiIzV3ZLOTJ4VzFpNXhvUEpLczlNTVJwbnY3LWZPSzhXdkZlaXdUYmdYeVZ3In0seyIuLi4iOiI3T1hta2tLSENER0E3WV9lVHdBTG1NVUROeWgtbm1idXl5Z1NMZWVkQTEwIn0seyIuLi4iOiI3b2c3UlFJY3A2SmZ0ekZ1Slp5VU52a0l1NkxEcGJMSGlnam9ucTRXYlZzIn0seyIuLi4iOiJCQlJqUWVmaElLa1hOVUFZSDRIRDBKUmE5RUJ6eUM5eFB6WTVoTjVEV3pBIn0seyIuLi4iOiJEZFVsZ091SU15RHZlRkNMS3g2QzN1Mm9KQWR5VzIwYnZJQWxaTFE3eFI0In0seyIuLi4iOiJJd2lRVWhQVFh4aHlVcWlPM3ctUm9oVXY4b09rakFiUFNheW4wLUY5T0VVIn0seyIuLi4iOiJKVEllaU4yOWVxRkJ0c0ZHWkUwRTJTbGdmNEhrVXBTWHZMc250S0F4dWpNIn0seyIuLi4iOiJLNXZadHMxdDNFWGJLbDV1YXY5cHFUcHptZzd1c3R6bzdkOVNWRkdUTElzIn0seyIuLi4iOiJOUWJTQkU2Q0FmY09yV0l1cnd3MWpzZ3dZeG94U2diV3R4YzVHcFg5LWFZIn0seyIuLi4iOiJUbHl2ZHhNc2RUekx6ZTJjU1hsQlFoUVB2SDRUaHN0ZVhaNElIYVJmMDdvIn0seyIuLi4iOiJVMGt1OEkyUFNac2NPQ0NuY2sxVTAtd2tMZGNzc2NqSnRxZEdzbzVpNTFzIn0seyIuLi4iOiJVWG9BR05yS1JPNkJ0T2cxZDZHd0pvVVFvdk13WGk5RmoxNTFoMjhCcjhzIn0seyIuLi4iOiJVcVItN2ZaYXp5d2JzUjEyQlA2QzFmQ2dUWGxQUTJlRWpaRWNaNi1wZHNNIn0seyIuLi4iOiJWUmRpZTY4YndjRGtQa2VmWkZTSXVXY2FNZU5kY09JOTlYZWEtd2tpRXE0In0seyIuLi4iOiJjRXpTc2JsSjkyeGd2TFZLXzVCLW9XRjJrVzltX2FXSHlXUFNJOWY0UV9BIn0seyIuLi4iOiJmRUJrOXRSR1M1eUxrZFRRTkFqd1p5TlJ4blk0UUllbDlmRVlhRnRTRjVNIn0seyIuLi4iOiJnM1U5U3lFeFFPNnJ3X3hDdVRfa0FXRjUwazdCcHFPMlNTSHBZNGNqdXI4In0seyIuLi4iOiJvbUczR3AxanNTdXJZcDRHTE10cUlIMnIyTGVaLWJ6ZlYyR2h1VDlfUmNvIn0seyIuLi4iOiJwS2UxWkVraktVckljTTlIRWVnNHJjQVVBbjlkT1VYaDROejdoMUZqWU1RIn0seyIuLi4iOiJ2cFZTR0wxVGJvbUpBWnJhWXpmcjdudkE3bGFBalVheFctMFFydTc1TzJnIn0seyIuLi4iOiJ2dGpjLVVjVVRMU1M3MFZKckx5VlF0TVhsc081SXVIeTJhSmpVTDc3My1rIn0seyIuLi4iOiJ5UUY2NmJGZ2lpZUQ4UzBwWnF5R1VjYjRLTXQtTnA4bTNTWmZIa21UQnBNIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiJIdkdPaTFJdlh1UTZPN0JlUExNUW4xRHd2WnVSQmlqcEM2T2NlNDgtcHp3In0seyIuLi4iOiJTWmk1dUdhYkp0UGlhSEVIOFBGYzZWbFpRZXU1RmFhbXZzamt0WHhmYTM4In0seyIuLi4iOiJTaHNpeFI0N3VpZXhjaWpXUFFFdS1QMG55aF9jNjVYcjF6YTdQX0dIMU40In0seyIuLi4iOiJnRXNoOUJQV1dOd1JSakhrckVJdDRVclMxcGU4TFZMdG1lYzVnYXBYYVE0In0seyIuLi4iOiJqMTBMWlFBSkN6RU5YUHJBYlA0ajByVk4wZnZnQW5WMGhSVkpRRjZQVjRrIn0seyIuLi4iOiJrNzA3RWpLRUpIQmY5aHBpWkF6LS1ud3hLaDJjdTIyakZySkd5SXZ6UG4wIn0seyIuLi4iOiJwVkpILXlySGJTb19yZnVVNmZGaGw1Y0liUHdFbXlnR1luZS1XYThHdFpJIn0seyIuLi4iOiJ2VlhzVnpvSS1oNy1TTjdvYVBXbTE4R1UwbjRQWS00NjVDWmJKRHZUWFY4In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.G1KknqsAbp8AXavp-Q35I9HOQQOPZKqiKlEaOMIYCHgxm8VMj1Ux6jgMNV0xHW-GeHWiW7Aczhc-PfOTFTWIfg~WyJVTUVubFdrNkZ6WmszN0RNM1J5Z3pBIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJzLWNZVU9pc3M4dEFDMUxpZ0wxTDBBIiwiMTUtMjA1MSJd~WyI5U0xEVHN3eVdyQ3U5RUxlSWtPRndBIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJIMXpoV1RLSURPV0JzZHpORVVoTmxRIiwiaHlicmlkIl0~WyJXT0g0d29EaDhVXzhEWjBqNHpMNHZRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJNSll1cWw5RW9FanU2cGFiZmUtcFl3Iiwic3VibWl0X2FwcGxpY2F0aW9uIl0~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpnWmtOMmt3ZXZqNUxOUzRBNUZWb0lHeDNWYl9HV1EzSGZyM2JCY1BMSllvIiwic2RfaGFzaCI6IlBORXBvcDd0d2lUbEpIRWhaYmEyZUxLcFowYXZWMGdfWTY1bWNTMGdpZDAifQ.3VNc2yL-9DIZtjPdT56o4UwI4sWuTbevxMxfNvZdKDLm2n5FzbnSzvA5Tu29Lg6hOq6M9Mdn6WUS4FIcizTLIg",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "submit_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "submit_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo"
+        },
+        "session": {
+          "application_id": "app_abc123",
+          "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG",
+          "binding_actions": [],
+          "candidate": {
+            "email": "jordan@example.com"
+          }
+        },
+        "submittedContact": {
+          "email": "jordan@example.com"
+        },
+        "hasEeo": false
+      }
+    },
+    {
+      "name": "KB-JWT signed by another key",
+      "expected": {
+        "kind": "invalid_signature"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6Ik1CUnZKdk9NSDhHZkhXRlZlbDV3dFV1SmViNW1helF2TVpfVDhqT09CWU0ifSx7Ii4uLiI6ImNrckNha0xyOXk2VE9LekZtbU9SZmFTQ2IyWlRDakhjRDNUTzFZMjZTLXcifSx7Ii4uLiI6ImN6cTQxSVl0NWN3Z3NQOWwwY3dQdnVKY09RQmpBR2ZhV0hhREtKOVhwTzQifSx7Ii4uLiI6InlIelU2bDdVUEdVYVNWRTFwSEkxTjFwYTdITGYyOEo2UDljdDJudVNaQ0UifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IkNoVWt4WXJvV2dKOFUwY0RlYVhqZ1VUUVdaQmMtbmJLd0djUEtxeWpCUk0ifSx7Ii4uLiI6IlJPd1pnMS10NUNVVVhJQlVaZk5PZEtibzFpOGhHWHc4SHV1Y0dCS1RJanMifSx7Ii4uLiI6IlhiY0RYemdSMWVsT3pjRndJaFIxWHhKU3VvaUQ5QlVoQ0l1MG9wbm5WWG8ifSx7Ii4uLiI6ImREdVNoSVY1R1pNeXJBMDFMOGdNclREZmlZb0wzM1psOHpJRHVnd2w3YTAifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiWlQtSG5EMGtobG1RYzhLNm9uYUx1SFFVTHAybEpfbFlSWm9ObHVwQUs1WSJ9LHsiLi4uIjoib0xzdFlyb3hfcVR0b3VWOTFSREVJLXdJNGgzMEI0UmdxM1NSajUzbWNKYyJ9LHsiLi4uIjoic29mVzdROVNkWElMTVlqRFZqbloxOTBJb0VVdG8xeXdTdmNxTGtDMFplRSJ9LHsiLi4uIjoieW9OcUJueUJncW1oVlNLc0JhZDZRQlhQblppTXlic0RLWjJuY2d2dlliWSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNnotei03QUNtckEwUjdOVWdRMFp2cTBuS1JiejBNZ2hCQXhPc1B3MmZxcyJ9LHsiLi4uIjoiS3pyVXBMYkZlOXlValJXUThRRi1ZckRBYnVlaWZOTVNjQkhCSjNnWHJ2QSJ9LHsiLi4uIjoiU2NNbEtWVWw1TW9DZk5fRms2RWtkMzg1OGkxVVJhVmZNVEJmM0VPZV9mQSJ9LHsiLi4uIjoiWkVUSXJkODRXekNtUlB3RGM0ZllmY3pmQWFST2lZbDZIVnN6YXUwSGVmOCJ9LHsiLi4uIjoiX252X1ozOVFkdVNBMFZUWWFOVVRoYUtkZEpyVmNnbnc4T2UwSmtvTlNaNCJ9LHsiLi4uIjoiakp1Rkk1dll3b0hWdUpEaGVQTi1lZkx0dXhFVU44b0pacm5lSmF0eFBVUSJ9LHsiLi4uIjoibGtMWXpkelVEcEdGNUxMMnBwRGZFaHI3ZG1pWUNQMXE5NmRGS2NQRkpzWSJ9LHsiLi4uIjoicGhic1JRSE5DZnItTVNUbDRUWmw4RGQ0aktXZE1ENy1XVjh1enFueGtWUSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIyVXBuMTh4akJGUFV6X0puNGdvZ1Q1eWt5R3ZtSm43dFZHWEhIQTRFemh3In0seyIuLi4iOiI2Sm4ycTJ2WXVhOXhZTXRDRERneWNGQlp1b2ppLVZpQlBtdDFjbkZfb2FvIn0seyIuLi4iOiJCazZCdldYdWx5SnpYenNyZHpSblBOME5BWEtVX2llLS0zNVJFVUprZEpZIn0seyIuLi4iOiJDdUpxVGRoMzVsT2lLYzZ0Qm55RHpYN3g1VG1CTXM5emNFd1Z2X2FLRll3In0seyIuLi4iOiJIXzNFZTdidEhtZHhyRlUxbkZ6Yi1RVGViYUdFU0NwMUtBNUp6YVp0cFk4In0seyIuLi4iOiJNWnlZYVFOUzNNU0czT1BQY21WZkhxQ1JMQkdxbDRBQlZ1NWtfUFg0bkxzIn0seyIuLi4iOiJRTXZ2bmoyRmNVNXE5VU80WjBicGJzM2wwOWFXNEo0R0szcmNadkpZUVRRIn0seyIuLi4iOiJVOVhPWWlaOVh4VmhPdTVUYmNJSWRtOHRJYnZrVlhuUGxIZGRjQWsxSFFvIn0seyIuLi4iOiJWQUJhbHNHU0hKMVBBWDlzdlpEQzVTWkhkSUU2bGdpTklxZ1NOVW5DVXVzIn0seyIuLi4iOiJWcm5qVlFfemdQX3ZWeHBUT0FJNjQyclFVeDU5T2VOaDlwX0I1WkJQdUFFIn0seyIuLi4iOiJZa25ZcTNTdXp2SUNKSUZWQ1gxU1ZSVWZtOFJRVENuRWxuazNRQTVpbWs0In0seyIuLi4iOiJhanR5Q1FwUGFnYzZpQWpBNVZhZ2NVUFl5eUliNm8xck9oeS13WEpGSmVRIn0seyIuLi4iOiJodjFHeU9jUDJTdEppVE1xbklpckV3Z1BLR2NjdDZZaDFCc3poMU1VQ3ZVIn0seyIuLi4iOiJpY1JWMExLRFFVTUJZSG1NQ1NRcHZ0VHRxNUR3R0R5WWRtc25GazV5QlIwIn0seyIuLi4iOiJvcmxsS3hFMGpCMW84RzBrclJwSG1PcFlZeTg0a2ZYS0JXR3dwU0J0M2E0In0seyIuLi4iOiJyaTBwYk9JOVFiMUdGc1JwSmtQdlJYTFprZ05RTEhjWHhWVUprQkR6RzZRIn0seyIuLi4iOiJ0OF9DSE1TYzl6V3NuTWxMei1Cd2V4d045SmhQUm93Mms4RUxnUGtNT1drIn0seyIuLi4iOiJ0Q2xkbV9kY0poN3dOYXBiSnJSXy1hRjlDZlFFTURpbE5Wc1k0UUgxbG5FIn0seyIuLi4iOiJ1SnY4bFVfTG5rZnFiNDZrZl9yMnZLUkNIMUZ5YWlSemVleHBTREE2R2tnIn0seyIuLi4iOiJ1T19LXzQxdU1Hd19WcGRoaDk1eGh3a0xrS2pnaGMwU3FLeG5VTWpGMHM4In0seyIuLi4iOiJ1VEhEU3dDbmdNVENGdmdtQlowYVZQU3NTdHpLNmFfUm1iTjJzRy1iUWt3In0seyIuLi4iOiJ1eEd1dUtGZ1dwOVhYMmlsZXVZdXdWeWxJMGktOWNib2lUUElGZnVJeEYwIn0seyIuLi4iOiJ2WWRMVGtVQ1RWNk4wdmFtUUJJWklEYy01SFlRYVdIYThfOXdocllxU1AwIn0seyIuLi4iOiJ3bThhVy12ZjhCd0Ntdi14c0xZWDdGeThjSkpWTk5uOU5na05vdzBHWnhNIn0seyIuLi4iOiJ5WWc1ajhRVzFHT24tTXRhdk03UW9wM19fdF9leGpzeWVNSTNCS2UtYkdjIn0seyIuLi4iOiJ6eDhZQzhjaWNRb1hUNzdFYWkwQkRqN1ZQWGNmNENvWGxlaWEwVW5qUENVIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwVWZNZUN3X2pnU1FwdTdWVHM2N0QzemNQRFVRbUlzZUdhMU90azBaaWhjIn0seyIuLi4iOiI0UFZKd0tSdG1NUlJaVTE0VFBsaUUzOU1oWWc3TWdmenRMSzMwQUZRVzM0In0seyIuLi4iOiJERElDSFJJQUlYVWZFN2dEczd3ZVhxNWZNOV9wLWtHNmYyQ2tfMzVVbnRrIn0seyIuLi4iOiJPSV82dG5kbzRzWkgxb1pyemZiLTBnRzFsRnBaSmNUcWJ2OTRDWF9uTXk0In0seyIuLi4iOiJRYlRIMGFjVFJyQWE1MHNxOXZtMm1oZnd3MHZseHNfRXRlVHlGN25vUHBVIn0seyIuLi4iOiJVb0dkeGdSQnFWcWxYaGkyaThULXRWRjdSajFQZUNGUzdHbTI0Y0ZPVGprIn0seyIuLi4iOiJlbnZwSzNwWjFZVmVfWC1VUkZxWmlxUWNlUjFGRVA0N0xEYmdmMS02UUdNIn0seyIuLi4iOiJ3eW8wVzZMdUcwMVpyb2FXTXZJYy1mcTQ5Q3pHeWpaanFkTjdldkJfandrIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.pl2eMYyarEIOOLE0w1rbjjjEpEmmCf6zsGx4-rRbLiGvkB1vggpEFmFR3AE3sq6VtA56DWQzHCtC4ilyhFV0sQ~WyJJNVFjaDdZdFcwTno5eHhOdFlpZDR3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJtZTcwYjcyaUV3cDJBVHliMXNwUkdnIiwiMTUtMjA1MSJd~WyJJQ2ZDVG1hSXdOSkdSWkdCSm1zb0RnIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJqazlJVTFQOWQ4bWoxbTlZWm1FcV9RIiwiaHlicmlkIl0~WyJMSnI0eVRVbXJrMFQ0b2xSZHJwTWNRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJ0T2lLc1QxS0UwSER6azliVEhqUy1RIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IlZEZXlXeUt0WjVtN004OVNOM0R3SHdmaXA3UmcxNVJTeHhYcllyYUJJNGsifQ.8r1HTIfyaNZOukAt0gjKwDPeZeGxjzYzSSzIMgVkYB2DrWhiCeVaxeepf8NatqyaPlMQ3x_OwlEXR1jp5eaUgQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "cnf is not the request's signing key",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjhLRk9WYmxqNWxWY20tZndoLUNjVm1WQmZMa0d2SDJPa2dUMlVOemRrenMifSx7Ii4uLiI6IkdjcmptT1hxTlVpV0xhQjlvWnlDVmZyUllrem1uUGFJNDBJQ0NyOFNqdGMifSx7Ii4uLiI6Ilc2eWE5NFY1UkQ2Y1Z3Q0dlNHo2aV9oV2w3UmZEOElxTi1udzdyNk5PV2sifSx7Ii4uLiI6InZKR3hSZ0U1clM3TjlHdGVjc0d5Mjd6dnRISlJpaWpfWlZCb1BUeFFFdGMifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6Ii12RUhCQUoxMUg1cTV1RnZLU2ZZTWk4NW05NlVybVhta1JOMGJJWGJEcEEifSx7Ii4uLiI6ImRWc0tWZDlidmgyd2NFb2FmcllRSXlOQ2xodkxqNWs0Sy1QR19LRGRpSUUifSx7Ii4uLiI6InA5OENTbVFWd0Zra2RGSFVWRnFzLWRaLWVrYjVmV1BFZmlHRld0WlRrZlEifSx7Ii4uLiI6InB2c2htMW1rYmRVWWFxWUgteTNDYkRPamJvd01kcnBQRTlMelZJdDQwUWsifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiMV85d0ZIcUJ1WDVzekxGT0hMTEZ5eGFNempVdnYwWGtHYnE5cWJaV2VVNCJ9LHsiLi4uIjoiNjBFbkNnQW9VX3A4c3V1TlFQVDJDdklEbnVZeVpTajl1XzdaTmpNbDBodyJ9LHsiLi4uIjoiaUZjY1dFdjc1cUg4T1REOWtUTU1fcUllemV4ZGxydEZJSHVldXpjc1ZvWSJ9LHsiLi4uIjoicVlQYmlyaEdQQVpyMjg4M0tqU1RtcTc5OE5LR3JnTmRITEJzbmY2WkU1USJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNGl1U1ZYcEpSRVZSYi1lMVlicklFTWRhWEc1cmdWcWRCRVJ2S0hUZzJFWSJ9LHsiLi4uIjoiQ1psVXJXT05vSHdwa01leW1zcW42d181MUFuZ0tUbUpVVTY1cENyLUpBNCJ9LHsiLi4uIjoiRVZMbmFiR0NSWTEyWGpRTWFodzlFSDlaUDRoaXZ1TVh0UGNkWnBwaTBRUSJ9LHsiLi4uIjoiS0gyTmpGN3ZybncwUTVfQVVuNE1vMFZMUzBvMUg0X3VSTjRxaWNlNGhHTSJ9LHsiLi4uIjoiXzlkUkMxNjhwcUx4dGc1Y3JPbXZNOHFvbV9TVGkxeW1KRVQ1SU5HTkZWVSJ9LHsiLi4uIjoiX0hjR3BBdFVyZkJZRDlRZl9OTGFKOVFNNDd2R1lXUXMzYnB1ZDBHWFQ0WSJ9LHsiLi4uIjoieFRlc2VtOEFUVmpjYVp4Q2NZb20wd3BHcGNjY1k5Y3dZSWgwdTFUaXA5SSJ9LHsiLi4uIjoieTJOeC1hQWp5Zzd0QkFsR3c0aFF1elA3RUg3WlNFN1V2NzFjSXduR2ZVWSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIzVFRLX2ROQXljYVotOXFYSXJYdmJpTGNGS25mQUdlXzJPWG5VWlUzbW5BIn0seyIuLi4iOiI2blRycUlwLWVJQ2hibVBXaEFtUTBVdnhUVTZINUF3ZlpQVXFTaGRPYU1nIn0seyIuLi4iOiI2emJFSnBVQXhSeUd0dmpCRzgxYWVYeDdDUlA3cU5aX2U0Q3V4MHU0QVBrIn0seyIuLi4iOiI3OHNFSXZ1XzVsMGM3VTJMZE5jVmtadU1PZnlmUUtvMjBBb1dCSVhMc0ZzIn0seyIuLi4iOiI3ejVKSEhpRWsxSVZldE5lRXpwZm1HN1AwanFyam9jdUtWQkJ2c0hmbk1vIn0seyIuLi4iOiI5cDgzU3oxbVlNLTkybnktUXAyQnBnV1RtWWJuR0ZZb0hxN0doUnhaazNNIn0seyIuLi4iOiJBRGNCeVFQc1Ztc3ZVOHd1TmJ2clM4aFE0WFphQVBuMUlTamYtNEU1SVZnIn0seyIuLi4iOiJEN2JuNE1IYlFUdzZfWThRaVhOODQxY1ZEbHAtS1hWLVhScm5oYTlxeTRFIn0seyIuLi4iOiJJRFl0MnRlOURBSWlvRDUtQTlsQ05qenRHa2tVMktQSmVNTVZ1MHpTanBNIn0seyIuLi4iOiJJdDdqdy13MFNZX1Bzc2VFa1FqN2R3amlLakVqQTlTUzl4WEE1VGdyWlg4In0seyIuLi4iOiJMcVZxcU1IUmZTYzFLMFp0Tm1hbWFjOTcwaXMxU1VsZWFiMXZKY2Nadm53In0seyIuLi4iOiJNSnJDT3FGWXY0Y1ItazEyQWRLTG1rNHMzQkhhNXJ6YjdNbWhOV0ZCVmI4In0seyIuLi4iOiJQNWt0RkVnbnphTzFlcUJJYnlQYjlHY0dfVGJ3NlA4clluOExnMjdoZkVBIn0seyIuLi4iOiJTaUlKMy1aUlpGbVo0Z3NsdzgzSjNFRnNpa1FyaFhjbWpieUlOS1dXSlJ3In0seyIuLi4iOiJTdzQtSXdFcHh2WDY4XzdIXzh0cWszeHROYUYtWTM3TE4yS1BxeFFrbzVnIn0seyIuLi4iOiJWalFvUHpfenYySGpqYm5fWWtQWjVPdW9iZHFKSDA5c2VOQUF5UUtPUXdnIn0seyIuLi4iOiJZWWcxamVqZ0J3bk9fMEFvNExQaHMxb2ZHQkNHRmdmSU1fY1VEbWJicW8wIn0seyIuLi4iOiJhNC16YWc0UkFWMEJaRGVSOTJhcHVkLVREZ2hsV2dqZVlmQnJuVmFCa2JZIn0seyIuLi4iOiJjUU5UNFF2dXpiNk5BRWpzclR0RGFEcXY5alh5WnNZc3FzZmFGaHpJY2Z3In0seyIuLi4iOiJjb3hyVVV0S0d2WUlJTHB3VVd4ck1WbEZKakZXX3BSMHZNTDF3Wi1kWVhrIn0seyIuLi4iOiJkUkczeUJfYnRDR0VnSnUzZEN1c0dwRWQtTHV0R0ZFRU84alV0bVdWNDZRIn0seyIuLi4iOiJlUDlKZTIyZlFYU29RVkJ6VkdmTENjbGt5OTFqYXBla1hkcUVUc0tkOE84In0seyIuLi4iOiJtcDdPZUV1NVFQYjB4Q3pPRDR1LTlqYXZPOHMxYzhzM1lOX2ZCS2VWbkd3In0seyIuLi4iOiJvLVp2SERIUDRkbWRBV2tLTDl5eEthSDFZLXlrZzJ2aUNBX2Z5RTd4TnA4In0seyIuLi4iOiJzV3BpbEJxV0p6RjhOTHVlVzJGWTFrN0VSSW5HcWRiRDNsSUFsQ09lQ2tnIn0seyIuLi4iOiJzc2xiV0pWSmY0YmZxQTlJT3lQM2liZ3lJcDNfZkw5alBlUW1tbXptV1lNIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwUUNpbVF4UmNmV2ViYWFmVWVjb0xITmxINHg3SGtJVGFod0xyZEZiekZvIn0seyIuLi4iOiJHUGJLUkh3UXBuX2pDeXMzZkw0cXRUYXNNdnRVSlBQUjBoN1ZVdmJtQUlBIn0seyIuLi4iOiJVVzhUeHhxRGdRdjR1Mjc1YWJCZ3VySFNuQXhiTG1jNkdYNkF6dHByckRJIn0seyIuLi4iOiJleU9kWVFrOUxJUHdxNEczX3U1WVFZaW9wajNLSFgyallYTXRZd0dJa0JnIn0seyIuLi4iOiJpZFp1Y3NfRjVLNWVSRHFISUVxTFlid2tXVGQ1Y3hMbmx3UlpVeXBEVlpZIn0seyIuLi4iOiJtbkFjQzY4MW5QQ3BEcUJpQUNOdEZEUzJveGpNSldPVWdBVmF0b0lNQnBZIn0seyIuLi4iOiJwa3EzVXRVbUNXVFpWNGhXUzZlMVhnSzUxUjVZLUxPZXd2SnVFMzRpc3pZIn0seyIuLi4iOiJwcU9fSS1OSmMyaEllWVpWRS1CcnpWV3pRZHZ4cHZoWUM2eVdOZ3N4X3lVIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.nlWSNPV38ISnDt-YTwqkEcb51EZpEZZvo8aOZANKYmUsM3CvBwGeqb25vpniPwF1eO31p-AORZWMq91xSXUnUA~WyItVUN4bEh6M0xKN1AxWXlKN3ZYbklBIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJ2QXd2VWktOUhoRl94bEd1QzNpdWd3IiwiMTUtMjA1MSJd~WyJPRjFnR2xLYllFQWhnRTB0Q1l5emtRIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJza2FXNm5Rc0IxMlB4NTl1b1hENGhRIiwiaHlicmlkIl0~WyJkSl9Ud0hlV3Zfc1BZQ0ZuRHM5NWpRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyItcERQVXZpUW1SQjl4eTRONGV1M0NBIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6ImFKWE1zbmFrZUU1U0NhZkE2T3o1Q3RsT0x2bDV5LVZWZ1NMUURVT0tqdEUifQ.XofVf2x2axTPHy_cAzf5b21MIT6xYB04jP_MCtdw2mYGTADUKZ3gcgCjUlp8wXCCZ4taP99bipV7YszofDYmMw",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "0Qj27SBixY3Ug9NTwXd5ZLJUZsJfUsqCL2f4LoqCI1w",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "3r7ocP7xY0Z9aiNfSbGvxMXXfCRgZIOUHLS8Kp4UFm4",
+            "y": "hxvs7BLBHqxdsHLClzovxrGNfZLSqkKlETWXFYDt8Tg"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "agent_id differs",
+      "expected": {
+        "kind": "binding_mismatch"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IjNCV29vMnFucy1temVLVkc5cWRKZkdELVE3cEoxWHZhLUxSbjdZOC1EeE0ifSx7Ii4uLiI6IkdZYWdqRkhrVUhaQzBhUE50aEJmQWczeU9JM1JYZnFHeTRqVDdlU0FQTjAifSx7Ii4uLiI6IlJlalBDWWpVRVpXUU1oMUVMVTdmVEJHVmVHY21CdnhHemZZTm1PM2xsZTQifSx7Ii4uLiI6InBPUHdPc3V0UTdPMklaVVpFUXlFU29mMHZYbkhQckk2RVczb3BUVHMyTlkifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjVVZXY4VG51b044QmM5NmI1c0tyNTRBdDR0QWFmOWZIVTRydFFwekJ2ZkEifSx7Ii4uLiI6IjVrR3RKS0dzWHkyeDI4V1Z4VzlNaXlZMnhESjltTUtpbDRBSDdja1ptWkkifSx7Ii4uLiI6IkE3YkdEMkZ2Z044eEFkQVl6bTBGNnp5VGdsQ2JIdlhOVklSWVpWcWdVNTgifSx7Ii4uLiI6Ik1wYV9ITUg1WTh2M2taYU5HNzJQdWdwVnV1cWN6NzNvNUQ1OVp4V2NYSlEifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiSXRtV2pJWXliMkQ1TnNSTmNVOThmTUZhTUdHYmJlQXdROUxyMGdhUE5tbyJ9LHsiLi4uIjoiUEdpM0JTQXhaaGZQZFhKYXJiZ09pOWFFQUZOZmt0ZWt2aVppck84cmpKUSJ9LHsiLi4uIjoiaHp1bE83YzF0WlZ2YVZuTGs5MUVTWjRlbXhYNEkzVUFCcmNEMGE4TUFENCJ9LHsiLi4uIjoib2NMeE9wS1I5ZDdNWTJjTTJtTkh5bm50SVNrVkVsazFlQUVWMTBSeUZIdyJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiRDQ1RVZPRkFsT1Vld0tWc2pIRm5UcERSVHhUYmUtdGh4WTZkd0xHc3QzdyJ9LHsiLi4uIjoiUkhOeDhvMUg0My1MaFg3UTNxa1phQmNpU0NzWUVvN1NxWTRtSWd0VUVXRSJ9LHsiLi4uIjoiU3dpYXo0bE5YNlE2ZUdLUnRoLVNrWG5vQmdRemRyczBMZlktUk5zMGZLUSJ9LHsiLi4uIjoiYjdfeU9KejFHNmMwOHlUdlo3dmxlV2s5V1RaR0NPNjNlWGx5Y08zQmRadyJ9LHsiLi4uIjoiY09sLXRYdE85Nl9uZ1pvRTZWVTZqM0FhZjQ1aWFRODBicWtvajNqWjRWUSJ9LHsiLi4uIjoiZUprQ2tqZHQxR2U0R1pfT1EtNzNaRDNieWJTc2ZqRnV2RWZjMWpnRjRrQSJ9LHsiLi4uIjoidXJZRTZ6QVh1OFljMUx1emNFSHNpQzhKVnVlRUpMNkFMN0lqS2xVQlh6NCJ9LHsiLi4uIjoid0E0dkktQ01JSzVvRGxDbFZuMGlvVnhLb0FZOXpmSzRsamczSjZJbUJpcyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIxOWIwX21mRnNtd3lPLTF3TFpLUjFfV0hHV3VQZEJUTGFncG56dEhOdEQwIn0seyIuLi4iOiIxcURvb05jRk9NdVpHeUk5dmhmajdSN0gwTVgwX01EdHREY2xQTDJGQllBIn0seyIuLi4iOiI2MDlxSEFacW5FM3NtRFBEaVlxcFRVT3d3UTNJMlBvZEt6WG56dzJzNWo0In0seyIuLi4iOiI3MnY3V0FONDB2S0hDcWlmNUtySGtpd1JpYzNCUk4wd0NzWThIRGlvX1lVIn0seyIuLi4iOiI4VWV1SGZObjdfTjhtYzZmWVdiNENSV2xRWllnNjBhTGwyZC0zNEg1VGo0In0seyIuLi4iOiI5a1pWUG1fTXZNd1ctUVFOMGJNN2VhZlRleVlFeFJGUjkwTkk2bGpxeDM0In0seyIuLi4iOiJBOHJEd3JWcV9FeFMya3YwS3BUbmoyWTlWTnNSak1Gb09DZlotR2J2Mm1nIn0seyIuLi4iOiJCS0lXQllfVDhhVjBhdm9wa3EyLUlnbEtTMzJvM3gyVjQ0eDZycUtYZVNNIn0seyIuLi4iOiJDOXVPR2pnWlJ0WFJVaDZONE5Rb0FDTjVORFFzcTBtbWhzdzBHQllEU3dFIn0seyIuLi4iOiJLcnJUQjdYTzhmVXlXWlNOQ2RmQnU4bHpKM3ZBelpnWUdBZUZLVzlyMTZNIn0seyIuLi4iOiJOTFh6YmJMUy1QcURVd2YxZ2pLSk96a2U4ak5ocnh3c1dtdzFiT19QTGs0In0seyIuLi4iOiJPSVl2M0tMeDdDcTYzajczNkxXLVJDdGM2c3NvLXFaN3llbUU5R0gtZUVnIn0seyIuLi4iOiJQNERpV09WbVhaMGV2dUZQWkFWVHlLYzZENXE5OFRNM29jbHBha0hGVEN3In0seyIuLi4iOiJSQUFWRDFHczc1ZmRsaHhuc3VmYkduOTlQZVkyLTREalp5UENkcFNCZVVnIn0seyIuLi4iOiJUTU5XdWJuaWJEZEtiYzFqMnR4Y09MMEJST2lGVTNFTzhPdlZ1R0FGQzNNIn0seyIuLi4iOiJWY0k4eFRodERxZUVLZVlFZERBRTAyWlprWUVWQkdSdUdwbnpSbU8xdFM4In0seyIuLi4iOiJZM0tPOXFDYUxkcEJMbnVPNkFSN1BQT0c0SEVNZmlkc1dQWUgtSllScklRIn0seyIuLi4iOiJhdXR4cG0tZzJEbEtadDl3bDZVSnRKTzRDSkU1Snl2QjNQaF9rY00yZEtVIn0seyIuLi4iOiJjNFV3cEt5WWRvTmh0b001UW05S3VoMlkxZUFWVmxsMU84aEdnekw4N2xBIn0seyIuLi4iOiJoV0E5WmtWRWRmV2h0a3NWTlRGdm5NdjVEbVE3TjlULUtuQ2JmZ0l1R3FJIn0seyIuLi4iOiJpbF9LaFZfQjVma2Jxa3ItRFZZakZGTEFFdlkzN2Mwd2RNZDBySUQzcW9jIn0seyIuLi4iOiJvQmFTOHlQTHdyRm5rUzRtaUY1M0dreFg3UWpUSDlxYmw4WUh5d2RmUHdBIn0seyIuLi4iOiJvck5KWTVoUXNEM3FMMHI4NlE3Q005d2ttTnpJVV9jR3dBc1lxS2ZSZ04wIn0seyIuLi4iOiJ0T3NzdnJuU0o2QWFUQUdxVDlMb1hJOTE0ZnZfM21YN2dfTWNxVGhZTFlVIn0seyIuLi4iOiJ3eWJIR3laMmdhbVBPT2xOSkswSmlUWUszU1V1OElxMFNoTnVRQWtBMjVvIn0seyIuLi4iOiJ4QllWN003VW9rZFlmaHo2S1lEdnZkZkpkZEdZdUUwNnhJS3FrOWNUdFVJIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIzY18tNmRjXzBnZ3BNS0d1Um9wYVVPZEsxc3ZpdGZidEk3b1ZMaFgtc1ZJIn0seyIuLi4iOiJUSHRsWkp1RE9jZGlJal8wWXM4V3ZxV0tZeUpjRmxlTl83VjNEMk1maURJIn0seyIuLi4iOiJYM3RmSW5ISU5COHBDUVk1cEI2ZlBVem5WVUhneEhPWXhWc2tyY0J0a3g0In0seyIuLi4iOiJkczg0UEJ6WkpjUWRYMHlPVVhZN1FYb1gzRVVGXzROaG5Yc2cwVlNjRGdRIn0seyIuLi4iOiJqQi12VXRTQVZpT2RXeExSQjQ4TGxIZ21JNkZEakNlYm80d1c4NERjU3lVIn0seyIuLi4iOiJraTYxSzduN2swTktuS0Q2a2VCeUl4VTRwb0xsbFhGT0F3YnZFZXc2b1BJIn0seyIuLi4iOiJ4ZWFvby1iWkk0aVlNcWN5RGFyNUFlbE4zSzB4emNVYVdnOFpKbHZVOC00In0seyIuLi4iOiJ4cjlnNjVwX1BlM2J4MW5wNm1GMGtkcXU4Z1lvSDhZWlE1bjB2dVZqQ2ZBIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.OPuwTADiFoj29Jj5gfnYthbLxKPcTiBRIKN2cVuXxrcieg5ZuBfIg3rbz9ZbV3hLiGiDRBiOQmR_9GLKg4OPJg~WyJraHBjTTlRSEJLLVI1WHVlTFNsdXB3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJDZHJNdE9TQnhnOEpad3B2R3ItWUVBIiwiMTUtMjA1MSJd~WyI4THlxMmNoMlpySV9vNU90R2t0amZBIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJ1UWFLZGR4enozNDA2MVlVQjZCX0ZRIiwiaHlicmlkIl0~WyJDZnBOeFJpWDlwOXNWckJINGdEVlZRIix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyI0RWVidzdxZEVqYnhlRDVYeVQ3bVVBIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IkFPZUhaNHZ4Qnhpd3BxdVpZc2x2T3pGVWxkb3dZQlRvSHg1ZEs2dGFCeTgifQ.a-mbceGf5LHqXeBHZ31TM11BTgKFZGn71iVVkv4NQD81tJEBejywhFx_C_wMUcI1-MifZy_V-gX59bG1YGTwsQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant.beta",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "revoked",
+      "expected": {
+        "kind": "revoked"
+      },
+      "now": 1791892800,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjY2NiwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkppZ2ktV1lVMGtycEZRb18yRkxvOUh5NWp2LVc1T3NpNnE2dk9wbTBiUUkifSx7Ii4uLiI6ImNLTWl3VVhlUVp4eW0taFE5c1dwd1BYMUV1YUs4YjBnT2dzWVVmUUVKUEEifSx7Ii4uLiI6ImtmempyNXJ4X3pzV3hackk2RVVlRjUtVVNDRlp1aTRQTGpGb2xKME5CZEkifSx7Ii4uLiI6InBvMFlnUG1GWTQ0X1BQbkxqbW9rZmJPZmtmYXE5ckRROEFaYlpqT3N3S1kifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6Ijhod2V0c0F6OS1CTVhYUTRmbHZUS25nVXk0N0xRcV9DdVJFVjA0dVRhaXMifSx7Ii4uLiI6IkFFTFoxWWVUdk5MR3luWUtrZkE1Rm1BWDdvMGp6YnFNTXNWaFl3MFRoeTgifSx7Ii4uLiI6IkJIS2VBRFZRV2F2a010QmZYaHRtaU9yYjB3Z0Q0bjZ4ZUJmZDZlS2dnMDAifSx7Ii4uLiI6Ik5vLXRFU0ZlMF93clU0ZmVGZFFETVNJbU5wTjJlZUljWWhvdDlQRzQyaU0ifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiMy1MVFRvbHlFQXZmb3l2cUg1VWhBLUhaQklUYl9VSXF0aDhteUFPOEVNSSJ9LHsiLi4uIjoiRzJXRWVtTnpnd2ROVXh3bmRFTUg5V3dJNnRaMEN0eHZmVV9FbTJrOE5wSSJ9LHsiLi4uIjoiYzQzNU5YdUtLQXFjdmRHTXo2dUtoQUU4dVptU2I5WU9jcTBOdGNjMFVLbyJ9LHsiLi4uIjoiZWVZUnU2Wk55NE8zeDB4UUkwcGdFcDJibmt1b0taYU9vQWVkTkZsLXJyMCJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiM09Kb2Q5Zk01dF9RSUs3NmhTMUtlS3N5cGxmY1NGTHJfYzk1UGFoN3ZMWSJ9LHsiLi4uIjoiOGhmYndpQkxCc0ZlS3hleldiTWgxZzhsS25GeGVHZU1LV3RFTlhwMFBnSSJ9LHsiLi4uIjoiRGxsSkQyMEM3LWQzNF9kWTV2aWZMWXZ4OGhwZk5XMGdPbWNwTE9SeGhkUSJ9LHsiLi4uIjoiUVp2OS1fYTBsR3N4bXlSaTE1MlJvV0FKZVJzQ1FCVXVQY1NRbU41eDNxayJ9LHsiLi4uIjoiV2ROMWQ4NGc0elhjNURwMlVlTnZNRWZITkZCZDY5elNoV21oRnVPQlNwTSJ9LHsiLi4uIjoiZXpWcDROenJIbktCNEVkXzE5ZHFUMUl6TGRSZUotU1NqQ2UtcVVxcFR4ayJ9LHsiLi4uIjoiZmZhZ1haYVBfSnlMemJ3REU0WnpFWjVTRV9qczFVb0ZPb25tTG53YUpNOCJ9LHsiLi4uIjoibjh2Nk4xV1hsdVJOazJObnVXSlJsR0RoaUEwODBnZElva0dDc05iUXR2cyJ9XSwic2FsYXJ5IjpbeyIuLi4iOiIwV1hGUGRqX2RCeXg5aE5nMWMxUjNWQmdXRjNmSUs1UHlJV0RPZmhuYnkwIn0seyIuLi4iOiIwZnNMZWdRbXFOUUFjckJvNFRFanlQMDAzZkMwRGhEZXhWdFVFS0lrX1dJIn0seyIuLi4iOiIzQlpHZ3o1OG9IVmIxV2hVek96VlQtWmxfeUFoVnNZM1JaZHk1Zms2WW5ZIn0seyIuLi4iOiI4TlQtMDZ4bm1KUTBnOGpubXdzbHRkT3dBYnBRRFBJal9yRzNoSGJxRHdrIn0seyIuLi4iOiI4V0QzcWxCdGxVQ1Q4U2tCbVI5QmY5RFJraUxxcmZJaWJRRnRjN3RpWWtBIn0seyIuLi4iOiI4aDhjMWxPYjY4TFZJdTRfRmhQZ01xS0VWN1g2ZXkxQm8tYXZXM0dsaXZNIn0seyIuLi4iOiJBWGVaY1YwTTFfT0RUSklQSXppSE1VWXJKazNRVFVwZEZKekdobl91VERNIn0seyIuLi4iOiJES3ZtOGpjVllvQ1JmNkhSbjJkNS1iTXhjczBMNi14eXhXcDhMMUswUUxFIn0seyIuLi4iOiJGUDRUc1lfdVBtOHhyLTgyWV9UdGxRd1dQano3MDlSeVNYWFB2QnlBOTBzIn0seyIuLi4iOiJGUnUyRTlITndiOV9ObGwwQkFHZXR3VVZ2dXM2cXZTY240T3RtQmYxS0drIn0seyIuLi4iOiJGY0d2WUFNSzgyTy10SFdhV2FBbVp6c2dZdC1kRzBsaVdyMThLTDJSZWRRIn0seyIuLi4iOiJGaVB4Q0lJU2RMdUR2TkRuSzdmb0E2RGdKaG9JVTgyWlcydmZzdEhINklzIn0seyIuLi4iOiJMOE5WNXYwME9LUmI5RjRZNTBaLXN1QTh1bk9VWHhrUzd3WFppek9aMW9JIn0seyIuLi4iOiJNSEczLXFXNkdZQW13OUw5ZU1mWG9SU004TjRucWZkT2xDMXg2MUhWUUZrIn0seyIuLi4iOiJPMFYtZDdxT1o1aFE0aUF2VUpuUjR4enpsUHVRcnZZYklSM1A0X1o0c2NJIn0seyIuLi4iOiJTbWZjUTVHcDhrRjZYdlRWdlpVM2FXcnFSV2dBTGRnRXZkNllITkxkekVzIn0seyIuLi4iOiJXQ3hvZTFZV3d6TE1mNmxRSWhGcGkyQ2pyMmJ3QUFHSU1EUmZud0tlYXJBIn0seyIuLi4iOiJhZy1qazFsRDNVUWRaTGFXdmJsQjl0MEZQaFgtQTFJU1RJZGg4ZERfa0hjIn0seyIuLi4iOiJkd3gza2NmNkhDcGp6c0xYU3hmWXg2SHBqVXd5ZzNtREFCMGM3cEItQm5NIn0seyIuLi4iOiJmUmFzQVdfZW01Z0xaR3Rqb0FsS3JTVmVpSUhfSFkzM0FkRElpTWdkVW5BIn0seyIuLi4iOiJmV1NSRjNHeWxmbmNuNjF5UkdpYnZ0dVlxeEhzV1VkVy1IZTlpbXkyWEs4In0seyIuLi4iOiJqcHAyc2dSSWMwcW45LURJUzY1WUNKN19kcnE2dkYzNzZyX1Q4OEdXUGJJIn0seyIuLi4iOiJtclN5MllhcUFCdGVqcVNfbk00eEZDN0x1X3RXWGx0YThoX1ZMZlZCVnZnIn0seyIuLi4iOiJuYjdKUXMwZDQ3N1N1b2MxNFJSMVlnVWkwaDFLUWcxSVlOemhCcWdZOWhFIn0seyIuLi4iOiJ2cTgxa2Jnd25sbG5jelo2cFBiTkdwcnBSbjV3TVZRdlRDZ3JNMnZ0ZFlZIn0seyIuLi4iOiJ6VXpfV0J2d241aXdxVnJOT1hyV2JkM2xxTVdXUUc3NDFsb3duSHpsSTljIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIwcW1idi1HNENaMzU0bW00SmQ1Mk5nUzN2bGFZNFU5WlFCSjRVQXEyMW5zIn0seyIuLi4iOiIySnZfUTVVV3pnUFpJdGszcEtVOFdfUDJVbFQxV2E3Vm5zN0x3ekZXX0xRIn0seyIuLi4iOiJGbmo2aEp3V3M5Z1o5Z2dNT0x2RWNyVjh5QndrNWw5aU0wWlMtTGk4LThBIn0seyIuLi4iOiJITVN5cnRGd3hMM0kxalZNTVJWNHhZY1R1MUEwVXMxY2xtTTFTZkFRRldjIn0seyIuLi4iOiJLR3pGNHl2NURuOFVVWll0NTZHdktRTlpLU2VEc2hCUURxV2ZYVmhlWVY0In0seyIuLi4iOiJPaERxOU1QeWNidElTdkxCYUFzd3VBcUZoTWJ6ZFRyLTNKMFFPRTVnWjhjIn0seyIuLi4iOiJkLVBSZVZaQXg4eVk4QXdwRHpGR1VNdmNiOTFYdjBiZjVDUElXdFFDSERnIn0seyIuLi4iOiJkU2JZc1NYdVhpQlRDUzlMQWJlV2ZwbEFJb2NBa1JQbWdGaWhENzFEOHY0In1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.6r0fK59meSBqaSM32whK12fV00VBmWmKJ2vFTxvD1spU9xaVXRLsXxLegSSMvIAk2mXk34fEWFkreFljvqL0uA~WyI2TEZCaDJia09hbVNxSWh1Y09pdmVRIix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJRU0RVVF9uc1B4c2pZZG9CTVBLN3VBIiwiMTUtMjA1MSJd~WyJlWVUyQ2RWWF81V3JMVWFaaHlKSFp3Iix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyIzRmxNeFdKNDA1MG93akI3eV9wdjVRIiwiaHlicmlkIl0~WyJUT2F1TkVYWHRRMGgxdzdBNlN2NS13Iix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJfaklxQU5Bd2xLblZxNkxnRUdpS2tRIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6Ii1XTnI2Z1czLXFTM0VwSE5GM1FlVm5ocEtUN0QwdVBWakZkTmtNZ2Z4RTgifQ.t5CSw24wMiN6WRQaSk467YK_yr70EK-H88y3d2x9coMXo3Rd9o53ou9-CpIXg-RJYM75hFWWRGKr1ObznONYkQ",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1791892800,
+          "expires": 1791892860
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    },
+    {
+      "name": "expired",
+      "expected": {
+        "kind": "expired"
+      },
+      "now": 1796083200,
+      "request": {
+        "presentation": "eyJ0eXAiOiJkYytzZC1qd3QiLCJraWQiOiJ1S1g3R2VQalBVUFo0dU5MT05yLTM1Ry1rV1ZnSWMyVUxaUWdJZ0FRTE9vIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL21hbmRhdGVzLmV4YW1wbGUiLCJ2Y3QiOiJodHRwczovL3NwZWMub2pjcC5kZXYvdmN0L3N0YW5kaW5nLW1hbmRhdGUvdjEiLCJ2Y3QjaW50ZWdyaXR5Ijoic2hhMjU2LWhSZlMxc09NeURvN1RCUjhhVmM1VGZSQW5mbS9kbzluUThqY1dTT3VVNXM9Iiwib2pjcF92ZXJzaW9uIjoiMC4zIiwibmJmIjoxNzkwODEyODAwLCJleHAiOjE3OTYwODMyMDAsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYWERyZXBVNXI2YjVlSWNFWkxYeU5IdGNIdWJvOXRZQ2F0NjlQalU2UXFnIiwieSI6ImtBbC13dzExRjhBV09aNkJsRUxfUmgtc0g4WUd1YmZ0WERVTjJPbFk5NG8ifX0sImFnZW50X2lkIjoiYWkubm9ydGhzdGFyLmFzc2lzdGFudCIsInN0YXR1cyI6eyJzdGF0dXNfbGlzdCI6eyJpZHgiOjEwMCwidXJpIjoiaHR0cHM6Ly9tYW5kYXRlcy5leGFtcGxlL3N0YXR1cy8xIn19LCJjYW5kaWRhdGUiOlt7Ii4uLiI6IkpWc2U1T0ppdWk3OVljYWY0bWIzSzdJYzV6OG9jMnhMMkZ2eHA5SGRHbWsifSx7Ii4uLiI6ImNTOHZxS0tMZnJMQXZqY0tsVWF0SkxzVFo1UFNVaHVVMmhNS0txQWlDUkUifSx7Ii4uLiI6ImUySDZ1Ylh6TV91ZVJHakphY0J0QlFuVzZqZmhjOG1NMDhwM29QMFpKMDQifSx7Ii4uLiI6Im9qVWxwZEdaSGtLeVlValY4eHdyaE10N0xEaUNjbVEtd21sT3JDaHYwbHcifV0sInNjb3BlIjp7InRheG9ub215IjoiaHR0cHM6Ly93d3cub25ldGNlbnRlci5vcmcvdGF4b25vbXkvMjAxOS9saXN0Lmh0bWwiLCJqb2JfZmFtaWxpZXMiOlt7Ii4uLiI6IjgzaWlKU1pLRS10YkhKc2ZNYjJzMmJVN1NKNEFaVDcwMEdaODRFSUx6TFUifSx7Ii4uLiI6IlVtVnRfb2dOaW5PV2poMDFPYU9KaGVsM0VzSGFvZEtiWnNCRjUtRnBXeXMifSx7Ii4uLiI6IlY4TU1CV1c1UlYtWks2enpna1NCZEk2Z3loS0dETklUWXZTUmhpdmhZbGcifSx7Ii4uLiI6InlJYzlnT3RnMW5NQzZ4dy1JSzdLOUVTZzVCSUhOVzRwdGFVTWVTdTBPaEkifV0sImxvY2F0aW9ucyI6W3siLi4uIjoiN2h1dFdacjdISVM5ZWgtZmRUV1M5cm5seFotREpfYjRFYXZTbGp2TzR0RSJ9LHsiLi4uIjoiOVFqVlVwY1d6VGprNzg3OUJmLW9UOFh4ZW5JajlBYjJUSHhsNlVSRkVHdyJ9LHsiLi4uIjoiSmdoRGxxdGRacFJCSjVkb0VTc2lWMDZPUkNGanZnd1dhcEIyN1o5d3NUQSJ9LHsiLi4uIjoiVzdxRXY5OHliZGJIdEVPU1BTSEE0SzZHTVozQnAxaGpqUWpRRl9uRmIwRSJ9XSwicmVtb3RlX3BvbGljeSI6W3siLi4uIjoiNXAwbWNJRjF4RkhoM3JEdEc4TTM2d01FRmxTOVg5MjRueFg2Y1dTTlFiOCJ9LHsiLi4uIjoiNXlKNkQ1TnNsX3FkSEhfSWRwRWVDbWZSRXlhNVJxaTdmWW1qczh1NzBmOCJ9LHsiLi4uIjoiQ2k3Z1c1a2ZXb1NkMzMzNnozSDVBVVdNVndfOWtHQWF2SWNXNmxnb0FJTSJ9LHsiLi4uIjoiVlhmMldrN2FHekR3cENQZ2hnZ1JXeTVzNlZoSXFCdzRQQnFVZzRIN01rYyJ9LHsiLi4uIjoiVzNsQTZIdTQwbldUS29acUM5Ti13SHlCU3B0NHJlYzhPaXg2Q3JqQXJ0USJ9LHsiLi4uIjoiV1VkcUZJNVNSaHJLejVseEVRaUw1UkwzY2psbGo2V01ZRzZTdFpLNS1PZyJ9LHsiLi4uIjoiWl8tWmRJT2NkZ0lqTDlqSVB3c3BoLU9CM0E2Rmp3c1BjcjBsSlloLTJ3TSJ9LHsiLi4uIjoibnpPTEFxSE9hUHNER0xxTnpEaW43RzhBZVdhNjJiLU5GakQ3VEt6Tk5RSSJ9XSwic2FsYXJ5IjpbeyIuLi4iOiItRndpdzlZbmFmcXlYZk9TWThxRno2WDFCOENkVWpLZ3N1QkQxemRqTEdnIn0seyIuLi4iOiI2T1ViaWxWMkRlVEVGLVpqYkZSX2JmRkJIX0ZPQzBFdDBaa05VTzhwUzQ0In0seyIuLi4iOiJCb1NQVnlfdXFlRDFSZnZaNC1GOGhIUUlEc21EZnFxZk14X1VkRFRTOHJNIn0seyIuLi4iOiJFY1gyRHhLSXEtVmFab0hmcHpEUXcwUGtnQl9PT2VNUTJmOXRZcW1uTGNRIn0seyIuLi4iOiJMb2JuODhBNHd6TnNScDFHaTJPOUUyS1RjT1l3RHdzS3M1TjJHNk96bHRjIn0seyIuLi4iOiJQMDZtM1JBSktOUjU3TGtMeVU1Ym9LTTRiQVBhS1UtNWlPQzBFWWpxOTI0In0seyIuLi4iOiJQRGVwY2RJS0Z6ZjdlT3dHUXhlamdJUjhGa2MtQzhnOE5SRlBuZWg3TVhjIn0seyIuLi4iOiJRbjJFc0pfMDZfVFZIeC1jU2NVcWZkYkxfSnktWllJMkhacjRReEJXUFp3In0seyIuLi4iOiJadjZrT2dyV0RFV1V5NTJqWjZDSHp3XzhnNFdyakJReEprTGIyZkxkWXNZIn0seyIuLi4iOiJhcXVkM1hyU1EydnhvOHZYMmlLSzJNU3ZZTjZhMnhDRXdJNVZjQ3RuaFN3In0seyIuLi4iOiJheHNObHkyLVpvejFaWmJ0ZWpQdXB2NVpPQ1JUWDBYQkpHT2JXUlA2ZFdBIn0seyIuLi4iOiJiTDVZVTlFenJrR3o5cmktT2RLejRfNlpTVmJYWGdoTENiT2RJT05yTnhnIn0seyIuLi4iOiJkOGlHM1QxTVljOTZMSURXVlAybE1hbUVNNm16R2MyVXpMd2ZkdkFSd1d3In0seyIuLi4iOiJkelBvLUZFWmNnTnEyU1JtOFU1R3dyNUJPWGNVTlR1ZTZUeHZZVC1YaU1NIn0seyIuLi4iOiJlWWJfN3p2VUgtVmpyLXFvd3RlbjFwVFpmWUNMMHB3VGZGTHZaWldtMXZFIn0seyIuLi4iOiJnM2V0VnRQaUVaTVRfYXM4ajVlYXlJR3hhUWNvSmROR19meVBFemttdlQ4In0seyIuLi4iOiJpZjczdXE4RnZBN1VzTHpXbkp0S2xhZlR2el9pU0lNMndZcm9hUkI2djFrIn0seyIuLi4iOiJrQ0JnX3JVWTI1elR1OVIzWU9PcXhmcGczUDRaM1lVUkFWWU1jVlhYUzhJIn0seyIuLi4iOiJtWHJlTFhGQUR3NmpsTm5kQzYxRVJJVXZTX0pHODFQU0gybi1RWnprWlZZIn0seyIuLi4iOiJtWmxTQURWV0pDOHp0dHliV1pGZzRxT29Hbm9zVi1OUlVVb2dpa01wV05NIn0seyIuLi4iOiJuSWhMc0NzTDNUX1Z1SW1XWWZON1FOUXJlZndYV1ZZcUh2STNsNVNkQWs0In0seyIuLi4iOiJyS3RiNVU2WVBxMVBnNGhVWlRvdm1NMVdlSDNvWEVFcUR1MEk5b2J2Y080In0seyIuLi4iOiJybUdueVhvNmZsVHNRZDNHcy1QQS1oWTFzblphSUcyTWd6ZjZwaXplMnowIn0seyIuLi4iOiJzMDdHY0c1R3NyS0h6X05MaS00OE1GRC01akhMV0RlMjh3OUJhNlFwLWhnIn0seyIuLi4iOiJ2bGpLakVDRF9lR2hzOVU0OTlONThKcVJzZXBzQ1RXVzZySWhiWVRuSldJIn0seyIuLi4iOiJ5VjZkSkNvVkhOemNwVkZTNjI3YjJiWXBKM0MtRm56UTltVXpyenk1cVVnIn1dfSwibGltaXRzIjp7InBlcl9lbXBsb3llciI6Mn0sImJyZWFkdGgiOiJuYXJyb3ciLCJhY3Rpb25zIjpbeyIuLi4iOiIxNEJPcXN2Y0swQi1mazJ2c2lud0oxU3cwQVNabXVkQk9UaEV3UUxIUV9RIn0seyIuLi4iOiI5RVNWZE9fUkFfSzJ5Sy1vQlUwdGtsbENHVy1hbWRIWGZQN2lwbXNGa0FnIn0seyIuLi4iOiJBd1llVXFiS041TzBuRzJsTGNuWHhmRHhnQ285cXI5Uk9wVWJyUzJmTmxRIn0seyIuLi4iOiJNZ000ZTViNDdRdW5KRG5Ca0F4S1N2REVGNW1CbmxCNWtSRTkzNGpWdlowIn0seyIuLi4iOiJSbS1LdGRzOFhuelFkVXo0bjdYZ1VTSnBIeEl3SzQ1aGtQcmRMX2tNY1NNIn0seyIuLi4iOiJXTEZlZGhkQXV0d3dvWnAzVV9DeU9lRDZFU3ZOS2ctM3dfQXlURnhNYmc0In0seyIuLi4iOiJZVGV5dEttMVMtV1dEYnVLaXdyVWJYdDRsbEFJeVJTdU54RERpdHNmSFQ0In0seyIuLi4iOiJaLWcyc0ZuYUZTMUphZ1dEM2FxQ0FvNFRjM0NFbW9tbW9qVjBIWVVkSktJIn1dLCJwcm9oaWJpdGVkIjpbImFjY2VwdF90ZXJtcyIsImFjY2VwdF9vZmZlciJdLCJjb25zZW50X3Njb3BlIjoiYXBwbGljYXRpb25fcHJlZmlsbCIsInByb3ZpZGVyX3RydXN0X2Zsb29yIjoidmVyaWZpZWQiLCJfc2RfYWxnIjoic2hhLTI1NiJ9.BQit7vWSECcu3GeIDlWEMpCnNfcVAapn8sZgkgaulWeUC3dlqPuljHJ7GLTg0c9SsmJefNa7t8L26aMBjWvCMA~WyJadkJrMWVFNW43ZmoxZ2FNbEFPcGR3Iix7ImVtYWlsIjoiam9yZGFuQGV4YW1wbGUuY29tIn1d~WyJBX0V0WFdKNkt1VmhXTW5rRmdwcFd3IiwiMTUtMjA1MSJd~WyJnb3ZIdWZ4cjVlZDJyN3dSbHBaNVBBIix7ImFkZHJlc3NDb3VudHJ5IjoiVVMiLCJhZGRyZXNzUmVnaW9uIjoiTlkifV0~WyJ5cTNLb2dPcDhGd1J1NDlsQUxJRUFRIiwiaHlicmlkIl0~WyJoM1EyQjZIX1lDeldJc0Q5QmZndmJ3Iix7ImF0X2xlYXN0IjoxMzIwMDAsImN1cnJlbmN5IjoiVVNEIiwidW5pdFRleHQiOiJZRUFSIn1d~WyJVTXU3MmxfXzNtWG5Rc0wwUnkyLVpRIiwiYmVnaW5fYXBwbGljYXRpb24iXQ~eyJ0eXAiOiJrYitqd3QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJodHRwczovL2NhcmVlcnMuYWNtZS5jb20iLCJub25jZSI6InNpZ19ub25jZV8wMTIzNDU2Nzg5YWJjZGVmIiwiaWF0IjoxNzkxODkyODAwLCJvamNwX2FjdGlvbiI6InNoYTI1NjpZNmJ0dUpQQ3FvS19GWldmU3NhWUtsdUlVSEdtRmlwY1ZaWkVIb0FxRkNFIiwic2RfaGFzaCI6IkV6azRlSm5DNVZvbndPMEZPN09sN3hSVUkwdFhxNzNPQXBJekxjQlAyTUUifQ.8jHOyVIZW22C83iDJSLPK6yM9seDlrO7j7R1r7z95vuK_wYABWw3kMu7pZdjMI67PRVpuvj829L7jcS0ZNa2_w",
+        "agent": {
+          "agent_id": "ai.northstar.assistant",
+          "keyid": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8",
+          "jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+            "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o"
+          },
+          "nonce": "sig_nonce_0123456789abcdef",
+          "created": 1796083200,
+          "expires": 1796083260
+        },
+        "tool": "begin_application",
+        "employerId": "acme-corp",
+        "job": {
+          "ojcp_id": "careers.acme.com:analyst-1",
+          "occupationalCategory": [
+            {
+              "@type": "CategoryCode",
+              "codeValue": "15-2051.00",
+              "inCodeSet": "https://www.onetcenter.org/taxonomy/2019/list.html"
+            }
+          ],
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "addressCountry": "US",
+              "addressRegion": "NY",
+              "addressLocality": "New York"
+            }
+          },
+          "remote_policy": "hybrid",
+          "baseSalary": {
+            "currency": "USD",
+            "minValue": 132000,
+            "maxValue": 150000,
+            "unitText": "YEAR"
+          },
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          }
+        },
+        "statement": {
+          "ojcp_version": "0.3",
+          "resource_server": "https://careers.acme.com",
+          "employer": {
+            "ojcp_employer_id": "acme-corp"
+          },
+          "tool": "begin_application",
+          "job_id": "careers.acme.com:analyst-1",
+          "agent_id": "ai.northstar.assistant",
+          "agent_key_thumbprint": "ItOEDVQErHk-Aw1IvYuYza_2UjRlymHZFFp7xR1g2k8"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+packages:
+  - sdks/typescript/*
+  - services/*
+allowBuilds:
+  cbor-extract: set this to true or false
+minimumReleaseAgeExclude:
+  - '@hono/node-server@2.1.5'
+onlyBuiltDependencies:
+  - esbuild

@@ -1,0 +1,82 @@
+{
+  "description": "OJCP digest: 'sha256:' + base64url(SHA-256(JCS(value))), no padding. Sources: spec Action Statement example; RFC 0008 §4.2.",
+  "cases": [
+    {
+      "name": "spec action statement (0.1)",
+      "value": {
+        "ojcp_version": "0.1",
+        "resource_server": "https://careers.acme.com",
+        "employer": {
+          "ojcp_employer_id": "acme-corp"
+        },
+        "tool": "submit_application",
+        "job_id": "careers.acme.com:analyst-2026-001",
+        "application_id": "app_abc123",
+        "agent_id": "ai.northstar.assistant",
+        "agent_key_thumbprint": "tKwHslziExQ7dQgDX2HX8q9EuvAYmS_A3SKfjNHpdX8",
+        "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo",
+        "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG"
+      },
+      "jcs": "{\"agent_id\":\"ai.northstar.assistant\",\"agent_key_thumbprint\":\"tKwHslziExQ7dQgDX2HX8q9EuvAYmS_A3SKfjNHpdX8\",\"application_id\":\"app_abc123\",\"candidate_data_digest\":\"sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo\",\"employer\":{\"ojcp_employer_id\":\"acme-corp\"},\"job_id\":\"careers.acme.com:analyst-2026-001\",\"mandate_nonce\":\"mn_xBVlesPAiuvWDyyxUDEDzDTG\",\"ojcp_version\":\"0.1\",\"resource_server\":\"https://careers.acme.com\",\"tool\":\"submit_application\"}",
+      "digest": "sha256:f-iFWllBWhQTjicNqPPPyN25DsN5rkUQThmL2e2VahM"
+    },
+    {
+      "name": "RFC 0008 §4.2 action statement (0.3)",
+      "value": {
+        "ojcp_version": "0.3",
+        "resource_server": "https://careers.acme.com",
+        "employer": {
+          "ojcp_employer_id": "acme-corp"
+        },
+        "tool": "submit_application",
+        "job_id": "careers.acme.com:analyst-2026-001",
+        "application_id": "app_abc123",
+        "agent_id": "ai.northstar.assistant",
+        "agent_key_thumbprint": "tKwHslziExQ7dQgDX2HX8q9EuvAYmS_A3SKfjNHpdX8",
+        "candidate_data_digest": "sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo",
+        "mandate_nonce": "mn_xBVlesPAiuvWDyyxUDEDzDTG"
+      },
+      "jcs": "{\"agent_id\":\"ai.northstar.assistant\",\"agent_key_thumbprint\":\"tKwHslziExQ7dQgDX2HX8q9EuvAYmS_A3SKfjNHpdX8\",\"application_id\":\"app_abc123\",\"candidate_data_digest\":\"sha256:l8Kt_6K5fFTzhjg_iIYDcXjskULviQZ5h7QClTNOeqo\",\"employer\":{\"ojcp_employer_id\":\"acme-corp\"},\"job_id\":\"careers.acme.com:analyst-2026-001\",\"mandate_nonce\":\"mn_xBVlesPAiuvWDyyxUDEDzDTG\",\"ojcp_version\":\"0.3\",\"resource_server\":\"https://careers.acme.com\",\"tool\":\"submit_application\"}",
+      "digest": "sha256:9FB-VobIkY_6Z5nKxHLuSj0G5NdHZs5Z4ejTxdAq-7c"
+    },
+    {
+      "name": "candidate_data_digest material",
+      "value": {
+        "application_data": {
+          "answers": {
+            "q1": "yes"
+          },
+          "cover_letter": "Hello"
+        },
+        "candidate_context": {
+          "consent_scope": "application_prefill",
+          "email": "jordan@example.com"
+        }
+      },
+      "jcs": "{\"application_data\":{\"answers\":{\"q1\":\"yes\"},\"cover_letter\":\"Hello\"},\"candidate_context\":{\"consent_scope\":\"application_prefill\",\"email\":\"jordan@example.com\"}}",
+      "digest": "sha256:f3GkR7v4W-Y5P6Y2QtVLK2ThTeN8Hrduyi1-EAyyp08"
+    },
+    {
+      "name": "binding_actions_digest of an empty array",
+      "value": [],
+      "jcs": "[]",
+      "digest": "sha256:T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU"
+    },
+    {
+      "name": "JCS orders keys and normalizes numbers",
+      "value": {
+        "b": 1,
+        "a": [
+          3,
+          "é",
+          {
+            "z": null,
+            "y": 1e+21
+          }
+        ]
+      },
+      "jcs": "{\"a\":[3,\"é\",{\"y\":1e+21,\"z\":null}],\"b\":1}",
+      "digest": "sha256:1P0VRlVS7X9Z-AkL4pjRaNvUDIKpkLilyiOLL0U6Cq0"
+    }
+  ]
+}

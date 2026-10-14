@@ -1,0 +1,41 @@
+{
+  "name": "@ojcp/agent-wallet",
+  "version": "0.0.0",
+  "description": "Agent-side OJCP credentials: agent keys and key directory, RFC 9421 request signing, action and standing mandates (RFC 0003, RFC 0008), and an MCP client that signs every call.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./mcp": {
+      "source": "./src/mcp.ts",
+      "types": "./dist/types/mcp.d.ts",
+      "default": "./dist/mcp.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && tsc -b"
+  },
+  "dependencies": {
+    "@ojcp/credentials-core": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1"
+  }
+}

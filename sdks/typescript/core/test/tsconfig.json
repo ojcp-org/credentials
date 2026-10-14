@@ -1,0 +1,11 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "composite": false,
+    "declaration": false,
+    "rewriteRelativeImportExtensions": false
+  },
+  "include": ["**/*.ts", "../src/**/*.ts", "../src/**/*.json"]
+}

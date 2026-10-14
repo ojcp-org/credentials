@@ -1,0 +1,25 @@
+{
+  "name": "@ojcp/verifier",
+  "version": "0.0.0",
+  "description": "Provider-side OJCP credential checks: standing and action mandates (RFC 0008, RFC 0003) and wallet presentations of hiring credentials (RFC 0013).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && tsc -b"
+  },
+  "dependencies": {
+    "@ojcp/credentials-core": "workspace:*",
+    "zod": "^4.6.7"
+  }
+}

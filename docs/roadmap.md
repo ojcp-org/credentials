@@ -1,46 +1,32 @@
 # Roadmap
 
-Each milestone ends with something runnable and a test that proves it. Everything tracks draft RFCs; when they change during the comment period (closing November 11, 2026), the fixtures change first and the code follows.
+Everything tracks draft RFCs. When they change during the comment period (closing November 11, 2026), `vectors/` changes first and the code follows.
 
-## M0: Foundations
+## Done (TypeScript, local)
 
-- pnpm workspace with three packages (`agent-wallet`, `mandate-verifier`, `mandate-issuer`), CI, npm trusted publishing.
-- RFC 0008's conformance cases (§10) added to `@ojcp/conformance` as shared fixtures, so every implementation tests against the same vectors.
-- `Signer` and `Store` interfaces with in-memory implementations.
-- Mandate key set: generate, publish in the agent key directory with `ojcp_mandate_until`, enforce the 7-day rule.
-- RFC 9421 request signing through `http-message-sig`.
+- **Foundations.** pnpm workspace, `@ojcp/credentials-core`, `Signer` interface, RFC 9421 signing profile, mandate key set with `ojcp_mandate_until` and the 7-day rule.
+- **The credential.** Standing-mandate SD-JWT VCs: claim set, disclosure rule, fixed padding, salary rungs, `breadth`, `prohibited`, month epochs. Verifier §8 steps 1–6.
+- **Applying.** O*NET-SOC hierarchy, coverage engine, disclosure choice, KB-JWT with `ojcp_action`, credential choice per resource server and employer, binding actions and EEO fail closed, the user's total and per-employer counts, signed `fetch`, MCP client.
+- **Issuance.** Issuer service with consent page, one-time codes, OpenID4VCI code and refresh flows, batch issuance, status lists on hourly epochs, revocation from an account page.
+- **Hiring credentials.** RFC 0014 types and baseline issuer profile (records API, offers with `tx_code`, offboarding, alumni retrieval); RFC 0013 §6.2 presentation validation.
+- **Action mandates.** Statement for approval, presentation, verification.
+- **Vectors.** Language-neutral vectors and a TypeScript test that holds the SDK to them.
 
-**Done when:** requests signed by the wallet pass the existing agent-identity checks in `@ojcp/conformance`.
+Proved by 49 tests, including end-to-end runs through the issuer's HTTP handlers, the agent wallet and a provider built on the verifier, covering every RFC 0008 §10 fixture class except `standing_unlinkable` across two live providers.
 
-## M1: The credential
+## Next
 
-- Build and verify standing-mandate SD-JWT VCs: claim set, disclosure rule, fixed padding, salary grid rungs, `breadth`, `prohibited`, lifetime.
-- `mandate-verifier` §8 steps 1–4 for credentials (holder proof, admission, audience and time, scope).
+1. **Python SDK** (`sdks/python`): agent wallet and verifier, on the OpenWallet Foundation's Python SD-JWT library, held to `vectors/`. Agent frameworks are mostly Python.
+2. **Kotlin SDK** (`sdks/kotlin`): verifier first, for JVM providers (including the Recruitics provider, which already uses `ojcp-java-sdk`), held to `vectors/`.
+3. **Conformance.** Move the RFC 0008 §10 cases into `@ojcp/conformance` as fixtures that drive a provider over the wire, generated from `vectors/`.
+4. **Publish.** npm trusted publishing for the three TypeScript packages, and a container image for the issuer.
+5. **Issuer gaps.** `jkt` candidate bindings (proof of possession at issuance), the high-assurance profile (`x5c`, wallet and key attestation), ISO mdoc encoding (RFC 0014 §2.4), an Oblivious HTTP client for first status fetches.
 
-**Done when:** every credential-level fixture passes in `mandate-verifier`, and credentials produced by the issuer library pass it.
+## First adopters
 
-## M2: Applying
-
-- Coverage engine: bundled O*NET-SOC 2019 hierarchy, locations, remote policy, employment type, experience level, salary rung selection.
-- Presentation builder: disclosure selection, KB-JWT with `ojcp_action` (JCS digest of the action statement), credential selection per resource server and employer.
-- Policy checks: `binding_actions` present and empty, no `eeo`, consent-scope ceiling, overall total and own per-employer count.
-- `mandate-verifier`: status checks, replay, idempotent submit, per-employer count (HMAC keyed, per-employer secrets).
-- MCP client helper.
-
-**Done when:** an end-to-end test runs search, `begin_application` and `submit_application` against a local OJCP provider using `mandate-verifier`: covered jobs are accepted, and each rejection fixture is refused with `user_mandate_required`.
-
-## M3: Issuance
-
-- Reference mandate issuer: authorization server with `authorization_details`, candidate verification (email or phone code, `jkt` proof of possession), consent page from pinned Type Metadata, batch issuance, status lists on epochs, revocation, dashboard.
-- Wallet issuance client and refresh on identical terms.
-
-**Done when:** a person approves a mandate on the consent page, the agent applies to a covered job, and revoking at the dashboard stops further applications within one status epoch.
-
-## M4: First adopters
-
-- Sandbox deployment for demos and integration testing (operator to decide; see Open questions).
-- One provider verifying mandates in production code: a TypeScript provider through `mandate-verifier`, or the Recruitics provider through the same fixtures on the JVM.
-- One agent platform piloting the wallet. Tink is the natural first ask, since its feedback on PR #40 is about how agents should behave under standing mandates.
+- A sandbox issuer for demos, clearly labelled as a test instance (see Open questions).
+- One provider verifying mandates in production code.
+- One agent platform piloting the wallet. Tink is the natural first ask, given its feedback on PR #40.
 
 **Done when:** the pilot agent applies through the pilot provider under a real mandate, and the conformance suite passes both.
 
@@ -48,6 +34,6 @@ Each milestone ends with something runnable and a test that proves it. Everythin
 
 | Dependency | Why it blocks | Plan |
 |---|---|---|
-| **RFC 0010 trust tiers** | §5.3: an agent may exercise a standing mandate only after deriving the provider's tier from source (a). No implementation of 0010 exists yet. | M2 uses a test `TrustResolver`. Real use needs an 0010 implementation, a separate workstream. |
-| **RFC 0009 job codes** | Scope matching needs `occupationalCategory` with O*NET codes on postings. No listed provider emits them today. | Demo against the ojcp.dev reference provider with coded jobs; ask providers to add codes as part of 0009 adoption. |
-| **RFC 0008 changes** | The employer opt-out under discussion on PR #40 (a `standing_not_accepted` reason, per-employer refusal) changes verifier and wallet behaviour. | Track the PR; fixtures first. |
+| **RFC 0010 trust tiers** | §5.3: an agent may exercise a standing mandate only after deriving the provider's tier from source (a). No implementation of 0010 exists yet. | The wallet takes a `TrustResolver`; real use needs a 0010 implementation (see Open questions). |
+| **RFC 0009 job codes** | Coverage needs `occupationalCategory` with O*NET codes on postings. No listed provider emits them yet. | Demo against coded jobs; ask providers to add codes as part of 0009 adoption. |
+| **Type Metadata at `spec.ojcp.dev`** | `vct#integrity` must match the published bytes. | Publish `vectors/type-metadata/*.json` byte for byte (RFC feedback note 9). |

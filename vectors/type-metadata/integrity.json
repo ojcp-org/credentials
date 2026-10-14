@@ -1,0 +1,25 @@
+{
+  "description": "vct#integrity = SRI sha256 of the served bytes, which are the JCS serialization of the metadata document.",
+  "types": {
+    "employment": {
+      "vct": "https://spec.ojcp.dev/vct/employment/v1",
+      "integrity": "sha256-qUv1Mbqht9YgH14DHGNAiDDfUBd8lBK1K9cdp4IBE2g="
+    },
+    "education": {
+      "vct": "https://spec.ojcp.dev/vct/education/v1",
+      "integrity": "sha256-QtXQnA537m1Nn7OamMhCFaDwQUB5gNxRvg+EKD5i3/M="
+    },
+    "professional_license": {
+      "vct": "https://spec.ojcp.dev/vct/professional-license/v1",
+      "integrity": "sha256-Xhj+VCOU2uV2gj4llp4hhkfAmppiLJa1OuzYXYQBe90="
+    },
+    "certification": {
+      "vct": "https://spec.ojcp.dev/vct/certification/v1",
+      "integrity": "sha256-hSeDPYEWI3BwQnfSILzEBW9MsV3DB1LOh23KaxA7AZo="
+    },
+    "standing_mandate": {
+      "vct": "https://spec.ojcp.dev/vct/standing-mandate/v1",
+      "integrity": "sha256-hRfS1sOMyDo7TBR8aVc5TfRAnfm/do9nQ8jcWSOuU5s="
+    }
+  }
+}

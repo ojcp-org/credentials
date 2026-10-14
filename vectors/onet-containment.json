@@ -1,0 +1,90 @@
+{
+  "description": "RFC 0008 §2.2: a scope code contains a job's primary code by the published O*NET-SOC 2019 hierarchy, never by string prefix; residual 'All Other' jobs match only an exact code. Data: data/onet/soc-2019.json.",
+  "cases": [
+    {
+      "scope": "29-1210",
+      "job": "29-1221.00",
+      "contains": true
+    },
+    {
+      "scope": "29-1000",
+      "job": "29-1221.00",
+      "contains": true
+    },
+    {
+      "scope": "29-1200",
+      "job": "29-1221.00",
+      "contains": false
+    },
+    {
+      "scope": "15-1250",
+      "job": "15-1252.00",
+      "contains": true
+    },
+    {
+      "scope": "15-1252",
+      "job": "15-1252.00",
+      "contains": true
+    },
+    {
+      "scope": "15-1252.00",
+      "job": "15-1252.00",
+      "contains": true
+    },
+    {
+      "scope": "15-2051",
+      "job": "15-2051.00",
+      "contains": true
+    },
+    {
+      "scope": "15-0000",
+      "job": "15-2051.00",
+      "contains": true
+    },
+    {
+      "scope": "15-1250",
+      "job": "15-2051.00",
+      "contains": false
+    },
+    {
+      "scope": "15-1200",
+      "job": "15-1299.00",
+      "contains": false
+    },
+    {
+      "scope": "15-1299",
+      "job": "15-1299.00",
+      "contains": true
+    },
+    {
+      "scope": "15-1299.00",
+      "job": "15-1299.00",
+      "contains": true
+    },
+    {
+      "scope": "15-1200",
+      "job": "15-1299.04",
+      "contains": true
+    },
+    {
+      "scope": "15-1299",
+      "job": "15-1299.04",
+      "contains": true
+    },
+    {
+      "scope": "99-9999",
+      "job": "15-1252.00",
+      "contains": false
+    },
+    {
+      "scope": "15-1250",
+      "job": "15-1252.99",
+      "contains": false
+    },
+    {
+      "scope": "15-125",
+      "job": "15-1252.00",
+      "contains": false
+    }
+  ]
+}

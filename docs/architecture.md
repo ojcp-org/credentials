@@ -8,105 +8,111 @@ RFC 0008 assigns the OpenID4VCI roles like this (§3.1):
 
 | OpenID4VCI role | Who |
 |---|---|
-| Credential Issuer and Authorization Server | The **mandate issuer** |
-| Wallet (holds credentials) | The **agent platform**, not the person |
-| End-User | The **candidate**, who authenticates at the issuer and approves the consent page |
+| Credential Issuer and Authorization Server | The **mandate issuer** (`services/issuer`) |
+| Wallet (holds credentials) | The **agent platform** (`@ojcp/agent-wallet`), not the person |
+| End-User | The **candidate**, who proves an email or phone and approves the consent page |
 
-That's why the core is a server-side library: the agent platform holds the credentials and keys on behalf of all its users.
+That is why the agent wallet is a server-side library: the platform holds credentials and keys for all its users. Hiring credentials (RFC 0014) go the other way: they are held in the **person's own wallet app** and presented straight to the employer (RFC 0013); the agent never sees them.
 
-## Components
+## Packages
 
 ```mermaid
 flowchart TB
   subgraph AP[Agent platform]
     LLM[Agent / LLM tooling] --> AW
     subgraph AW["@ojcp/agent-wallet"]
-      KS[Mandate key set]
-      ISS[Issuance client]
-      CS[Credential store]
-      POL[Coverage & policy engine]
-      PR[Presentation builder]
-      SIG[Request signer]
-      ST[Status & refresh]
+      KR[AgentKeyring<br/>request key + mandate key set]
+      VCI[OpenID4VCI client]
+      H[StandingMandateHolder]
+      SF[createSignedFetch]
+      MCP[connectOjcpProvider]
     end
-    KMS[(Cloud KMS / HSM)]
-    DB[(Store)]
-    AW --- KMS
-    AW --- DB
   end
-  subgraph MI[Reference mandate issuer]
-    AS[Authorization server + consent page]
-    CI[Credential issuer]
+  subgraph IS[services/issuer]
+    AS[Consent + OAuth]
+    CI[Credential endpoint]
     SL[Status lists]
-    DASH[Candidate dashboard]
+    REC[Record API]
   end
   subgraph JP[Job provider]
-    MV["@ojcp/mandate-verifier"]
-    CNT[(Per-employer counts)]
+    V["@ojcp/verifier"]
+    L[(Ledger: nonces + counts)]
   end
-  ISS <-->|OpenID4VCI| AS
-  ISS <-->|OpenID4VCI| CI
-  PR -->|OJCP tools over MCP| MV
-  MV -->|fetch on schedule| SL
-  MV --- CNT
-  DIR["Agent key directory<br/>(Agent Identity → Key Discovery)"] -.-> MV
-  KS -->|publishes| DIR
+  W[Person's wallet app] -->|RFC 0013 presentation| V
+  VCI <-->|OpenID4VCI| AS
+  VCI <-->|OpenID4VCI| CI
+  W <-->|OpenID4VCI pre-authorized| CI
+  MCP --> SF -->|RFC 9421 + user_mandate| V
+  V -->|scheduled fetch| SL
+  V --- L
+  KR -->|key directory| V
+  KR -->|key directory, polled| CI
+  AW & V & IS --> CORE["@ojcp/credentials-core"]
 ```
 
-## `@ojcp/agent-wallet` modules
+### `@ojcp/credentials-core`
+
+| Module | Contents |
+|---|---|
+| `keys`, `jws`, `encoding`, `digest` | The `Signer` interface (WebCrypto, or any HSM/KMS behind it), RFC 7638 thumbprints, compact JWS with the algorithm taken from the key, JCS and the OJCP `sha256:` digest |
+| `sd-jwt` | RFC 9901 issuance with exact decoy padding and order-hiding (or order-keeping) arrays, strict parsing and reconstruction, selective presentation by predicate or DCQL claim path, KB-JWTs with extra claims |
+| `agent-identity` | The spec's RFC 9421 signing profile (`created`, `expires` ≤ 300 s, `nonce`, `keyid`, `tag=web-bot-auth`, `Content-Digest`), verification with the spec's error codes, `agent_id` grammar, namespace and delegated binding |
+| `action` | Action statements, `candidate_data_digest`, `binding_actions_digest` |
+| `mandate/*` | The standing-mandate model and claim builder, the disclosure rule and padding checks, the salary grid, scope coverage |
+| `onet` | O*NET-SOC 2019 hierarchy containment (never string prefix; residual "All Other" only exact) |
+| `hiring/types`, `vct` | The four RFC 0014 types (issue and presented schemas), coarse claims, lifetime caps, `basis`; Type Metadata and `vct#integrity` |
+| `status-list` | Token Status Lists with ≥ 10,000 entries and unpredictable indexes |
+| `wire` | zod schemas for the OJCP shapes consumed (job facts, binding actions, agent declaration, `auth.user_mandates`) |
+
+### `@ojcp/agent-wallet`
 
 | Module | Responsibility | RFC 0008 |
 |---|---|---|
-| **Mandate key set** | Create, publish and retire the platform's pool of ≥ 32 P-256 mandate keys, shared by all users; mark each with `ojcp_mandate_until`; never bind a key published less than 7 days ago; keep keys non-exportable | §3.4, §7.4 |
-| **Issuance client** | Propose a mandate in an OpenID4VCI `authorization_details` entry carrying `ojcp_standing_mandate`; request batches with one proof per key from a random subset of the key set; record `applications_total` and the salary floor returned in the token response | §3.1, §3.2, §3.4 |
-| **Credential store** | Hold each user's batches; enforce which credential is used where: one per (resource server, employer) for application actions, fresh ones for search, never one credential at two resource servers | §4.1 |
-| **Coverage & policy engine** | Before any application: is the job covered (O*NET hierarchy, location, remote policy, employment type, experience level, salary rung)? Is `binding_actions` present and empty? Is the provider's RFC 0010 tier at least `verified` and the mandate's trust floor? Is the user's overall total and own per-employer count respected? Stop and ask the user otherwise | §2.2, §2.4, §5.1–5.3, §6.3 |
-| **Presentation builder** | Choose disclosures (exactly one `candidate` element; the covering job-family, location, remote-policy and action elements; the highest salary rung not above the posting's low end); build the KB-JWT with `aud`, `nonce`, `sd_hash` and `ojcp_action` = `sha256:` + base64url(SHA-256(JCS(action statement))) | §2.1, §2.3, §4.2 |
-| **Request signer** | RFC 9421 signatures with `keyid` = the `cnf` key thumbprint, nonce shared with the KB-JWT, idempotent retries for `submit_application` | §4.2, §4.3 |
-| **Status & refresh** | Watch its own credentials' status; refresh batches before they run out (OpenID4VCI §14.5) on identical terms; re-ask the user for anything else | §7.1–7.3 |
-| **MCP client helper** | Wrap `@modelcontextprotocol/sdk` tool calls so the agent declaration, signature and mandate proof are attached automatically | — |
-| **Activity log** | A per-user record of what was applied for, under which mandate, for the dashboard and for the user's own records | — |
+| `AgentKeyring` | Request-signing key; mandate key set of ≥ 32 shared P-256 keys with `ojcp_mandate_until`; eligibility (published ≥ 7 days, valid past `exp`); key directory document | §3.4, §7.4 |
+| OpenID4VCI client | `beginStandingMandate` (PKCE, `authorization_details`), `completeStandingMandate`, `refreshStandingMandate`; one proof per randomly chosen eligible key | §3.1, §3.2, §7.3 |
+| `StandingMandateHolder` | Credential choice (one per resource server and employer; fresh for search; never across resource servers), coverage on the full scope, trust floor from RFC 0010 source (a) only, binding actions and EEO fail closed, the user's total and own per-employer count, disclosure choice, KB-JWT with `ojcp_action` | §2.2–2.3, §4, §5, §6.3 |
+| `createSignedFetch` | Signs every request; for a call carrying a standing mandate, signs with the `cnf` key and reuses the KB-JWT nonce (except `submit_application`) | §4.2 |
+| `connectOjcpProvider` (`@ojcp/agent-wallet/mcp`) | MCP client over the signed fetch | — |
+| Action mandates | Statement for approval; presentation with a KB-JWT by the agent key | spec *User Mandates* |
+| `TrustResolver` | Interface only: the wallet consumes an effective tier and its source; deriving tiers belongs to RFC 0010 | §5.3 |
 
-### Pluggable interfaces
+### `@ojcp/verifier`
 
-| Interface | Implementations |
+| Export | Responsibility |
 |---|---|
-| `Signer` | In-memory (tests), OS keychain / Secure Enclave (local agents), AWS KMS / Google Cloud KMS (hosted agents). ES256 only for mandate keys. |
-| `Store` | In-memory (tests), SQLite (single process), Redis / Cloudflare KV (distributed). Holds credentials, nonces, counters, cached status lists. |
-| `TrustResolver` | Derives a provider's effective tier under RFC 0010 source (a). Until 0010 has an implementation, only a test resolver exists (see Roadmap). |
-| `Classifier` | O*NET-SOC 2019 hierarchy lookups for job-family coverage (bundled data). |
+| `verifyStandingMandate` | §8 steps 1–6. Returns a decision to bind to the session (step 7); for submissions, a `commit()` that atomically consumes `mandate_nonce` and records the count |
+| `verifyActionMandate` | Spec *User Mandates → Verification*: digest or embedded statement, `cnf.jkt`, lifetime, status or single use, `jti` and `mandate_nonce` consumption |
+| `verifyHiringPresentation` | RFC 0013 §6.2 steps 2–5 for `dc+sd-jwt`: pinned keys and signing windows, accepted issuer/type/profile/basis, time, holder binding, status, dropping unrequested claims; `contactMatches` for the §3 confirmation |
+| `StatusListCache` | Scheduled, verified status-list copies with a maximum age; injectable fetch (for an Oblivious HTTP relay) |
+| `MandateLedger` | Interface plus an in-memory implementation; the count key is HMAC under a per-employer secret |
+| `MandateRejected` | `toToolError()` gives the wire error; the failure class stays internal |
 
-## Reference mandate issuer
+### `services/issuer`
 
-A small web service, deployable by anyone:
-
-- **Authorization server and consent page.** Authorization code flow with `authorization_details`. Verifies each candidate identifier (email or phone by one-time code, or proof of possession for a `jkt`). Renders the consent page from a locally pinned copy of the Type Metadata matching `vct#integrity`, with every element §3.3 lists, in plain language.
-- **Credential issuer.** Validates every proof key against the agent's key directory, `ojcp_mandate_until` and the 7-day rule; computes salary rungs from the grid (§2.2); pads allow-lists with decoys to the fixed lengths (§2.5); issues batches with distinct salts, signatures and status indexes.
-- **Status lists.** Each batch spread across several lists, each list shared by many users; changes applied at fixed epochs of at most one hour; lists served from a CDN-friendly path.
-- **Dashboard.** The candidate sees active mandates and the agent's reported activity, and revokes (all credentials of the authorization, including refreshed batches).
-
-## `@ojcp/mandate-verifier`
-
-For providers on Node or edge runtimes. Implements §8 in order (holder proof, admission, audience and time, action and scope, status, replay and count, session binding), fails closed with `user_mandate_required`, and keeps the per-employer count keyed by HMAC of employer and candidate binding (§6.1). Providers on the JVM (for example, the Recruitics provider via `ojcp-java-sdk`) implement the same steps against the same fixtures.
+`Issuer` holds the protocol logic; `createApp` is a thin Hono layer; `IssuerStore` has in-memory and SQLite (`node:sqlite`) implementations. Status lists, their used indexes and queued changes are persisted, so restarts never forget a revocation. Integrations a deployment supplies: `Messenger` (webhook in production), `MandateKeySource` (polls agent key directories and records first-seen times).
 
 ## Libraries
 
-| Need | Package |
+| Need | Choice |
 |---|---|
-| SD-JWT and SD-JWT VC | `@sd-jwt/core`, `@sd-jwt/sd-jwt-vc` (OpenWallet Foundation) |
-| Token Status List | `@sd-jwt/jwt-status-list` |
-| OpenID4VCI client and server | `@openid4vc/openid4vci`, `@openid4vc/oauth2` (OpenWallet Foundation `oid4vc-ts`) |
-| Presentation queries (RFC 0013 later) | `dcql` |
-| JWT and keys | `jose` |
-| RFC 9421 request signatures | `http-message-sig` (Cloudflare `web-bot-auth`) |
-| JSON canonicalization (RFC 8785) | `canonicalize` |
-| MCP | `@modelcontextprotocol/sdk` |
-| Schema validation | `ajv` with the schemas from `@ojcp/conformance` |
+| SD-JWT | Own implementation in core: RFC 0008 needs exact padding, the disclosure rule on the raw payload, and KB-JWT extra claims. Interoperability is tested against the OpenWallet Foundation's `@sd-jwt/sd-jwt-vc` in both directions. |
+| Token Status List | `@owf/token-status-list` |
+| RFC 9421 | `http-message-sig` (Cloudflare) |
+| JWK thumbprints | `jose` |
+| JCS (RFC 8785) | `canonicalize` |
+| Validation | `zod` 4 |
+| HTTP | `hono`, `@hono/node-server` |
+| MCP | `@modelcontextprotocol/sdk` (optional peer dependency) |
 
-Toolchain: TypeScript, ESM-only, pnpm workspaces, tsdown, vitest, npm trusted publishing. Same as `@ojcp/conformance`.
+Toolchain: TypeScript 7, ESM only, pnpm workspaces, tsdown, vitest, Biome. Sources run directly in development through the `source` export condition.
+
+## Several languages
+
+Each language gets a native SDK under `sdks/<language>/`, built on that ecosystem's libraries. Consistency comes from `vectors/` and `data/onet/`, generated by `scripts/` and checked by every SDK's tests, not from sharing one implementation.
 
 ## Security notes
 
-- **Keys.** Mandate keys are shared across all of a platform's users by design (§3.4): a per-user key would be a cross-provider identifier. Candidate binding, not the key, limits each credential to its own candidate.
-- **Fail closed in the agent too.** The provider checks scope, but the wallet checks it first and refuses to begin an uncovered application. Binding actions, EEO answers and anything that records assent always go back to the person (§5.1, §5.2).
-- **No cross-employer counting service.** The user's overall total is enforced only by the agent (§6.3). The activity log stays with the agent platform and the issuer dashboard, never a shared service.
+- **Keys.** Mandate keys are shared across a platform's users by design (§3.4); candidate binding limits each credential to its own candidate.
+- **Fail closed in the agent too.** The holder refuses before the provider would: uncovered jobs, binding actions, EEO, trust below the floor or not derived.
+- **Nothing reveals which check failed.** Every mandate refusal on the wire is `user_mandate_required`, with `details.reason` only for the two policy-dependent cases.
+- **No cross-employer counting.** The user's total lives with the agent; providers count per employer, keyed by an HMAC they can't join across employers.

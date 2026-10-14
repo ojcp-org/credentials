@@ -1,0 +1,25 @@
+{
+  "name": "@ojcp/issuer",
+  "version": "0.0.0",
+  "description": "Self-hostable OJCP credential issuer: RFC 0008 standing mandates and RFC 0014 hiring credentials over OpenID4VCI.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown && tsc -b",
+    "start": "node dist/main.mjs"
+  },
+  "dependencies": {
+    "@ojcp/credentials-core": "workspace:*",
+    "hono": "^4.13.13",
+    "@hono/node-server": "^2.1.5",
+    "zod": "^4.6.7"
+  }
+}

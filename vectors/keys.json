@@ -1,0 +1,36 @@
+{
+  "description": "TEST KEYS ONLY. Never use outside these vectors.",
+  "issuer": {
+    "key_ops": [
+      "sign"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "vaGXmER21xb7hV59EfFlXf3JrBPpH2jyr_8CojPryt0",
+    "y": "5LDg7wlZq82uI8FDJjbcKYvFsbirihpG26FraeLXsDc",
+    "crv": "P-256",
+    "d": "NNJUw89wIQahbWPGInXY2oyCNFn4hZkY1CPxEg24yUY"
+  },
+  "agent_mandate_key": {
+    "key_ops": [
+      "sign"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "XXDrepU5r6b5eIcEZLXyNHtcHubo9tYCat69PjU6Qqg",
+    "y": "kAl-ww11F8AWOZ6BlEL_Rh-sH8YGubftXDUN2OlY94o",
+    "crv": "P-256",
+    "d": "JHdgPYanUF0IzrG3XGezEQAz-x-99O1phqn1FFOliGY"
+  },
+  "agent_other_key": {
+    "key_ops": [
+      "sign"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "3r7ocP7xY0Z9aiNfSbGvxMXXfCRgZIOUHLS8Kp4UFm4",
+    "y": "hxvs7BLBHqxdsHLClzovxrGNfZLSqkKlETWXFYDt8Tg",
+    "crv": "P-256",
+    "d": "UkIUDb5o6AiEV1Y0AgwxejTnuNZJEsexVP_JKjomDeI"
+  }
+}

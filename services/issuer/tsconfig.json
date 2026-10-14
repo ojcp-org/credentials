@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist/types",
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "types": ["node"],
+    "lib": ["es2024"]
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../../sdks/typescript/core"
+    }
+  ]
+}

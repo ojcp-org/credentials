@@ -1,0 +1,29 @@
+{
+  "description": "RFC 0008 §2.3 normalization of candidate bindings before comparison and counting.",
+  "cases": [
+    {
+      "input": {
+        "email": "  Jordan@Example.COM "
+      },
+      "normalized": {
+        "email": "jordan@example.com"
+      }
+    },
+    {
+      "input": {
+        "phone": "+1 (555) 555-0123"
+      },
+      "normalized": {
+        "phone": "+15555550123"
+      }
+    },
+    {
+      "input": {
+        "phone": "+44 20 7946 0958"
+      },
+      "normalized": {
+        "phone": "+442079460958"
+      }
+    }
+  ]
+}

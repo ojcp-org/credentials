@@ -14,9 +14,9 @@ Why OJCP doesn't reuse AP2's mandate format directly: hiring needs things paymen
 
 | Project | What it provides | Use here |
 |---|---|---|
-| [sd-jwt-js](https://github.com/openwallet-foundation/sd-jwt-js) (OpenWallet Foundation) | SD-JWT, SD-JWT VC, Token Status List | Credential format and status |
-| [oid4vc-ts](https://openwallet.foundation/2025/02/25/openid4vc-dcql-and-openid-federation-three-new-fundamental-typescript-projects-incubated-at-openwallet-foundation) and dcql-ts (OpenWallet Foundation) | OpenID4VCI and OpenID4VP, DCQL | Issuance client and server; RFC 0013 later |
-| [web-bot-auth](https://blog.cloudflare.com/web-bot-auth) (Cloudflare) | RFC 9421 HTTP message signatures for agents (`http-message-sig`) | Request signing, the same scheme as OJCP agent identity |
+| [sd-jwt-js](https://github.com/openwallet-foundation/sd-jwt-js) (OpenWallet Foundation) | SD-JWT, SD-JWT VC, Token Status List | Status lists (`@owf/token-status-list`); the reference our own SD-JWT code is tested against for interoperability |
+| [oid4vc-ts](https://openwallet.foundation/2025/02/25/openid4vc-dcql-and-openid-federation-three-new-fundamental-typescript-projects-incubated-at-openwallet-foundation) and dcql-ts (OpenWallet Foundation) | OpenID4VCI and OpenID4VP, DCQL | Not used yet: the issuer and client here cover only the flows RFC 0008 and RFC 0014 need. A candidate for the high-assurance profile. |
+| [web-bot-auth](https://blog.cloudflare.com/web-bot-auth) (Cloudflare) | RFC 9421 HTTP message signatures for agents (`http-message-sig`) | Request signing and verification under the OJCP profile |
 | [EQUS Credentials SDK](https://github.com/equs-ai/equs-credentials-sdk) | Rust core with Node, WASM, Android and iOS wrappers; SD-JWT VC, OpenID4VC, experimental delegated SD-JWT chains with AP2 support | Closest general-purpose "agent credentials" SDK; small project, so a reference rather than a dependency |
 
 ## Standards work to track

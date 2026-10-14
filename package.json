@@ -1,0 +1,31 @@
+{
+  "name": "ojcp-credentials",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "packageManager": "pnpm@11.6.0",
+  "scripts": {
+    "build": "pnpm -r --filter './sdks/typescript/*' --filter './services/*' build",
+    "test": "vitest run",
+    "typecheck": "tsc -b",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "vectors": "node --conditions=source scripts/generate-vectors.ts",
+    "onet": "node scripts/build-onet.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@ojcp/agent-wallet": "workspace:*",
+    "@ojcp/credentials-core": "workspace:*",
+    "@ojcp/issuer": "workspace:*",
+    "@ojcp/verifier": "workspace:*",
+    "@types/node": "^24.19.2",
+    "hono": "^4.13.13",
+    "tsdown": "~0.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4",
+    "zod": "^4.6.7"
+  }
+}
