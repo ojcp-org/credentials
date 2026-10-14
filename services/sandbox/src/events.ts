@@ -50,6 +50,8 @@ export class EventBus {
   readonly #events: SandboxEvent[] = [];
   readonly #listeners = new Set<(e: SandboxEvent) => void>();
   #next = 1;
+  /** Names this world, so a page polling `since` notices a reset. */
+  readonly world = crypto.randomUUID();
   readonly #clock: SandboxClock;
 
   constructor(clock: SandboxClock) {

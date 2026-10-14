@@ -360,7 +360,6 @@ export function SandboxBar() {
           style={{ borderTop: "1px solid #28282f", rowGap: 6 }}
         >
           <Badge
-            color="ojcpGold"
             variant="light"
             radius="sm"
             style={{ flexShrink: 0, color: OJCP.gold, background: "rgba(232,168,48,0.14)" }}

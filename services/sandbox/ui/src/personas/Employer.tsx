@@ -338,8 +338,7 @@ function Verify({ appRef: code }: { appRef: string }) {
                   Open my wallet
                 </Button>
                 <Button
-                  variant="subtle"
-                  color="gray"
+                  variant="default"
                   loading={busy}
                   onClick={async () => {
                     const r = await call("skip");
@@ -398,17 +397,32 @@ function Verify({ appRef: code }: { appRef: string }) {
   );
 }
 
+const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+const ARRANGEMENT: Record<string, string> = {
+  onsite: "on-site",
+  hybrid: "hybrid",
+  remote: "remote",
+};
+
+/** A disclosed location element (RFC 0009) as a recruiter would write it. */
+function placeName(x: unknown): string {
+  if (!x || typeof x !== "object") return String(x);
+  if ("anywhere" in x) return "anywhere";
+  const country = "addressCountry" in x ? String(x.addressCountry) : "";
+  const region = "addressRegion" in x ? String(x.addressRegion) : "";
+  const countryName = country ? (regionNames.of(country) ?? country) : "";
+  return [region, countryName].filter(Boolean).join(", ");
+}
+
 function describeLearned(r: Received): string[] {
   const l = r.learned;
   const out: string[] = [];
   if (r.occupations.length) out.push(`Open to ${r.occupations.join(", ")} roles`);
   const locations = Array.isArray(l.locations) ? l.locations : [];
-  if (locations.length)
-    out.push(
-      `Open to working in ${locations.map((x) => (typeof x === "object" && x ? Object.values(x).join("-") : String(x))).join(", ")}`,
-    );
+  if (locations.length) out.push(`Open to working in ${locations.map(placeName).join(", ")}`);
   const remote = Array.isArray(l.remote_policy) ? l.remote_policy : [];
-  if (remote.length) out.push(`Arrangement: ${remote.map(String).join(", ")}`);
+  if (remote.length)
+    out.push(`Open to ${remote.map((r) => ARRANGEMENT[String(r)] ?? String(r)).join(" or ")} work`);
   const salary = Array.isArray(l.salary) ? l.salary[0] : undefined;
   if (salary && typeof salary === "object" && "at_least" in salary)
     out.push(

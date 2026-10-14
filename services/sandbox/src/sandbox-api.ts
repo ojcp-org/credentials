@@ -202,9 +202,10 @@ export function sandboxApi(current: () => Sandbox, reset: () => Promise<void>): 
     current().visited.add(page);
     return c.json({ ok: true });
   });
-  app.get("/events", (c) =>
-    c.json(current().world.events.since(Number(c.req.query("since") ?? 0))),
-  );
+  app.get("/events", (c) => {
+    const { events } = current().world;
+    return c.json({ world: events.world, events: events.since(Number(c.req.query("since") ?? 0)) });
+  });
   app.get("/parties", async (c) => {
     const { world, agent } = current();
     const parties = await Promise.all(

@@ -12,7 +12,8 @@ import type { LlmSession } from "./llm.ts";
 export type Card =
   | { kind: "proposal" }
   | { kind: "permission" }
-  | { kind: "jobs" }
+  /** `open`: the jobs it could apply to when it said so, so the card reads the same later. */
+  | { kind: "jobs"; open: string[] }
   | { kind: "applications"; ids: string[] };
 
 export interface ChatMessage {
@@ -131,10 +132,10 @@ export class Assistant {
       { kind: "permission" },
     );
     const feed = await this.#view.feed();
-    const open = feed.filter((f) => f.verdict === "can_apply").length;
+    const open = feed.filter((f) => f.verdict === "can_apply");
     this.#say(
-      `${open} jobs fit what you allowed, at employers whose identity I could confirm. Want me to apply to them?`,
-      { kind: "jobs" },
+      `${open.length} jobs fit what you allowed, at employers whose identity I could confirm. Want me to apply to them?`,
+      { kind: "jobs", open: open.map((f) => f.job.id) },
     );
   }
 

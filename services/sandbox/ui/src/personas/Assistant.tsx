@@ -44,7 +44,7 @@ import { api, boot } from "../boot.ts";
 type Card =
   | { kind: "proposal" }
   | { kind: "permission" }
-  | { kind: "jobs" }
+  | { kind: "jobs"; open: string[] }
   | { kind: "applications"; ids: string[] };
 
 interface Message {
@@ -129,7 +129,7 @@ interface FeedItem {
 const pill: Record<Application["state"], { color: string; label: string }> = {
   sent: { color: "teal", label: "Sent" },
   needs_you: { color: "orange", label: "Needs you" },
-  not_sent: { color: "gray", label: "Not sent" },
+  not_sent: { color: "gray", label: "Held back" },
 };
 
 function ProposalCard({
@@ -230,9 +230,12 @@ function PermissionCard({ chat }: { chat: Chat }) {
 function JobsCard({
   act,
   paused,
+  offered,
 }: {
   act: (fn: () => Promise<unknown>) => Promise<void>;
   paused: boolean;
+  /** The jobs JobGPT could apply to when it posted this card. */
+  offered: string[];
 }) {
   const [feed, setFeed] = useState<FeedItem[]>();
   useEffect(() => {
@@ -245,7 +248,10 @@ function JobsCard({
       </Badge>
     );
   if (!feed) return <Loader size="sm" />;
-  const open = feed.filter((f) => f.verdict === "can_apply");
+  // The card keeps the jobs it offered; a job applied to since says so.
+  const byId = new Map(feed.map((f) => [f.job.id, f]));
+  const listed = offered.flatMap((id) => byId.get(id) ?? []);
+  const open = listed.filter((f) => f.verdict === "can_apply");
   const outside = feed.filter((f) => f.verdict === "outside");
   const unverified = feed.filter((f) => f.verdict === "unverified");
   const row = (f: FeedItem) => (
@@ -264,7 +270,11 @@ function JobsCard({
           {f.job.employer} · {f.job.place} · {f.job.arrangement} · {f.job.pay}
         </Text>
       </Box>
-      {f.recipient.verified ? (
+      {f.verdict === "applied" ? (
+        <Badge color="gray" variant="light" style={{ flexShrink: 0 }}>
+          {f.reasons[0] ?? "Handled"}
+        </Badge>
+      ) : f.recipient.verified ? (
         <Badge
           color="teal"
           variant="light"
@@ -285,9 +295,9 @@ function JobsCard({
   return (
     <Paper withBorder radius="lg" p="md">
       <Text fw={700} size="sm" mb={4}>
-        {open.length} jobs I can apply to
+        {listed.length} jobs that fit what you allowed
       </Text>
-      {open.map(row)}
+      {listed.map(row)}
       <Accordion variant="contained" mt="sm" radius="md">
         {outside.length > 0 && (
           <Accordion.Item value="outside">
@@ -536,6 +546,41 @@ function Sidebar({ chat }: { chat: Chat }) {
   );
 }
 
+/** Below the md breakpoint the sidebar is hidden; this keeps its status in view. */
+function StatusStrip({ chat }: { chat: Chat }) {
+  const p = chat.permission;
+  return (
+    <Group
+      hiddenFrom="md"
+      px="md"
+      py={8}
+      gap="xs"
+      wrap="nowrap"
+      bg="#f9f9f9"
+      style={{ borderBottom: "1px solid #ececec" }}
+    >
+      <Text size="sm" fw={600}>
+        Job search
+      </Text>
+      <Badge size="xs" color={p ? "teal" : "gray"} variant="light">
+        {p ? "On" : "Off"}
+      </Badge>
+      <Text size="xs" c="dimmed" truncate style={{ flex: 1 }}>
+        {p
+          ? `${p.sent} of ${p.total} used · until ${p.until}`
+          : chat.cancelled
+            ? "You cancelled it in your wallet"
+            : ""}
+      </Text>
+      {p && (
+        <Anchor href={`${boot.origins.wallet}/#permissions`} size="xs" style={{ flexShrink: 0 }}>
+          Manage
+        </Anchor>
+      )}
+    </Group>
+  );
+}
+
 /**
  * Reveals JobGPT's new replies a few words at a time, one message after another,
  * like a model streaming tokens. Replies already seen in this tab appear at once.
@@ -546,9 +591,13 @@ function useReveal(messages: Message[] | undefined) {
   useEffect(() => {
     if (shown !== undefined || !messages) return;
     const last = messages.at(-1)?.id ?? 0;
-    // What this tab has already shown; a reset world restarts at 0. Coming back
-    // from the wallet, whatever arrived meanwhile streams in.
-    const seen = Number(sessionStorage.getItem("jobgpt:shown") ?? 0);
+    // With reduced motion, nothing types in.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setShown(last);
+    // Coming back from the wallet, whatever arrived meanwhile streams in. A new
+    // tab shows the history at once and types only the latest reply; a reset
+    // world (ids start again) starts from the greeting.
+    const stored = sessionStorage.getItem("jobgpt:shown");
+    const seen = stored === null ? (messages.at(-2)?.id ?? 0) : Number(stored);
     setShown(Number.isFinite(seen) && seen <= last ? seen : 0);
   }, [messages, shown]);
   useEffect(() => {
@@ -659,6 +708,7 @@ export function Assistant() {
     <Box style={{ display: "flex", height: "calc(100vh - var(--bar-h, 116px))" }} bg="white">
       <Sidebar chat={chat} />
       <Box style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <StatusStrip chat={chat} />
         <ScrollArea style={{ flex: 1 }}>
           <Stack maw={780} mx="auto" px="md" py="xl" gap="lg">
             {chat.messages.length <= 1 && (
@@ -695,7 +745,7 @@ export function Assistant() {
                           )}
                           {m.card?.kind === "permission" && <PermissionCard chat={chat} />}
                           {m.card?.kind === "jobs" && (
-                            <JobsCard act={act} paused={!chat.permission} />
+                            <JobsCard act={act} paused={!chat.permission} offered={m.card.open} />
                           )}
                           {m.card?.kind === "applications" && (
                             <Paper withBorder radius="lg" px="md" py={4}>
@@ -764,6 +814,7 @@ export function Assistant() {
             <Paper withBorder radius="xl" p={6} pl="md" shadow="xs">
               <Group wrap="nowrap" gap="xs">
                 <Textarea
+                  aria-label="Message JobGPT"
                   variant="unstyled"
                   autosize
                   minRows={1}
@@ -812,6 +863,7 @@ export function Assistant() {
         onClose={() => setPhone(undefined)}
         centered
         withCloseButton={false}
+        aria-label="Jordan's phone: approval request"
         radius={36}
         padding={0}
         size={360}

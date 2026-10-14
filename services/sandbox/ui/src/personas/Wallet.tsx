@@ -88,7 +88,7 @@ const day = (s: number) =>
 
 function Phone({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Center py="xl" bg="#e9ecf3" mih="calc(100vh - var(--bar-h, 116px))">
+    <Center py={{ base: 0, xs: "xl" }} bg="#e9ecf3" mih="calc(100vh - var(--bar-h, 116px))">
       <div className="phone-device">
         <div className="phone-screen">
           <Box bg="#0b0d12" c="white" px="lg" pt="lg" pb="md">
@@ -237,8 +237,8 @@ function Permissions() {
             </Box>
           </Group>
           <Text size="sm">
-            Can apply for {p.jobs.join(", ")} roles, at most {p.perEmployer} per company and{" "}
-            {p.total} in total, until {p.until}.
+            Can apply for: {p.jobs.join(", ")} and related roles. At most {p.perEmployer} per
+            company and {p.total} in total, until {p.until}.
           </Text>
           <Button
             mt="sm"

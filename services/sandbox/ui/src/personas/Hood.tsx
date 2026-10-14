@@ -101,11 +101,23 @@ function Timeline() {
   useEffect(() => {
     let since = 0;
     let live = true;
+    let world: string | undefined;
     const load = async () => {
-      const fresh = await api<Event[]>(`/_sandbox/events?since=${since}`).catch(() => []);
-      if (!live || fresh.length === 0) return;
-      since = Math.max(since, ...fresh.map((e) => e.id));
-      setEvents((prev) => [...fresh.reverse(), ...prev].slice(0, 500));
+      const page = await api<{ world: string; events: Event[] }>(
+        `/_sandbox/events?since=${since}`,
+      ).catch(() => undefined);
+      if (!live || !page) return;
+      // A reset built a new world, whose ids start again: start the timeline over.
+      if (world !== undefined && page.world !== world) {
+        world = page.world;
+        since = 0;
+        setEvents([]);
+        return load();
+      }
+      world = page.world;
+      if (page.events.length === 0) return;
+      since = Math.max(since, ...page.events.map((e) => e.id));
+      setEvents((prev) => [...page.events.reverse(), ...prev].slice(0, 500));
     };
     void load();
     const t = setInterval(load, 2000);
@@ -143,6 +155,19 @@ function Timeline() {
                 borderLeft: `3px solid ${e.outcome === "ok" ? "#2b8a3e" : e.outcome === "refused" ? "#e03131" : "#3a3a46"}`,
                 cursor: e.detail ? "pointer" : undefined,
               }}
+              {...(e.detail
+                ? {
+                    role: "button",
+                    tabIndex: 0,
+                    "aria-expanded": open === e.id,
+                    onKeyDown: (k: React.KeyboardEvent) => {
+                      if (k.key === "Enter" || k.key === " ") {
+                        k.preventDefault();
+                        setOpen(open === e.id ? undefined : e.id);
+                      }
+                    },
+                  }
+                : {})}
               onClick={() => setOpen(open === e.id ? undefined : e.id)}
             >
               <Group gap={6}>
@@ -150,7 +175,7 @@ function Timeline() {
                   {e.actor}
                 </Badge>
                 <Text size="xs" c={OJCP.muted}>
-                  {e.where} · {new Date(e.at * 1000).toISOString().slice(11, 19)}
+                  {e.where} · {new Date(e.at * 1000).toLocaleTimeString()}
                 </Text>
               </Group>
               <Text size="sm" c={OJCP.text}>

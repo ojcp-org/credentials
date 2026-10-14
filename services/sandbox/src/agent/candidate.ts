@@ -65,6 +65,14 @@ const ORDER: Record<FeedItem["verdict"], number> = {
   unverified: 4,
 };
 
+/**
+ * The ATS lists its tenants' jobs on its own site too. Read the tenant's
+ * careers site first and skip the ATS's copy. (The lookalike's copies of
+ * Acme's jobs stay: that a stranger lists them is the point.)
+ */
+const TENANT_FIRST = (host: Host): number => (host === "globex" ? 0 : 1);
+const LISTS_TENANT_JOBS = new Set<Host>(["ats", "globex"]);
+
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 const money = (n: number, currency = "USD") =>
   new Intl.NumberFormat("en", { style: "currency", currency, maximumFractionDigits: 0 }).format(n);
@@ -77,8 +85,7 @@ const day = (s: number) =>
   });
 
 const WHY_NOT: Record<CoverageFailure, string> = {
-  unclassified:
-    "The posting has no occupation code, so your agent can't tell whether it's a job you chose.",
+  unclassified: "The posting has no occupation code, so I can't tell whether it's a job you chose.",
   job_family: "It isn't one of the kinds of job you chose.",
   location: "It isn't in a place you chose.",
   remote_policy: "Its work arrangement isn't one you chose.",
@@ -263,15 +270,25 @@ export class CandidateView {
     };
   }
 
-  /** Every job at every provider, with the agent's answer for each. */
+  /**
+   * Every job at every provider, with the agent's answer for each. A job posted
+   * both on an ATS's own site and on the employer's careers site under it is the
+   * same job, so it's listed once, from the employer's site.
+   */
   async feed(): Promise<FeedItem[]> {
     const m = await this.#mandate();
     const items: FeedItem[] = [];
-    for (const host of PROVIDER_HOSTS) {
+    const seen = new Set<string>();
+    for (const host of [...PROVIDER_HOSTS].sort((a, b) => TENANT_FIRST(a) - TENANT_FIRST(b))) {
       const { derived } = await this.#agent.describe(host);
       const jobs = await this.#agent.search(host);
       const site = this.#agent.world.origins.host(host);
       for (const j of jobs) {
+        const sameJob = `${j.employer?.ojcp_employer_id ?? host}|${String(j.title)}`;
+        if (LISTS_TENANT_JOBS.has(host)) {
+          if (seen.has(sameJob)) continue;
+          seen.add(sameJob);
+        }
         const code = Array.isArray(j.occupationalCategory) ? j.occupationalCategory[0] : undefined;
         const codeValue =
           code && typeof code === "object" && "codeValue" in code
@@ -307,15 +324,13 @@ export class CandidateView {
           items.push({
             ...base,
             verdict: "no_permission",
-            reasons: ["Give your agent permission first."],
+            reasons: ["Give me permission first."],
           });
         else if (!base.recipient.verified)
           items.push({
             ...base,
             verdict: "unverified",
-            reasons: [
-              "Your agent couldn't confirm who runs this site, so it won't send your details there.",
-            ],
+            reasons: ["I couldn't confirm who runs this site, so I won't send your details there."],
           });
         else {
           const coverage = evaluateScope(m.scope, jobFacts(j, m.scope.taxonomy));
@@ -358,7 +373,7 @@ export class CandidateView {
           state: "sent",
           headline: "Sent",
           detail:
-            "Your agent applied for you. The employer sees it was sent by an agent you authorized.",
+            "I applied for you. The employer sees it was sent by an assistant you authorized.",
           ...disclosed,
         };
       case "needs_approval":
@@ -367,7 +382,7 @@ export class CandidateView {
           state: "needs_you",
           headline: "Needs you",
           detail:
-            "This application includes terms only you can agree to. Your agent won't accept them for you.",
+            "This application includes terms only you can agree to. I won't accept them for you.",
           ...disclosed,
           approvalId: outcome.approval.id,
           terms: outcome.approval.bindingActions.map((b) => ({
@@ -380,7 +395,7 @@ export class CandidateView {
           ...base,
           state: "needs_you",
           headline: "Needs you",
-          detail: `${base.employer} asks you to confirm your work history with your wallet, on its own page. Your agent never sees your records, so this step is yours.`,
+          detail: `${base.employer} asks you to confirm your work history with your wallet, on its own page. I never see your records, so this step is yours.`,
           ...disclosed,
           verification: {
             id: outcome.verification.id,
@@ -399,7 +414,7 @@ export class CandidateView {
         return {
           ...base,
           state: "not_sent",
-          headline: "Skipped",
+          headline: "Held back",
           detail: AGENT_REASON[outcome.reason] ?? outcome.text,
           learned: [],
           notLearned: ["Nothing was sent to this employer."],
@@ -410,7 +425,7 @@ export class CandidateView {
           state: "not_sent",
           headline: "Not accepted",
           detail:
-            "The employer's system didn't accept your agent's permission. It never says which check failed; if you recently cancelled your permission, this is why.",
+            "The employer's system didn't accept my permission. It never says which check failed; if you recently cancelled your permission, this is why.",
           learned: [],
           notLearned: ["Your application was not created."],
         };
@@ -440,7 +455,7 @@ export class CandidateView {
       record.state = "sent";
       record.headline = "Sent";
       record.detail =
-        "You agreed to the terms on your own device, for this application only, and your agent sent it.";
+        "You agreed to the terms on your own device, for this application only, and I sent it.";
     } else {
       record.state = "not_sent";
       record.headline = "Not accepted";
@@ -463,8 +478,8 @@ export class CandidateView {
       record.headline = "Sent";
       record.detail =
         step === "deferred"
-          ? "You chose not to use your wallet, and your agent sent the application. The employer checks your work history its own way; that doesn't count against you."
-          : "You confirmed your work history with your wallet, straight to the employer, and your agent sent the application.";
+          ? "You chose not to use your wallet, and I sent the application. The employer checks your work history its own way; that doesn't count against you."
+          : "You confirmed your work history with your wallet, straight to the employer, and I sent the application.";
       record.workHistory = step;
     } else {
       record.state = "not_sent";
@@ -492,19 +507,18 @@ export class CandidateView {
 
 const AGENT_REASON: Record<string, string> = {
   per_employer_reached:
-    "You allowed at most this many applications per company, and your agent has reached it.",
-  total_reached: "Your agent has sent as many applications as you allowed in total.",
-  not_covered: "This job is outside what you gave your agent permission for.",
-  trust: "Your agent couldn't confirm who runs this site, so it won't send your details there.",
+    "You allowed at most this many applications per company, and I've reached it.",
+  total_reached: "I've sent as many applications as you allowed in total.",
+  not_covered: "This job is outside what you gave me permission for.",
+  trust: "I couldn't confirm who runs this site, so I won't send your details there.",
   binding_actions: "This application needs terms only you can agree to.",
-  no_mandate: "Your agent doesn't have current permission to apply for you.",
-  no_credential: "Your agent needs to renew its permission before applying again.",
+  no_mandate: "I don't have current permission to apply for you.",
+  no_credential: "I need to renew my permission before applying again.",
   wallet_claims:
-    "The employer asked your wallet for information employers aren't allowed to ask for, so your agent didn't pass the request on.",
+    "The employer asked your wallet for information employers aren't allowed to ask for, so I didn't pass the request on.",
   wallet_step_origin:
-    "The employer's verification page wasn't on its own site, so your agent didn't pass it on.",
-  wallet_step_malformed:
-    "The employer's verification request didn't make sense, so your agent stopped.",
+    "The employer's verification page wasn't on its own site, so I didn't pass it on.",
+  wallet_step_malformed: "The employer's verification request didn't make sense, so I stopped.",
 };
 
 function isNamed(employer: unknown): employer is { name: string } {
