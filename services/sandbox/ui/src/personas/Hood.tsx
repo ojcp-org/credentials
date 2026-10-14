@@ -18,13 +18,12 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  TextInput,
   ThemeIcon,
   Title,
 } from "@mantine/core";
 import { IconCheck, IconExternalLink } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
-import { api, boot } from "../boot.ts";
+import { api } from "../boot.ts";
 import { useStory } from "../chrome/SandboxBar.tsx";
 import { OJCP } from "../theme.ts";
 
@@ -175,7 +174,6 @@ function Lab({ parties, reload }: { parties: Parties; reload: () => void }) {
   const [busy, setBusy] = useState<string>();
   const [note, setNote] = useState<string>();
   const [provider, setProvider] = useState<string | null>("acme");
-  const [url, setUrl] = useState(boot.origins.acme ?? "");
   const [results, setResults] =
     useState<
       Array<{
@@ -308,29 +306,22 @@ function Lab({ parties, reload }: { parties: Parties; reload: () => void }) {
           Conformance run
         </Text>
         <Text size="sm" c={OJCP.muted} mb="xs">
-          Every case against any provider that admits the sandbox's permission service.
+          Every case against the provider chosen above. Point the open-source runner,
+          @ojcp/conformance, at your own provider.
         </Text>
-        <Group gap="xs">
-          <TextInput
-            size="xs"
-            style={{ flex: 1 }}
-            value={url}
-            onChange={(e) => setUrl(e.currentTarget.value)}
-          />
-          <Button
-            size="xs"
-            color="ojcpGold"
-            c={OJCP.obsidian}
-            loading={busy === "conf"}
-            onClick={async () => {
-              const r = await run("conf", "/_sandbox/lab/conformance", { provider: url });
-              if (r && typeof r === "object" && "results" in r)
-                setResults(r.results as typeof results);
-            }}
-          >
-            Run
-          </Button>
-        </Group>
+        <Button
+          size="xs"
+          color="ojcpGold"
+          c={OJCP.obsidian}
+          loading={busy === "conf"}
+          onClick={async () => {
+            const r = await run("conf", "/_sandbox/lab/conformance", { provider });
+            if (r && typeof r === "object" && "results" in r)
+              setResults(r.results as typeof results);
+          }}
+        >
+          Run all cases
+        </Button>
         {results && (
           <Stack gap={4} mt="sm">
             {results.map((r) => (

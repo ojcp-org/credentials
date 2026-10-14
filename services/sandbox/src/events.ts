@@ -113,6 +113,8 @@ export class Inbox {
       send: async (to, message) => {
         const address = "email" in to ? to.email : to.phone;
         this.messages.push({ from: sender.name, to: address, ...message, at: this.#clock.now() });
+        // Anyone can trigger messages on a public sandbox; keep the latest only.
+        if (this.messages.length > 200) this.messages.shift();
         this.#events.emit({
           actor: sender.actor,
           where: sender.where,

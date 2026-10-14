@@ -25,6 +25,8 @@ export interface ChatMessage {
 export const FIRST_ASK =
   "Find data science jobs in New York, hybrid or remote, paying at least $125k, and apply for me.";
 
+const MAX_MESSAGES = 200;
+
 export class Assistant {
   readonly messages: ChatMessage[] = [];
   readonly #view: CandidateView;
@@ -51,7 +53,14 @@ export class Assistant {
   }
 
   #say(text: string, card?: Card): void {
-    this.messages.push({ id: this.#next++, role: "assistant", text, ...(card ? { card } : {}) });
+    this.#push({ id: this.#next++, role: "assistant", text, ...(card ? { card } : {}) });
+  }
+
+  /** The chat is public on a deployed sandbox, so it keeps only the latest messages. */
+  #push(message: ChatMessage): void {
+    this.messages.push(message);
+    if (this.messages.length > MAX_MESSAGES)
+      this.messages.splice(0, this.messages.length - MAX_MESSAGES);
   }
 
   async #hasPermission(): Promise<boolean> {
@@ -74,7 +83,7 @@ export class Assistant {
     if (this.#busy) throw new Error("One moment, still working on the last request.");
     this.#busy = true;
     try {
-      this.messages.push({ id: this.#next++, role: "user", text });
+      this.#push({ id: this.#next++, role: "user", text });
       await this.#reply(text);
     } finally {
       this.#busy = false;

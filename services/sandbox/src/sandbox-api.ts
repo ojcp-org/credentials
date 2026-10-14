@@ -288,9 +288,10 @@ export function sandboxApi(current: () => Sandbox, reset: () => Promise<void>): 
 
   app.post("/lab/conformance", async (c) => {
     const { world } = current();
-    const { provider } = z
-      .object({ provider: z.url({ protocol: /^https$/ }) })
-      .parse(await c.req.json());
+    // Only the sandbox's own providers: on a public deployment, a URL of the
+    // visitor's choosing would make the server fetch anything it can reach.
+    const { provider: host } = z.object({ provider: ProviderHost }).parse(await c.req.json());
+    const provider = world.origins.origin(host);
     // A fresh candidate each run, so per-employer counts from earlier runs don't interfere.
     const runner = await SandboxAgent.create(
       world,

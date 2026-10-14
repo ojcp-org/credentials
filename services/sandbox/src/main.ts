@@ -93,6 +93,16 @@ const fetchHandler = async (request: Request): Promise<Response> => {
       status: 404,
     });
   if (url.pathname.startsWith("/_ui/")) return uiAsset(url.pathname);
+  // The pages' own calls come from the sandbox's sites. A browser sending a
+  // state change from anywhere else is another site acting on a visitor's
+  // behalf, so refuse it. Protocol endpoints (MCP, /token, direct_post) are
+  // called by servers and carry no Sec-Fetch-Site.
+  if (
+    request.method !== "GET" &&
+    (url.pathname.startsWith("/_sandbox/") || url.pathname.startsWith("/api/")) &&
+    request.headers.get("sec-fetch-site") === "cross-site"
+  )
+    return new Response("Cross-site requests aren't accepted.", { status: 403 });
   if (url.pathname.startsWith("/_sandbox/"))
     return sandbox.fetch(new Request(new URL(url.pathname.slice(9) + url.search, url), request));
   if (request.method === "GET" && PAGES[role]?.test(url.pathname))
