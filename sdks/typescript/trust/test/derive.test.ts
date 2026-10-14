@@ -217,6 +217,28 @@ describe("RFC 0010 derivation", () => {
       { name: "Initech", confirmed: false },
     );
 
+    // Non-default ports: the tenant rule holds on the same port, never across ports.
+    const atsPort = await provider(web, "https://ats.example:8443", { identity: ats.identity });
+    const tenantPort = await provider(web, "https://acme.ats.example:8443", {
+      identity: ats.identity,
+    });
+    const portAttestations = [
+      await kyb.issue("legal_entity", atsPort),
+      await registry.issue("business_registration", atsPort),
+    ];
+    tenantPort.staple(portAttestations);
+    expect(
+      (await deriveTier(tenantPort.origin, { lists, fetch: web.fetch, now: () => NOW })).tier,
+    ).toBe("verified");
+    const otherPort = await provider(web, "https://acme.ats.example:9443", {
+      identity: ats.identity,
+    });
+    otherPort.staple(portAttestations);
+    await unverifiedBecause(
+      deriveTier(otherPort.origin, { lists, fetch: web.fetch, now: () => NOW }),
+      /wrong_subject.*wrong_subject/,
+    );
+
     const unrelated = await provider(web, "https://acme-ats.example", { identity: ats.identity });
     unrelated.staple(hostAttestations);
     await unverifiedBecause(

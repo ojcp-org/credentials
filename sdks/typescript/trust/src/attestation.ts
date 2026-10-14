@@ -156,16 +156,22 @@ export interface SubjectBinding {
   subject: string;
   /** Thumbprint of its current identity key, and of predecessors linked by RFC 0011. */
   keys: readonly string[];
-  /** Host of the receiving origin, for the tenant rule. */
-  host: string;
+}
+
+/** Splits a `did:web` identifier into its host and (percent-encoded) port. */
+function didWebParts(did: string): { host: string; port?: string } {
+  const [host = "", port] = did.slice("did:web:".length).split("%3A");
+  return port === undefined ? { host } : { host, port };
 }
 
 function bindsSubject(sub: string, jkt: string, binding: SubjectBinding): boolean {
   if (!binding.keys.includes(jkt)) return false;
   if (sub === binding.subject) return true;
-  // §3.5: a host's attestation counts for a tenant under its namespace that carries the same identity key.
-  const parentHost = sub.slice("did:web:".length);
-  return !parentHost.includes("%3A") && binding.host.endsWith(`.${parentHost}`);
+  // §3.5: a host's attestation counts for a tenant under its namespace, on the same port,
+  // that carries the same identity key.
+  const parent = didWebParts(sub);
+  const tenant = didWebParts(binding.subject);
+  return parent.port === tenant.port && tenant.host.endsWith(`.${parent.host}`);
 }
 
 export type Rejection =

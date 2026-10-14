@@ -234,7 +234,7 @@ export async function deriveTier(origin: string, options: DerivationOptions): Pr
     return result;
   }
   const acceptance = options.acceptance ?? new InMemoryAcceptanceLog();
-  const binding = { subject, keys, host: url.hostname.toLowerCase() };
+  const binding = { subject, keys };
   const survivors: Attestation[] = [];
   for (const [index, compact] of staple.attestations.entries()) {
     const checked = await checkAttestation(compact, {
