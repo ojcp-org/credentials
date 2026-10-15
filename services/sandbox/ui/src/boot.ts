@@ -11,6 +11,8 @@ export type Role =
   | "attestB"
   | "lists"
   | "hr"
+  | "mdp"
+  | "vandelay"
   | "wallet";
 
 export interface Boot {

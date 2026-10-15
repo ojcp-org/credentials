@@ -30,11 +30,9 @@ function view(r: PendingRequest) {
     id: r.id,
     verifier: r.verifier,
     application: r.application,
-    share: r.share,
-    withheld: r.withheld,
+    options: r.options,
     warnings: r.warnings,
     expiresAt: r.expiresAt,
-    hasRecord: r.recordId !== undefined,
   };
 }
 
@@ -100,10 +98,12 @@ export function walletApp(wallet: SandboxWallet, permissions: WalletPermissions)
   });
 
   app.post("/api/wallet/request/:id", async (c) => {
-    const { decision } = z
-      .object({ decision: z.enum(["share", "decline"]) })
+    const body = z
+      .object({ decision: z.enum(["share", "decline"]), record: z.string().optional() })
       .parse(await c.req.json());
-    return c.json({ redirect_uri: await wallet.respond(c.req.param("id"), decision) });
+    return c.json({
+      redirect_uri: await wallet.respond(c.req.param("id"), body.decision, body.record),
+    });
   });
 
   // ── The permission service's consent screen, as a wallet screen (RFC 0008 §3.3) ──

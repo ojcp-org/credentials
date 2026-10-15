@@ -21,7 +21,7 @@ spec:
       containers:
         - name: ojcp-sandbox
           # Public image from the ojcp-org/credentials CI; no pull secret. Pinned to a commit.
-          image: ghcr.io/ojcp-org/sandbox:72564431d01ef4c0a456e9351dc6cea94baef53c
+          image: ghcr.io/ojcp-org/sandbox:02e3422042b6e5177a2d9cd25b82991b32d48864
           ports:
             - containerPort: 8080
               protocol: TCP

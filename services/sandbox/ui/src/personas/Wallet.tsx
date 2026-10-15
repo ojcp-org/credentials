@@ -69,6 +69,14 @@ interface Preview {
   txCode?: { length: number; description: string };
 }
 
+interface ShareOption {
+  recordId: string;
+  issuer: { origin: string; name: string };
+  basis: string;
+  share: Array<{ label: string; value: string }>;
+  withheld: string[];
+}
+
 interface Consent {
   id: string;
   verifier: { host: string; organization: string };
@@ -79,11 +87,14 @@ interface Consent {
     employer: string;
     job_title: string;
   };
-  share: Array<{ label: string; value: string }>;
-  withheld: string[];
+  options: ShareOption[];
   warnings: string[];
-  hasRecord: boolean;
 }
+
+const BASIS: Record<string, string> = {
+  customer_records: "reporting its customer's records",
+  own_records: "the employer's own records",
+};
 
 const day = (s: number) =>
   new Date(s * 1000).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" });
@@ -168,11 +179,20 @@ function Records() {
         <Paper p="lg" radius="lg" withBorder>
           <Text fw={600}>No records yet</Text>
           <Text size="sm" c="dimmed" mb="md">
-            Your employer's HR site can add a signed record of your job.
+            Your employer's HR platform, its payroll provider or the employer itself can add a
+            signed record of your job.
           </Text>
-          <Button component="a" href={`${boot.origins.hr}/`} variant="light">
-            Open WorkSecond
-          </Button>
+          <Group gap="xs">
+            <Button component="a" href={`${boot.origins.hr}/`} variant="light" size="xs">
+              WorkSecond
+            </Button>
+            <Button component="a" href={`${boot.origins.mdp}/`} variant="light" size="xs">
+              MDP
+            </Button>
+            <Button component="a" href={`${boot.origins.vandelay}/`} variant="light" size="xs">
+              Vandelay
+            </Button>
+          </Group>
         </Paper>
       ) : (
         s.records.map((r) => <RecordCard key={r.id} r={r} />)
@@ -594,12 +614,19 @@ function Authorize() {
   const [c, setC] = useState<Consent>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState<"share" | "decline">();
+  const [chosen, setChosen] = useState<string>();
   // Fetched once per link: the request URI allows only a few fetches.
   useEffect(() => {
     api<Consent>("/api/wallet/request/open", {
       client_id: clientId,
       request_uri: requestUri,
-    }).then(setC, (e: Error) => setError(e.message));
+    }).then(
+      (v) => {
+        setC(v);
+        setChosen(v.options[0]?.recordId);
+      },
+      (e: Error) => setError(e.message),
+    );
   }, [clientId, requestUri]);
 
   async function respond(decision: "share" | "decline") {
@@ -608,6 +635,7 @@ function Authorize() {
     try {
       const { redirect_uri } = await api<{ redirect_uri?: string }>(`/api/wallet/request/${c.id}`, {
         decision,
+        ...(decision === "share" && chosen ? { record: chosen } : {}),
       });
       location.href = redirect_uri ?? "/";
     } catch (e) {
@@ -624,6 +652,7 @@ function Authorize() {
     );
   if (!c) return <Loader m="auto" />;
   const who = c.application?.employer ?? c.verifier.organization;
+  const option = c.options.find((o) => o.recordId === chosen);
   return (
     <>
       <Paper p="md" radius="lg" withBorder>
@@ -667,12 +696,32 @@ function Authorize() {
           {c.warnings.join(", ")}
         </Alert>
       )}
-      {c.hasRecord ? (
+      {c.options.length > 1 && (
+        <Box>
+          <Text fw={600} size="sm" mb={6}>
+            Which record?
+          </Text>
+          <SegmentedControl
+            fullWidth
+            size="xs"
+            value={chosen ?? ""}
+            onChange={setChosen}
+            data={c.options.map((o) => ({ value: o.recordId, label: o.issuer.name }))}
+          />
+          <Text size="xs" c="dimmed" mt={4}>
+            The same job, signed by different places. {who} accepts each; pick whichever you like.
+          </Text>
+        </Box>
+      )}
+      {option ? (
         <Paper p="md" radius="lg" withBorder>
-          <Text fw={600} mb={4}>
+          <Text fw={600} mb={2}>
             {who} will see
           </Text>
-          {c.share.map((s) => (
+          <Text size="xs" c="dimmed" mb={4}>
+            From your record signed by {option.issuer.name} ({BASIS[option.basis] ?? option.basis})
+          </Text>
+          {option.share.map((s) => (
             <Group
               key={s.label}
               justify="space-between"
@@ -686,13 +735,13 @@ function Authorize() {
               </Text>
             </Group>
           ))}
-          {c.withheld.length > 0 && (
+          {option.withheld.length > 0 && (
             <>
               <Divider my="sm" />
               <Group gap={6} align="flex-start" wrap="nowrap">
                 <IconEyeOff size={16} color="gray" style={{ marginTop: 2 }} />
                 <Text size="xs" c="dimmed">
-                  Not shared: {c.withheld.join(", ").toLowerCase()}, and anything else in your
+                  Not shared: {option.withheld.join(", ").toLowerCase()}, and anything else in your
                   wallet.
                 </Text>
               </Group>
@@ -713,7 +762,7 @@ function Authorize() {
       <Stack gap="xs">
         <Button
           size="md"
-          disabled={!c.hasRecord}
+          disabled={!option}
           loading={busy === "share"}
           onClick={() => respond("share")}
         >

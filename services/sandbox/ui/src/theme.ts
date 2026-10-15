@@ -79,10 +79,20 @@ export function themeFor(role: Role): { theme: MantineThemeOverride; scheme: "li
   switch (role) {
     case "home":
       return { theme: ojcp, scheme: "dark" };
-    // WorkSecond's blue.
+    // WorkSecond blue; MDP payroll red; Vandelay green.
     case "hr":
       return {
         theme: createTheme({ ...base, primaryColor: "blue", primaryShade: 7 }),
+        scheme: "light",
+      };
+    case "mdp":
+      return {
+        theme: createTheme({ ...base, primaryColor: "red", primaryShade: 8 }),
+        scheme: "light",
+      };
+    case "vandelay":
+      return {
+        theme: createTheme({ ...base, primaryColor: "teal", primaryShade: 8 }),
         scheme: "light",
       };
     case "wallet":

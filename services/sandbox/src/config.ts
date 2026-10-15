@@ -31,7 +31,10 @@ export const HOSTS = {
   attestA: "attest-a",
   attestB: "attest-b",
   lists: "lists",
+  // Where Jordan's work record can come from (sources.ts).
   hr: "hr",
+  mdp: "mdp",
+  vandelay: "vandelay",
   wallet: "wallet",
 } as const;
 export type Host = keyof typeof HOSTS;

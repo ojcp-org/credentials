@@ -64,7 +64,7 @@ export interface WalletStepOptions {
   employerName: string;
   request: RequestCredential;
   /** Issuers this provider accepts for employment records, with pinned keys (§6.1). */
-  issuers: AcceptedHiringIssuer[];
+  issuers: Array<AcceptedHiringIssuer & { name: string }>;
   /** Every status list the accepted issuers enumerate, refreshed on a schedule (§6.2). */
   statusLists: () => Promise<string[]>;
   messenger: Messenger;
@@ -76,6 +76,8 @@ export interface WalletStepOptions {
 export interface KeptPresentation {
   record: Record<string, unknown>;
   issuer: string;
+  /** The accepted issuer's name, for reviewers: "WorkSecond", "MDP". */
+  issuerName: string;
   basis: string;
   presentationSha256: string;
   /** Bound session, or the contact typed on the wallet's device. */
@@ -638,6 +640,8 @@ export class WalletStepVerifier {
       kept: {
         record: checked.credential.record,
         issuer: checked.issuer.iss,
+        issuerName:
+          this.#o.issuers.find((i) => i.iss === checked.issuer.iss)?.name ?? checked.issuer.iss,
         basis: checked.credential.basis,
         presentationSha256: checked.presentationSha256,
       },

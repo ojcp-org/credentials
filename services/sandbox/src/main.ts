@@ -67,6 +67,8 @@ const PAGES: Partial<Record<Host, RegExp>> = {
   home: /^\/(hood)?$/,
   agent: /^\/$/,
   hr: /^\/(practice)?$/,
+  mdp: /^\/(practice)?$/,
+  vandelay: /^\/(practice)?$/,
   // The permission service's consent screen is a screen in the wallet app.
   wallet: /^\/(offer|authorize|permissions\/[A-Za-z0-9_-]+)?$/,
   acme: /^\/(verify\/[A-Z0-9]{4,6}|ats)?$/,
@@ -134,7 +136,7 @@ serve(
   },
   (info) => {
     console.info(`OJCP sandbox on :${info.port}`);
-    for (const h of [...PROVIDER_HOSTS, "issuer", "hr", "wallet"] as const)
+    for (const h of [...PROVIDER_HOSTS, "issuer", "hr", "mdp", "vandelay", "wallet"] as const)
       console.info(`  ${running.world.origins.origin(h)}`);
     console.info(`  start at ${running.world.origins.origin("home")}/`);
     console.info(`  (${Object.keys(HOSTS).length} origins)`);

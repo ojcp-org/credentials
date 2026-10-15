@@ -14,10 +14,10 @@ Every page carries the same thin sandbox bar, in OJCP's colours: the five tabs, 
 
 | Tab | Persona | Origin | What happens |
 |---|---|---|---|
-| 1 · HR | Jordan, at work | `hr.` | WorkSecond, a Workday-like HR platform Vandelay uses. Signed in as an employee, he adds a record of his job to his wallet, at any time (RFC 0014 §4.1). The platform signs as a `customer_records` issuer. |
-| 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. |
+| 1 · Records | Jordan, at work | `hr.`, `mdp.`, `vandelay.` | Three places keep Jordan's Vandelay record and can sign it (RFC 0014 §3): WorkSecond, the Workday-like HR platform Vandelay uses, and MDP, its ADP-like payroll provider, both `customer_records` issuers; and Vandelay itself, an `own_records` issuer. Each is its own site and issuer, with a **Get this record from** menu to move between them. Signed in as an employee, he adds a record to his wallet, at any time (§4.1). |
+| 2 · Wallet | Jordan's phone | `wallet.` | Redeems the offer over OpenID4VCI and checks the issuer's signature, keeping three copies bound to separate keys. The wallet provider also runs the permission service, so approving JobGPT's permission is a wallet screen (`wallet.…/permissions/{id}`): the wallet verified Jordan's email when he set it up, so he approves with Face ID and no code. **Permissions** lists and cancels it. Later checks Acme's signed request and shows exactly what Acme will see, with values, and what it won't. With more than one record Acme accepts, Jordan picks which to share. |
 | 3 · Assistant | Jordan, chatting | `agent.` | JobGPT, a ChatGPT-style assistant with a **Job search** app built on OJCP. It proposes a permission and sends Jordan to approve it in his wallet. It then shows jobs with trust badges and applies, and stops for what's Jordan's to do: Acme's work-history check, Initech's terms. It checks its own credentials' status, so it stops when Jordan cancels in the wallet. |
-| 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history, and what Acme never received. |
+| 4 · Employer | Acme | `acme.` | Its careers site. Its verification page (RFC 0013): confirm the email first, then share from the wallet, or continue without one. Its recruiters' ATS view: how each application arrived, what the permission disclosed, the verified work history and who signed it (WorkSecond, MDP or Vandelay), and what Acme never received. A step completed another way reads only "To check", never which route the candidate took (§7). |
 | 5 · Under the hood | Anyone evaluating OJCP | `sandbox.…/hood` | The ten steps, who's who with each site's trust tier, every message between the parties, and a lab: a domain takeover, a suspended attester, a distrusted attester, Jordan cancelling, the clock, hostile-agent probes and a conformance run against any of the sandbox's providers. The attesters' and trust list's own pages show what each vouched for and what it's doing. |
 
 On every page, short plain-English lines slide in at the corner as things happen anywhere in the sandbox: JobGPT asking for permission, an employer checking it, the wallet checking who's asking, an attester suspending a site. Only moments an event marks with `say` appear; the speaker button turns them off. A line still being read follows you to the next page, across redirects and origins, with its countdown carried on. Under the hood keeps the full technical record.
@@ -28,16 +28,19 @@ With `ANTHROPIC_API_KEY` set, free text in the assistant goes to a model, which 
 
 - **The wallet trusts only signed requests from verifiers it can check.** Acme signs with the `x509_hash` client ID prefix under a certificate for its host, issued by a sandbox verifier CA the wallet pins (RFC 0013 §4.2). The response goes encrypted (`direct_post.jwt`) to a key made for that request.
 - **A wallet answer can't be attached to someone else's application.** Acme's page confirms the application's email with a code before any wallet request exists. That browser becomes the bound session. A presentation completes the step only when it returns there, or when the candidate types the email on the wallet's device (RFC 0013 §3).
-- **Acme keeps only what it asked for.** `verifyHiringPresentation` checks the pinned issuer key and its signing window, the type, profile and basis, the key binding to the request's nonce and client ID, and status. Then it drops anything not requested, unread.
+- **Acme keeps only what it asked for.** `verifyHiringPresentation` checks the pinned issuer key and its signing window, the type, profile and basis, the key binding to the request's nonce and client ID, and status. Then it drops anything not requested, unread. Acme's policy accepts all three record keepers, each pinned by key for its own basis.
 - **The assistant only links.** Before relaying a wallet step it checks the site's trust tier, that the page is on the site's own origin, and that the claims are within RFC 0013 §5's list. It learns only that the step is done.
-- **The HR platform isn't told where the record is used.** Acme refreshes the platform's status lists on a schedule, not when Jordan presents.
+- **The record keeper isn't told where the record is used.** Acme refreshes every accepted issuer's status lists on a schedule, not when Jordan presents.
+- **No wallet, no penalty.** "Continue without a wallet" is always offered. The step is deferred, the application goes ahead, and the recruiter checks another way. Reviewers see whether a step is complete or still to check, never the route (RFC 0013 §7).
 
 ## Origins
 
 | Host (under `sandbox.ojcp.dev`, or `sandbox.lvh.me:8443` locally) | Role |
 |---|---|
 | `sandbox.` | The welcome (`/`) and Under the hood (`/hood`) |
-| `hr.` | WorkSecond, the HR platform: an RFC 0014 issuer (`services/issuer`) |
+| `hr.` | WorkSecond, the HR platform Vandelay uses: an RFC 0014 `customer_records` issuer (`services/issuer`) |
+| `mdp.` | MDP, Vandelay's payroll provider: another `customer_records` issuer |
+| `vandelay.` | Vandelay Industries' employee portal: an `own_records` issuer |
 | `wallet.` | Jordan's wallet |
 | `agent.` | JobGPT, Jordan's assistant: an agent platform built on `@ojcp/agent-wallet` |
 | `issuer.` | Protocol endpoints of the permission service Jordan's wallet provider runs (`services/issuer`): it issues standing mandates and publishes their status. It has no pages of its own: consent and the permissions list are wallet screens, and its account pages redirect there (`accountUi`) |

@@ -59,17 +59,17 @@ async function story(s: Sandbox): Promise<StoryStep[]> {
       tab: "hr",
       title: "Get your work record",
       detail:
-        "Jordan works at Vandelay Industries. Its HR platform, WorkSecond, can put a signed record of the job in his wallet at any time.",
+        "Jordan works at Vandelay Industries. Its HR platform (WorkSecond), its payroll provider (MDP) or Vandelay itself can each put a signed record of the job in his wallet, at any time.",
       href: `${o.origin("hr")}/`,
-      at: [{ url: `${o.origin("hr")}/` }],
-      done: world.hr.offered || world.wallet.records.length > 0,
+      at: world.sources.map((s) => ({ url: `${s.origin}/` })),
+      done: world.sources.some((s) => s.offered) || world.wallet.records.length > 0,
     },
     {
       tab: "wallet",
       title: "Save it in your wallet",
       detail:
-        "The wallet checks the HR platform's signature and keeps three copies, each bound to its own key.",
-      // The wallet opens from the HR portal's offer link, so that's where to go.
+        "The wallet checks the signer's signature and keeps three copies, each bound to its own key.",
+      // The wallet opens from the portal's offer link, so that's where to go.
       href: `${o.origin("hr")}/`,
       at: [{ url: `${o.origin("wallet")}/offer` }],
       done: world.wallet.records.length > 0,
@@ -158,8 +158,16 @@ type CaseIdT = (typeof Probe.CASES)[number]["id"];
 
 const ROLES: Partial<Record<Host, { name: string; role: string }>> = {
   hr: {
-    name: "WorkSecond (HR for Vandelay Industries)",
-    role: "Issues employment records (RFC 0014)",
+    name: "WorkSecond (HR platform Vandelay uses)",
+    role: "Issues employment records from its customer's records (RFC 0014)",
+  },
+  mdp: {
+    name: "MDP (Vandelay's payroll provider)",
+    role: "Issues employment records from its customer's payroll records (RFC 0014)",
+  },
+  vandelay: {
+    name: "Vandelay Industries",
+    role: "Jordan's employer, issuing employment records from its own records (RFC 0014)",
   },
   wallet: {
     name: "Jordan's wallet",

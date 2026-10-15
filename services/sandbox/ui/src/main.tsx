@@ -18,6 +18,8 @@ import { themeFor } from "./theme.ts";
 function Persona() {
   switch (boot.role) {
     case "hr":
+    case "mdp":
+    case "vandelay":
       return <Hr />;
     case "wallet":
       return <Wallet />;

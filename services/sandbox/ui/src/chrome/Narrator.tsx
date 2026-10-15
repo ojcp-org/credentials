@@ -42,7 +42,8 @@ const WHO: Record<string, { label: string; icon: typeof IconWallet; color: strin
   agent: { label: "JobGPT", icon: IconMessageChatbot, color: "#4dabf7" },
   wallet: { label: "Your wallet", icon: IconWallet, color: "#748ffc" },
   candidate: { label: "You", icon: IconUser, color: "#f783ac" },
-  hr: { label: "WorkSecond (HR)", icon: IconBuildingSkyscraper, color: "#38d9a9" },
+  // WorkSecond, MDP or Vandelay: the host beside the label says which.
+  hr: { label: "Record keeper", icon: IconBuildingSkyscraper, color: "#38d9a9" },
   provider: { label: "Employer", icon: IconBriefcase, color: "#ffa94d" },
   attester: { label: "Attester", icon: IconCertificate, color: "#69db7c" },
   lists: { label: "Trust list", icon: IconCertificate, color: "#69db7c" },

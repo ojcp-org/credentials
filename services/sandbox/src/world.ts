@@ -16,10 +16,10 @@ import type { Hono } from "hono";
 import { SandboxAttester, SandboxListPublisher } from "./attesters.ts";
 import { type Host, NOTICE, Origins, type SandboxConfig } from "./config.ts";
 import { EventBus, Inbox, SandboxClock } from "./events.ts";
-import { HrPlatform } from "./hr.ts";
 import { VerifierCa } from "./pki.ts";
 import { OJCP_VERSION, SandboxProvider } from "./provider/provider.ts";
 import { WalletStepVerifier } from "./provider/wallet-step.ts";
+import { RecordSource, SOURCES } from "./sources.ts";
 import { cancelPermission, type WalletPermissions, walletApp } from "./wallet/app.ts";
 import { SandboxWallet } from "./wallet/wallet.ts";
 
@@ -54,7 +54,8 @@ export class SandboxWorld {
   lists!: SandboxListPublisher;
   readonly providers = new Map<Host, SandboxProvider>();
   candidate!: CandidateDevice;
-  hr!: HrPlatform;
+  /** Where Jordan's work record can come from: HR platform, payroll, the employer itself. */
+  sources: RecordSource[] = [];
   wallet!: SandboxWallet;
   /** Acme's wallet steps (RFC 0013). */
   acmeWalletSteps!: WalletStepVerifier;
@@ -88,8 +89,8 @@ export class SandboxWorld {
 
   /** The hourly epoch: issuers publish queued status changes; providers refresh their copies. */
   async tick(): Promise<number> {
-    const applied =
-      (await this.issuer.status.applyEpoch()) + (await this.hr.issuer.status.applyEpoch());
+    let applied = await this.issuer.status.applyEpoch();
+    for (const s of this.sources) applied += await s.issuer.status.applyEpoch();
     await this.acmeWalletSteps.refreshStatus();
     return applied;
   }
@@ -177,15 +178,18 @@ export class SandboxWorld {
     this.apps.set("attestB", this.attestB.app());
     this.apps.set("lists", this.lists.app());
 
-    // The HR platform the candidate's employer uses (RFC 0014), and the candidate's wallet.
-    this.hr = await HrPlatform.create({
-      origins: o,
-      clock: this.clock,
-      events: this.events,
-      inbox: this.inbox,
-      employee: CANDIDATE,
-    });
-    this.apps.set("hr", this.hr.app());
+    // Where the candidate's work record can come from (RFC 0014), and the candidate's wallet.
+    for (const profile of SOURCES) {
+      const source = await RecordSource.create(profile, {
+        origins: o,
+        clock: this.clock,
+        events: this.events,
+        inbox: this.inbox,
+        employee: CANDIDATE,
+      });
+      this.sources.push(source);
+      this.apps.set(profile.host, source.app());
+    }
     // Wallets trust CAs that vouch for verifiers' request certificates (RFC 0013 §4.2).
     const verifierCa = await VerifierCa.create("OJCP sandbox verifier CA (test only)");
     this.wallet = new SandboxWallet({
@@ -236,17 +240,17 @@ export class SandboxWorld {
       origin: o.origin("acme"),
       employerName: "Acme Corporation",
       request: await verifierCa.issue(o.host("acme"), "Acme Corporation"),
-      // Acme's issuer policy (RFC 0013 §6.1): the HR platform, pinned by key, for its customers' records.
-      issuers: [
-        {
-          iss: this.hr.origin,
-          keys: [this.hr.pinnedKey()],
-          profile: "baseline",
-          types: ["employment"],
-          basis: ["own_records", "customer_records"],
-        },
-      ],
-      statusLists: async () => [...this.hr.issuer.config.statusLists],
+      // Acme's issuer policy (RFC 0013 §6.1): any of the places that keep
+      // Vandelay's records, each pinned by key, for its basis.
+      issuers: this.sources.map((s) => ({
+        iss: s.origin,
+        name: s.profile.name,
+        keys: [s.pinnedKey()],
+        profile: "baseline" as const,
+        types: ["employment" as const],
+        basis: [s.profile.basis],
+      })),
+      statusLists: async () => this.sources.flatMap((s) => [...s.issuer.config.statusLists]),
       messenger: this.inbox.as({
         actor: "provider",
         where: o.host("acme"),

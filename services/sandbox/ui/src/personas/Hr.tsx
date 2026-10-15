@@ -1,7 +1,9 @@
 /**
- * Tab 1: the HR platform Jordan's employer uses (WorkSecond, a wink at Workday). He's a
- * current employee, signed in, and can put a signed record of his job in his
- * wallet whenever he likes (RFC 0014 §4.1).
+ * Tab 1: where Jordan's work record comes from. Three places keep it and can
+ * sign it (RFC 0014 §3): WorkSecond, the HR platform Vandelay uses (a wink at
+ * Workday); MDP, its payroll provider (a wink at ADP); and Vandelay itself.
+ * Each is its own site. He's a current employee, signed in, and can put a
+ * signed record of his job in his wallet whenever he likes (§4.1).
  */
 import {
   Alert,
@@ -15,6 +17,7 @@ import {
   List,
   NavLink,
   Paper,
+  Select,
   Stack,
   Text,
   ThemeIcon,
@@ -30,8 +33,85 @@ import {
   IconWallet,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { api, boot } from "../boot.ts";
-import { WORKSECOND, WorkSecondMark } from "../brands.tsx";
+import { api, boot, type Role } from "../boot.ts";
+import { MDP, MdpMark, VANDELAY, VandelayMark, WORKSECOND, WorkSecondMark } from "../brands.tsx";
+
+/** Each source's site: its colours, mark and wordmark. */
+const LOOK: Record<
+  "hr" | "mdp" | "vandelay",
+  {
+    bar: string;
+    rule: string;
+    tint: string;
+    sub: string;
+    mark: React.ReactNode;
+    word: React.ReactNode;
+  }
+> = {
+  hr: {
+    bar: WORKSECOND.navy,
+    rule: WORKSECOND.orange,
+    tint: WORKSECOND.tint,
+    sub: "#b9c8e6",
+    mark: <WorkSecondMark />,
+    word: (
+      <>
+        work<span style={{ color: WORKSECOND.orange }}>second</span>
+      </>
+    ),
+  },
+  mdp: {
+    bar: MDP.red,
+    rule: MDP.ink,
+    tint: MDP.tint,
+    sub: "#f6c9d0",
+    mark: <MdpMark />,
+    word: <>Payroll &amp; HR</>,
+  },
+  vandelay: {
+    bar: VANDELAY.deep,
+    rule: VANDELAY.green,
+    tint: VANDELAY.tint,
+    sub: "#b7d6cc",
+    mark: <VandelayMark />,
+    word: <>Vandelay Industries · Employee portal</>,
+  },
+};
+
+const SOURCE_ROLES = ["hr", "mdp", "vandelay"] as const;
+type SourceRole = (typeof SOURCE_ROLES)[number];
+const isSource = (r: Role): r is SourceRole => (SOURCE_ROLES as readonly Role[]).includes(r);
+const here: SourceRole = isSource(boot.role) ? boot.role : "hr";
+
+/**
+ * Where else the same record is kept. Each is a separate company's site, so
+ * choosing one goes there, as switching between their apps would.
+ */
+function SourcePicker() {
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Text size="sm" fw={600} mb={4}>
+        Get this record from
+      </Text>
+      <Select
+        allowDeselect={false}
+        value={here}
+        data={[
+          { value: "hr", label: "WorkSecond · Vandelay's HR platform" },
+          { value: "mdp", label: "MDP · Vandelay's payroll provider" },
+          { value: "vandelay", label: "Vandelay Industries · its own records" },
+        ]}
+        onChange={(v) => {
+          if (v && v !== here) location.href = `${boot.origins[v as SourceRole]}/`;
+        }}
+      />
+      <Text size="xs" c="dimmed" mt={6}>
+        The same job, signed by whoever keeps it. Employers choose which signers they accept; you
+        choose which record to share.
+      </Text>
+    </Paper>
+  );
+}
 
 interface Me {
   platform: string;
@@ -62,26 +142,25 @@ function Shell({
   page: string;
   children: React.ReactNode;
 }) {
+  const look = LOOK[here];
   return (
-    <Box bg={WORKSECOND.tint} mih="100vh">
-      <Box
-        bg={WORKSECOND.navy}
-        c="white"
-        style={{ borderBottom: `3px solid ${WORKSECOND.orange}` }}
-      >
+    <Box bg={look.tint} mih="100vh">
+      <Box bg={look.bar} c="white" style={{ borderBottom: `3px solid ${look.rule}` }}>
         <Container size="lg" py="sm">
           <Group justify="space-between">
             <Group gap="sm">
-              <WorkSecondMark />
+              {look.mark}
               <Text fw={800} size="lg" style={{ letterSpacing: -0.3 }}>
-                work<span style={{ color: WORKSECOND.orange }}>second</span>
+                {look.word}
               </Text>
-              <Text c="#b9c8e6" size="sm" visibleFrom="xs">
-                · {me?.employer.name ?? ""}
-              </Text>
+              {here !== "vandelay" && (
+                <Text c={look.sub} size="sm" visibleFrom="xs">
+                  · {me?.employer.name ?? ""}
+                </Text>
+              )}
             </Group>
             <Group gap="xs">
-              <Avatar color="orange" radius="xl" size="sm">
+              <Avatar color="gray" radius="xl" size="sm">
                 JL
               </Avatar>
               <Text size="sm">{me?.employee.name ?? boot.candidate.name}</Text>
@@ -106,6 +185,9 @@ function Shell({
                 leftSection={<IconShieldCheck size={16} />}
               />
             </Paper>
+            <Box mt="md">
+              <SourcePicker />
+            </Box>
           </Grid.Col>
           <Grid.Col span={{ base: 12, sm: 9 }}>{children}</Grid.Col>
         </Grid>
@@ -207,15 +289,19 @@ function Records({ me }: { me: Me }) {
             You share only what an employer asks for. Exact dates and the rest stay in your wallet.
           </List.Item>
           <List.Item>
-            {me.employer.name} isn't told when or where you use it. Employers check its status
-            against a list shared by every customer of ours, fetched on a schedule.
+            {me.basis === "own_records"
+              ? "Your manager and HR aren't told when or where you use it."
+              : `${me.employer.name} isn't told when or where you use it.`}{" "}
+            Employers check its status against a shared list, fetched on a schedule.
           </List.Item>
           <List.Item>It never includes pay, ratings or reasons for leaving.</List.Item>
         </List>
       </Paper>
       <Alert variant="light" color="gray" icon={<IconInfoCircle />}>
-        Signed by {me.platform}, reporting what {me.employer.name} recorded in our system. If you
-        leave, we send a former-employee record to your personal email.
+        {me.basis === "own_records"
+          ? `Signed by ${me.platform} itself, from its own personnel records.`
+          : `Signed by ${me.platform}, reporting what ${me.employer.name} recorded in our system.`}{" "}
+        If you leave, we send a former-employee record to your personal email.
       </Alert>
     </Stack>
   );
@@ -228,13 +314,17 @@ function Practice({ me }: { me: Me }) {
       <Paper withBorder radius="md" p="lg">
         <List spacing="sm" size="sm">
           <List.Item>
-            <b>Basis:</b> <code>{me.basis}</code>. We sign in our own name, reporting what our
-            customer recorded (RFC 0014 §3).
+            <b>Basis:</b> <code>{me.basis}</code>.{" "}
+            {me.basis === "own_records"
+              ? "We sign our own personnel records, as the employer (RFC 0014 §3)."
+              : "We sign in our own name, reporting what our customer recorded (RFC 0014 §3)."}
           </List.Item>
-          <List.Item>
-            <b>Customers:</b> we confirm each customer's business registration before it can issue
-            records through us.
-          </List.Item>
+          {me.basis === "customer_records" && (
+            <List.Item>
+              <b>Customers:</b> we confirm each customer's business registration before it can issue
+              records through us.
+            </List.Item>
+          )}
           <List.Item>
             <b>Status:</b> we update a record's status within 7 days of the change that ends it.
           </List.Item>

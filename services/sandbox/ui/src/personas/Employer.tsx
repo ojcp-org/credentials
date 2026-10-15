@@ -95,6 +95,7 @@ interface Received {
     kept?: {
       record: Record<string, unknown>;
       issuer: string;
+      issuerName: string;
       basis: string;
       presentationSha256: string;
     };
@@ -520,18 +521,18 @@ function WorkHistory({ r, reload }: { r: Received; reload: () => void }) {
     return (
       <Stack gap={6}>
         <Badge color="teal" variant="light" leftSection={<IconShieldCheck size={12} />}>
-          Verified from the candidate's wallet
+          Verified: signed by {w.kept.issuerName}
         </Badge>
         <Text size="sm">
           {record.positionHistories?.map((p) => p.title).join(" → ")} at {record.organization?.name}
           , {record.tenure_years} years, {record.current ? "still there" : "left"}
         </Text>
         <Text size="xs" c="dimmed">
-          Signed by {new URL(w.kept.issuer).host} (
+          {w.kept.issuerName} ({new URL(w.kept.issuer).host}){" "}
           {w.kept.basis === "customer_records"
-            ? "an HR platform reporting its customer's records"
-            : "the employer itself"}
-          ), and tied to this application.
+            ? `keeps ${record.organization?.name ?? "the employer"}'s records and signed this in its own name`
+            : "signed this from its own records, as the employer"}
+          . Acme accepts it by its pinned key, and it's tied to this application.
         </Text>
         {requirement}
       </Stack>
@@ -557,13 +558,13 @@ function WorkHistory({ r, reload }: { r: Received; reload: () => void }) {
         </Badge>
       ) : (
         <Badge color="yellow" variant="light" leftSection={<IconAlertTriangle size={12} />}>
-          To check: the candidate didn't use a wallet
+          To check
         </Badge>
       )}
       <Text size="sm">
         {w.check
-          ? "The candidate chose to continue without a wallet, and a recruiter checked the work history by other means."
-          : "The candidate chose to continue without a wallet, so nothing here is verified yet. Check the work history your usual way, such as a reference call or a verification service."}
+          ? "A recruiter checked the work history by other means."
+          : "Not verified yet. Check the work history your usual way, such as a reference call or a verification service."}
       </Text>
       {requirement}
       <Text size="xs" c="dimmed">

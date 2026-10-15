@@ -1,7 +1,8 @@
 /**
  * The sandbox's made-up companies, each with a look of its own so it's always
- * clear whose site you're on. WorkSecond winks at Workday and BlueHouse at
- * Greenhouse; Acme is the cartoon classic. None is a real company.
+ * clear whose site you're on. WorkSecond winks at Workday, MDP (Manual Data
+ * Processing) at ADP, and BlueHouse at Greenhouse; Acme is the cartoon
+ * classic, Vandelay the Seinfeld one. None is a real company.
  */
 
 export const WORKSECOND = {
@@ -11,6 +12,21 @@ export const WORKSECOND = {
   blue: "#1f5fbf",
   orange: "#f5a623",
   tint: "#f3f6fb",
+};
+
+export const MDP = {
+  name: "MDP",
+  /** ADP's red, more or less. */
+  red: "#c8102e",
+  ink: "#2b2b2b",
+  tint: "#fbf4f5",
+};
+
+export const VANDELAY = {
+  name: "Vandelay Industries",
+  green: "#1f6f5c",
+  deep: "#123f35",
+  tint: "#f2f7f5",
 };
 
 export const ACME = {
@@ -26,6 +42,38 @@ export const BLUEHOUSE = {
   deep: "#0f3a85",
   tint: "#f2f6ff",
 };
+
+/** "mdp" in a red lozenge, with a crank handle for the M. */
+export function MdpMark({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size * 1.6} height={size} viewBox="0 0 48 30" aria-hidden="true">
+      <rect width="48" height="30" rx="15" fill="#fff" />
+      <text
+        x="24"
+        y="20.5"
+        textAnchor="middle"
+        fontFamily="Georgia, 'Times New Roman', serif"
+        fontStyle="italic"
+        fontWeight="700"
+        fontSize="17"
+        fill={MDP.red}
+      >
+        mdp
+      </text>
+    </svg>
+  );
+}
+
+/** A "V" over a crate: importer, exporter. */
+export function VandelayMark({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="6" fill="#fff" />
+      <rect x="5" y="17" width="22" height="10" rx="1.5" fill={VANDELAY.green} />
+      <path d="M8 5l8 11 8-11" fill="none" stroke={VANDELAY.green} strokeWidth="3.2" />
+    </svg>
+  );
+}
 
 /** A "w" under a rising half-second arc. */
 export function WorkSecondMark({ size = 30 }: { size?: number }) {

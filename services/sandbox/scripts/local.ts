@@ -35,6 +35,8 @@ const HOSTS = [
   "attest-b",
   "lists",
   "hr",
+  "mdp",
+  "vandelay",
   "wallet",
 ].map((h) => (h ? `${h}.${DOMAIN}` : DOMAIN));
 

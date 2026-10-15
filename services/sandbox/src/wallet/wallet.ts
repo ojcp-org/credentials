@@ -132,15 +132,23 @@ export interface Share {
   value: string;
 }
 
+/** A record the candidate could share for a request, with what the employer would see. */
+export interface ShareOption {
+  recordId: string;
+  issuer: { origin: string; name: string };
+  basis: string;
+  share: Share[];
+  /** What the record holds that this request leaves out. */
+  withheld: string[];
+}
+
 export interface PendingRequest {
   id: string;
   clientId: string;
   verifier: { host: string; organization: string };
   application: ApplicationInfo | undefined;
-  recordId: string | undefined;
-  share: Share[];
-  /** What the record holds that this request leaves out. */
-  withheld: string[];
+  /** Every record of the requested type; the candidate picks one (OpenID4VP lets the holder choose). */
+  options: ShareOption[];
   /** Claims outside RFC 0013 §5's permitted list (the wallet warns, §5). */
   warnings: string[];
   expiresAt: number;
@@ -356,7 +364,7 @@ export class SandboxWallet {
       "ok",
       `Wallet redeemed the offer (pre-authorized code + code from the text) and stored ${issued.credentials.length} copies, each bound to its own key`,
       { issuer: offer.credential_issuer, vct: HIRING_VCT[type], basis: held.basis },
-      "Your wallet checked the HR system's signature and saved your record. It never goes to JobGPT.",
+      `Your wallet checked ${held.issuer.name}'s signature and saved your record. It never goes to JobGPT.`,
     );
     return held;
   }
@@ -395,26 +403,29 @@ export class SandboxWallet {
       typeof RequestObject
     >["dcql_query"]["credentials"][number];
     const paths = query.claims.map((c) => c.path as ClaimsPathQuery);
-    const record = this.records.find((r) => query.meta.vct_values.includes(HIRING_VCT[r.type]));
     const info = payload.verifier_info?.find((v) => v.format === APPLICATION_INFO_FORMAT);
     const application = info ? ApplicationInfo.safeParse(info.data) : undefined;
     const requested = new Set(paths.map((p) => claimLabel(p)));
-    const holderView = record ? { ...record.record } : {};
+    const options: ShareOption[] = this.records
+      .filter((r) => query.meta.vct_values.includes(HIRING_VCT[r.type]))
+      .map((r) => ({
+        recordId: r.id,
+        issuer: r.issuer,
+        basis: r.basis,
+        share: paths.map((p) => ({
+          label: claimLabel(p),
+          value: describeValues(valuesAt({ ...r.record }, p)),
+        })),
+        withheld: Object.keys(r.record)
+          .map((k) => claimLabel([k]))
+          .filter((l) => !requested.has(l) && !l.startsWith("Job history")),
+      }));
     const pending: PendingRequest = {
       id: base64url(randomBytes(9)),
       clientId,
       verifier: { host: responseHost, organization: signer.organization ?? responseHost },
       application: application?.success ? application.data : undefined,
-      recordId: record?.id,
-      share: paths.map((p) => ({
-        label: claimLabel(p),
-        value: describeValues(valuesAt(holderView, p)),
-      })),
-      withheld: record
-        ? Object.keys(record.record)
-            .map((k) => claimLabel([k]))
-            .filter((l) => !requested.has(l) && !l.startsWith("Job history"))
-        : [],
+      options,
       warnings: paths.filter((p) => !isPermittedEmploymentClaim(p)).map((p) => claimLabel(p)),
       expiresAt: payload.exp,
       queryId: query.id,
@@ -428,7 +439,11 @@ export class SandboxWallet {
     this.#emit(
       "info",
       `Wallet checked a request from ${responseHost}: signed under a trusted verifier certificate for that host (${signer.organization ?? "no organization"})`,
-      { client_id: clientId, asks_for: pending.share.map((s) => s.label) },
+      {
+        client_id: clientId,
+        asks_for: paths.map((p) => claimLabel(p)),
+        records: options.map((o) => o.issuer.name),
+      },
       `Your wallet checked who's asking: ${signer.organization ?? responseHost}, verified for ${responseHost}. It shows you exactly what they'll see.`,
     );
     return pending;
@@ -438,17 +453,31 @@ export class SandboxWallet {
     return this.#requests.get(id);
   }
 
-  /** Shares or declines. Returns where the verifier sends the candidate next. */
-  async respond(id: string, decision: "share" | "decline"): Promise<string | undefined> {
+  /**
+   * Shares one of the request's records, or declines. Returns where the
+   * verifier sends the candidate next.
+   */
+  async respond(
+    id: string,
+    decision: "share" | "decline",
+    recordId?: string,
+  ): Promise<string | undefined> {
     const request = this.#requests.get(id);
     if (!request) throw new WalletError("This request is no longer open.");
+    const option =
+      decision === "share"
+        ? (request.options.find((o) => o.recordId === recordId) ??
+          (recordId === undefined ? request.options[0] : undefined))
+        : undefined;
+    if (decision === "share" && !option)
+      throw new WalletError("You don't have a record this employer accepts.");
     this.#requests.delete(id);
     const now = this.#clock.now();
     let body: URLSearchParams;
-    if (decision === "decline") {
+    if (decision === "decline" || !option) {
       body = new URLSearchParams({ error: "access_denied", state: request.state });
     } else {
-      const record = this.records.find((r) => r.id === request.recordId);
+      const record = this.records.find((r) => r.id === option.recordId);
       if (!record) throw new WalletError("You don't have a record this employer accepts.");
       const credential =
         record.credentials.find((c) => !c.presentedTo.includes(request.verifier.host)) ??
@@ -483,22 +512,24 @@ export class SandboxWallet {
       throw new WalletError(`${who} couldn't accept this. Go back to its page and try again.`);
     }
     this.activity.unshift(
-      decision === "share"
+      option
         ? {
             at: now,
             kind: "shared",
-            text: `Shared with ${who} (${request.verifier.host}): ${request.share.map((s) => s.label.toLowerCase()).join(", ")}`,
+            text: `Shared your record from ${option.issuer.name} with ${who} (${request.verifier.host}): ${option.share.map((s) => s.label.toLowerCase()).join(", ")}`,
           }
         : { at: now, kind: "declined", text: `Declined a request from ${who}` },
     );
     this.#emit(
-      decision === "share" ? "ok" : "info",
-      decision === "share"
-        ? `Wallet sent an encrypted presentation to ${request.verifier.host} with only the requested claims, bound to its nonce and client ID`
+      option ? "ok" : "info",
+      option
+        ? `Wallet sent an encrypted presentation of the ${option.issuer.name} record to ${request.verifier.host} with only the requested claims, bound to its nonce and client ID`
         : `Candidate declined ${request.verifier.host}'s request in the wallet`,
-      decision === "share" ? { disclosed: request.share.map((s) => s.label) } : undefined,
-      decision === "share"
-        ? `Your wallet sent ${who} only what it asked for, encrypted so only ${who} can read it.`
+      option
+        ? { issuer: option.issuer.origin, disclosed: option.share.map((s) => s.label) }
+        : undefined,
+      option
+        ? `Your wallet sent ${who} your record from ${option.issuer.name}, only what it asked for, encrypted so only ${who} can read it.`
         : `You declined ${who}'s request. Nothing was shared.`,
     );
     return answer.success ? answer.data.redirect_uri : undefined;

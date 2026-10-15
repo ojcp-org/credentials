@@ -63,6 +63,7 @@ const withoutPath = (kept: KeptPresentation | undefined): ReviewedPresentation |
   kept && {
     record: kept.record,
     issuer: kept.issuer,
+    issuerName: kept.issuerName,
     basis: kept.basis,
     presentationSha256: kept.presentationSha256,
   };

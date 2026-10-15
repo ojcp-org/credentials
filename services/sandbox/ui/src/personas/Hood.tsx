@@ -136,7 +136,7 @@ function Timeline() {
         onChange={setFilter}
         data={[
           { value: "all", label: "Everyone" },
-          { value: "hr", label: "HR" },
+          { value: "hr", label: "Records" },
           { value: "wallet", label: "Wallet" },
           { value: "agent", label: "Assistant" },
           { value: "issuer", label: "Permission" },
@@ -394,7 +394,8 @@ export function Hood() {
           </Title>
           <Text c={OJCP.muted}>
             Every party in this story runs on its own origin and talks to the others over HTTPS, the
-            way separate companies would. The HR platform signs Jordan's record; his wallet shows it
+            way separate companies would. Whoever keeps Jordan's work record (his employer's HR
+            platform, its payroll provider or the employer itself) signs it; his wallet shows it
             only to the employer that asks; his assistant applies under a permission it can't
             stretch, and never sees the record. Here's how each step works, and what happens when
             something goes wrong.

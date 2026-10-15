@@ -78,8 +78,8 @@ const TABS: Array<{
 }> = [
   {
     tab: "hr",
-    label: "HR",
-    who: "WorkSecond, Vandelay's HR system",
+    label: "Records",
+    who: "Where Jordan's work record comes from: WorkSecond (HR), MDP (payroll) or Vandelay",
     role: "hr",
     icon: IconBuildingSkyscraper,
   },
@@ -116,6 +116,8 @@ const TABS: Array<{
 
 const TAB_OF: Partial<Record<Role, Tab>> = {
   hr: "hr",
+  mdp: "hr",
+  vandelay: "hr",
   wallet: "wallet",
   agent: "assistant",
   acme: "employer",
