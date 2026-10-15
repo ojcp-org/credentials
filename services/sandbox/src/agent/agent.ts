@@ -219,6 +219,25 @@ export class SandboxAgent {
     return this.world.origins.origin("agent");
   }
 
+  /**
+   * While a batch runs (apply to all), one line per job would bury the
+   * reader; the batch narrates a summary instead. The technical record stays.
+   */
+  #quiet = 0;
+  async quietly<T>(run: () => Promise<T>): Promise<T> {
+    this.#quiet++;
+    try {
+      return await run();
+    } finally {
+      this.#quiet--;
+    }
+  }
+
+  /** One narration line on its own, e.g. a batch's summary. */
+  narrate(outcome: "ok" | "refused" | "info", title: string, say: string): void {
+    this.#emit(outcome, title, undefined, say);
+  }
+
   #emit(
     outcome: "ok" | "refused" | "info",
     title: string,
@@ -231,7 +250,7 @@ export class SandboxAgent {
       title,
       outcome,
       ...(detail ? { detail } : {}),
-      ...(say ? { say } : {}),
+      ...(say && this.#quiet === 0 ? { say } : {}),
     });
   }
 

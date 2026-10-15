@@ -520,12 +520,38 @@ export class CandidateView {
 
   /** What an auto-apply agent does: every job it may apply to, until a limit stops it. */
   async autoApply(): Promise<ApplicationRecord[]> {
-    const done: ApplicationRecord[] = [];
-    for (const item of await this.feed()) {
-      if (item.verdict !== "can_apply") continue;
-      done.push(await this.apply(item.provider, item.job.id));
-    }
+    const open = (await this.feed()).filter((item) => item.verdict === "can_apply");
+    const done = await this.#agent.quietly(async () => {
+      const out: ApplicationRecord[] = [];
+      for (const item of open) out.push(await this.apply(item.provider, item.job.id));
+      return out;
+    });
+    this.#narrateBatch(done);
     return done;
+  }
+
+  /** The batch in a sentence or two: what went out, and what's left for the candidate. */
+  #narrateBatch(done: ApplicationRecord[]): void {
+    if (done.length === 0) return;
+    const sent = done.filter((r) => r.state === "sent");
+    const needs = done.filter((r) => r.state === "needs_you");
+    const held = done.length - sent.length - needs.length;
+    const applications = (n: number) => `${n} application${n === 1 ? "" : "s"}`;
+    // Held back for different reasons (a limit, a renewal); the chat says which.
+    const heldBack = held ? ` It held back ${applications(held)}, and the chat says why.` : "";
+    this.#agent.narrate(
+      sent.length ? "ok" : "info",
+      `Apply to all: ${sent.length} sent, ${needs.length} waiting on the candidate, ${held} held back`,
+      sent.length
+        ? `JobGPT sent ${applications(sent.length)} to ${listOf([...new Set(sent.map((r) => r.employer))])}. Each employer checked your permission first.${heldBack}`
+        : `JobGPT hasn't sent anything yet.${heldBack}`,
+    );
+    if (needs.length)
+      this.#agent.narrate(
+        "info",
+        `${needs.length} applications wait on the candidate`,
+        `Your turn: ${listOf(needs.map((r) => (r.verification ? `${r.employer} wants to confirm your work history` : `${r.employer} has terms only you can agree to`)))}.`,
+      );
   }
 
   reset(): void {
@@ -548,3 +574,10 @@ const AGENT_REASON: Record<string, string> = {
     "The employer's verification page wasn't on its own site, so I didn't pass it on.",
   wallet_step_malformed: "The employer's verification request didn't make sense, so I stopped.",
 };
+
+/** "A", "A and B", "A, B and C". */
+function listOf(items: string[]): string {
+  return items.length <= 1
+    ? (items[0] ?? "")
+    : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
+}
